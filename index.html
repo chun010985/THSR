@@ -344,11 +344,11 @@
                         </label>
                     </div>
 
-                    <!-- 行程詳細資料 (包含 PNR 和 HSR Order ID) -->
+                    <!-- 行程詳細資料 -->
                     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                          <div class="lg:col-span-1">
-                            <label class="input-label">高鐵訂單編號</label>
-                            <input type="text" v-model="currentTripInput.hsrOrderId" class="input-minimal font-mono tracking-wider" placeholder="12碼">
+                            <label class="input-label">高鐵訂單編號 (12碼)</label>
+                            <input type="text" v-model="currentTripInput.hsrOrderId" maxlength="12" class="input-minimal font-mono tracking-wider" placeholder="202305120001">
                         </div>
                         <div class="lg:col-span-1">
                             <label class="input-label">訂位代號 (PNR)</label>
@@ -589,7 +589,7 @@
                                 </div>
                                 <div class="header-item">
                                     <div class="header-label">業務員</div>
-                                    <div class="header-value">{{ salesperson }}</div>
+                                    <div class="header-value">{{ salesperson || '-' }}</div>
                                 </div>
                                 <div class="header-item">
                                     <div class="header-label">訂單編號</div>
@@ -680,7 +680,13 @@
                         </div>
                     </div>
 
-                    <div class="fixed bottom-8 left-0 right-0 flex justify-center pointer-events-none">
+                    <div class="fixed bottom-8 left-0 right-0 flex justify-center pointer-events-none gap-4">
+                        <button @click="generateText" class="pointer-events-auto bg-white hover:bg-stone-50 text-stone-700 px-8 py-3 rounded-full shadow-xl flex items-center gap-2 transform transition-all hover:-translate-y-1 border border-stone-200 font-medium">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            下載純文字 (TXT)
+                        </button>
                         <button @click="generateImage" class="pointer-events-auto bg-stone-800 hover:bg-stone-900 text-white px-8 py-3 rounded-full shadow-xl flex items-center gap-2 transform transition-all hover:-translate-y-1">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -726,10 +732,9 @@
                     '嘉義': { '台南': 620, '左營': 820 },
                     '台南': { '左營': 410 }
                 },
-                // orderId (global) removed, now per trip (hsrOrderId)
                 groupNumber: '', 
                 cowayOrderId: '', 
-                salesperson: '', // 新增業務員
+                salesperson: '', 
                 booker: '卓芷伶', 
                 bookingDate: '', 
                 deadlineDate: '', 
@@ -745,7 +750,7 @@
                     depTime: '09:00',
                     arrTime: '10:45',
                     pnr: '', 
-                    hsrOrderId: '', // New field per trip
+                    hsrOrderId: '', 
                     tickets: [
                         { type: '全票', count: 1, price: 0 } 
                     ]
@@ -766,7 +771,6 @@
                 }
             },
             methods: {
-                // Swap stations function
                 swapStations() {
                     const temp = this.currentTripInput.origin;
                     this.currentTripInput.origin = this.currentTripInput.destination;
@@ -840,7 +844,7 @@
                          this.currentTripInput.depTime = '18:00';
                          this.currentTripInput.arrTime = '19:45';
                          this.currentTripInput.pnr = ''; 
-                         this.currentTripInput.hsrOrderId = ''; // Clear for next input
+                         this.currentTripInput.hsrOrderId = ''; 
                     } else {
                         this.currentTripInput.trainNumber = '';
                         this.currentTripInput.pnr = ''; 
@@ -853,13 +857,56 @@
                         if(previewSection) previewSection.scrollTop = previewSection.scrollHeight;
                     });
                 },
-                
                 generateTicket() {
-                    if (this.trips.length === 0) {
-                        alert("請先加入至少一筆行程！");
-                        return;
-                    }
+                    if (this.trips.length === 0) { alert("請先加入至少一筆行程！"); return; }
                     this.showModal = true;
+                },
+                
+                generateText() {
+                    let text = `訂位確認單\n\n`;
+                    text += `訂票人員: ${this.booker}\n`;
+                    text += `訂票日期: ${this.formatDate(this.bookingDate)}\n`;
+                    text += `D/L開票期限: ${this.formatDate(this.deadlineDate)} 18:00前\n`;
+                    text += `業務員: ${this.salesperson || '-'}\n`;
+                    text += `訂單編號: ${this.cowayOrderId || '-'}\n`;
+                    text += `團號: ${this.groupNumber || '-'}\n\n`;
+                    
+                    this.trips.forEach((trip, index) => {
+                        text += `--- ${trip.direction} ---\n`;
+                        text += `高鐵訂單: ${trip.hsrOrderId}\n`;
+                        text += `PNR: ${trip.pnr}\n`;
+                        text += `日期: ${this.formatDate(trip.date)}  班次: ${trip.trainNumber}\n`;
+                        text += `起程: ${trip.origin} (${trip.depTime}) -> 到達: ${trip.destination} (${trip.arrTime})\n`;
+                        text += `車廂: ${trip.carType}\n`;
+                        
+                        let ticketsStr = trip.tickets.filter(t => t.count > 0).map(t => `${t.type} x${t.count}`).join(', ');
+                        text += `票種: ${ticketsStr}\n`;
+                        text += `張數: ${this.getTotalCount(trip.tickets)}  個別金額: $${this.formatPrice(this.getTripSubtotal(trip))}\n\n`;
+                        
+                        text += `旅客資料:\n`;
+                        trip.passengers.forEach((p, i) => {
+                            text += `${i+1}. ${p.name} / ${this.maskID(p.id)} / ${this.formatDate(p.birthDate)} / ${p.passport || '-'}\n`;
+                        });
+                        text += `\n`;
+                    });
+                    
+                    text += `--------------------------------------------------\n`;
+                    text += `總金額 Total: TWD $${this.formatPrice(this.totalPrice)}\n\n`;
+                    
+                    text += `注意事項與退票說明:\n`;
+                    text += `1. 座位皆由電腦自動劃位，恕無法指定座位，亦無法保證同行者可安排相鄰座位。\n`;
+                    text += `2. 若因逾時未能搭乘，請自行洽詢站務人員是否可改搭當日其他車次之自由座，恕無法辦理退票。\n`;
+                    text += `3. 高鐵車票須於搭乘當日使用，逾期視同廢票，恕不受理退票。\n`;
+                    text += `4. 如需辦理退票，請於 4個工作日前 申請，並提供紙本票根或 APP 電子票截圖（天災導致高鐵停駛者不在此限）。\n`;
+                    text += `5. 退票將酌收手續費 每張新台幣 50 元。\n`;
+                    text += `6. 辦理退票時，請務必提供 紙本票根或電子票（APP 截圖），未提供者將視同正常搭乘，相關費用須自行負擔。\n`;
+                    text += `7. 因航班延誤或取消等非高鐵因素致無法搭乘者，車票 恕無法改期或退票，敬請見諒。\n`;
+                    
+                    const blob = new Blob([text], { type: 'text/plain' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `高鐵訂位確認單_${this.cowayOrderId || 'untitled'}.txt`;
+                    link.click();
                 },
 
                 generateImage() {
@@ -867,7 +914,6 @@
                     if (!element) return;
                     const modalContent = document.querySelector('.modal-content');
                     if (modalContent) modalContent.scrollTo(0,0);
-                    
                     html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
                         const link = document.createElement('a');
                         link.download = `高鐵訂位確認單_${this.cowayOrderId || 'untiltled'}.jpg`;
@@ -927,24 +973,16 @@
                 },
                 resetForm() {
                     if(confirm('確定要清空所有資料嗎？')) {
-                        this.groupNumber = ''; this.cowayOrderId = ''; this.salesperson = ''; // 清空業務員
+                        this.groupNumber = ''; this.cowayOrderId = ''; this.salesperson = ''; 
                         this.trips = []; this.showModal = false;
                         this.passengers = []; 
-                        
                         const todayDate = new Date();
                         const todayStr = todayDate.toISOString().split('T')[0];
-                        
                         const dlDate = new Date(todayDate);
                         dlDate.setDate(todayDate.getDate() + 2);
-                        
-                        if (dlDate.getDay() === 6) { 
-                            dlDate.setDate(dlDate.getDate() - 1);
-                        } else if (dlDate.getDay() === 0) { 
-                            dlDate.setDate(dlDate.getDate() - 2);
-                        }
-                        
+                        if (dlDate.getDay() === 6) dlDate.setDate(dlDate.getDate() - 1);
+                        else if (dlDate.getDay() === 0) dlDate.setDate(dlDate.getDate() - 2);
                         this.deadlineDate = dlDate.toISOString().split('T')[0];
-
                         this.currentTripInput = {
                             direction: '去程',
                             date: todayStr,
@@ -965,18 +1003,11 @@
             mounted() {
                 const todayDate = new Date();
                 const todayStr = todayDate.toISOString().split('T')[0];
-                
                 const dlDate = new Date(todayDate);
                 dlDate.setDate(todayDate.getDate() + 2);
-                
-                if (dlDate.getDay() === 6) { 
-                    dlDate.setDate(dlDate.getDate() - 1);
-                } else if (dlDate.getDay() === 0) { 
-                    dlDate.setDate(dlDate.getDate() - 2);
-                }
-                
+                if (dlDate.getDay() === 6) dlDate.setDate(dlDate.getDate() - 1);
+                else if (dlDate.getDay() === 0) dlDate.setDate(dlDate.getDate() - 2);
                 const dlDateStr = dlDate.toISOString().split('T')[0];
-
                 this.currentTripInput.date = todayStr;
                 this.bookingDate = todayStr; 
                 this.deadlineDate = dlDateStr; 
