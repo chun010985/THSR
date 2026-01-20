@@ -107,7 +107,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
+            background-color: rgba(255, 255, 255, 0.9);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -116,20 +116,20 @@
             backdrop-filter: blur(2px);
         }
         .spinner {
-            border: 4px solid #f3f3f3;
+            border: 4px solid #e5e7eb;
             border-top: 4px solid #0d9488;
             border-radius: 50%;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        /* 預覽確認單專用樣式 (美化版) */
+        /* 預覽確認單專用樣式 */
         .info-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -229,7 +229,6 @@
             opacity: 0;
         }
         
-        /* 必填星號 */
         .required-mark {
             color: #ef4444;
             margin-left: 2px;
@@ -243,8 +242,9 @@
         <!-- Loading Overlay -->
         <div v-if="isRecognizing" class="loading-overlay">
             <div class="spinner"></div>
-            <div class="text-stone-600 font-bold">正在辨識圖片中的文字...</div>
-            <div class="text-xs text-stone-400 mt-2">請稍候，辨識速度取決於圖片清晰度</div>
+            <div class="text-stone-700 font-bold text-lg">正在分析圖片中的行程資訊...</div>
+            <div class="text-sm text-stone-500 mt-2">辨識項目：訂單編號 / PNR / 車次 / 票種 / 旅客ID</div>
+            <div class="text-xs text-stone-400 mt-1">請稍候，速度取決於圖片清晰度</div>
         </div>
 
         <!-- 標題 (固定頂部) -->
@@ -252,13 +252,13 @@
             <h1 class="text-2xl font-light tracking-widest text-stone-800">高鐵訂位確認單生成器</h1>
         </header>
 
-        <!-- 主內容區 (雙欄佈局) -->
+        <!-- 主內容區 -->
         <main class="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 lg:p-6 bg-[#f5f5f4]">
             
             <!-- 左側：輸入表單區 -->
             <section class="lg:col-span-7 bg-white rounded-2xl border border-stone-200 overflow-y-auto custom-scrollbar input-section p-6 md:p-8 shadow-sm z-10">
                 
-                <!-- 標題列 + 訂票人員/日期 + D/L -->
+                <!-- 標題列 -->
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b border-stone-100 pb-4 gap-3">
                     <div class="flex items-center gap-4 flex-wrap">
                         <h2 class="text-lg font-medium text-stone-600 flex items-center gap-2">
@@ -268,7 +268,6 @@
                             資料輸入
                         </h2>
                         
-                        <!-- 整合區塊 -->
                         <div class="flex items-center gap-3 bg-stone-50 px-4 py-2 rounded-lg border border-stone-100 shadow-sm">
                             <div class="flex items-center gap-1 border-r border-stone-200 pr-3">
                                 <span class="text-xs text-stone-400">訂票人員</span>
@@ -291,7 +290,6 @@
                     </div>
                     
                     <div class="flex gap-2 ml-auto sm:ml-0">
-                        <!-- 垃圾桶圖示 -->
                         <button @click="resetForm" class="text-stone-400 hover:text-red-500 transition-colors p-1 rounded hover:bg-stone-100" title="清空所有資料">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -323,20 +321,23 @@
                         <h3 class="font-bold text-stone-700 text-sm">新增行程設定</h3>
                     </div>
 
-                    <!-- OCR 圖片上傳/貼上區塊 (新增) -->
+                    <!-- OCR 圖片上傳/貼上區塊 -->
                     <div 
-                        class="mb-6 border-2 border-dashed border-stone-300 rounded-lg p-4 text-center cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition-colors group"
+                        class="mb-6 border-2 border-dashed border-stone-300 rounded-lg p-6 text-center cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition-colors group flex flex-col items-center justify-center min-h-[100px]"
                         @click="$refs.fileInput.click()"
                         @dragover.prevent
                         @drop.prevent="handleDrop"
                     >
                         <input type="file" ref="fileInput" @change="handleFileUpload" accept="image/*" class="hidden">
-                        <div class="flex flex-col items-center justify-center text-stone-400 group-hover:text-teal-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span class="text-sm font-medium">點擊上傳 或 直接在此處貼上(Ctrl+V) 高鐵截圖</span>
-                            <span class="text-xs mt-1 opacity-70">系統將自動辨識 車次、日期、時間 與 PNR</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-2 text-stone-400 group-hover:text-teal-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <div class="text-sm font-medium text-stone-600 group-hover:text-teal-700">
+                            點擊上傳 或 直接貼上(Ctrl+V) 高鐵訂單截圖
+                        </div>
+                        <div class="text-xs text-stone-400 mt-1">
+                            支援辨識：訂單編號 / PNR / 車次 / 時間 / 票種 / 旅客身分證
                         </div>
                     </div>
 
@@ -808,7 +809,6 @@
                 }
             },
             methods: {
-                // OCR 圖片處理
                 handleFileUpload(e) {
                     const file = e.target.files[0];
                     if (!file) return;
@@ -820,7 +820,7 @@
                         if (item.kind === 'file' && item.type.startsWith('image/')) {
                             const blob = item.getAsFile();
                             this.recognizeImage(blob);
-                            e.preventDefault(); // 防止重複貼上
+                            e.preventDefault(); 
                             break;
                         }
                     }
@@ -849,40 +849,93 @@
                     });
                 },
                 parseOCRText(text) {
-                    // 1. 嘗試抓取 PNR (8碼英數)
-                    const pnrMatch = text.match(/\b[A-Z0-9]{8}\b/);
-                    if (pnrMatch) {
-                        this.currentTripInput.pnr = pnrMatch[0];
+                    // 1. PNR (8 chars, alphanumeric)
+                    const pnrMatch = text.match(/[A-Z0-9]{8}/);
+                    if (pnrMatch) this.currentTripInput.pnr = pnrMatch[0];
+
+                    // 2. High Speed Rail Order ID (8-12 digits)
+                    const orderIdMatch = text.match(/訂單編號[:\s]*(\d{8,12})/);
+                    if (orderIdMatch) {
+                        this.orderId = orderIdMatch[1];
+                    } else {
+                        // Fallback: search for 8+ digits if labeled
+                        const numMatch = text.match(/\b\d{8,10}\b/);
+                        if(numMatch) this.orderId = numMatch[0];
                     }
 
-                    // 2. 嘗試抓取 車次 (3-4碼數字，常在 "車次" 附近)
-                    // 這裡簡化抓取 3-4 碼數字，排除可能是時間的部分
-                    const trainMatches = text.match(/\b[0-9]{3,4}\b/g);
-                    if (trainMatches) {
-                        // 過濾掉明顯像年份或時間的
-                        const likelyTrain = trainMatches.find(n => {
+                    // 3. Train Number
+                    const trainMatch = text.match(/車次[:\s]*(\d{3,4})/);
+                    if (trainMatch) {
+                        this.currentTripInput.trainNumber = trainMatch[1];
+                    } else {
+                         // Fallback search for 3-4 digit number that is likely a train number
+                         const likelyTrain = text.match(/\b[0-9]{3,4}\b/g)?.find(n => {
                             const num = parseInt(n);
-                            return num < 2000 && num > 100; 
-                        });
-                        if (likelyTrain) this.currentTripInput.trainNumber = likelyTrain;
+                            return num < 2000 && num > 100;
+                         });
+                         if(likelyTrain) this.currentTripInput.trainNumber = likelyTrain;
                     }
 
-                    // 3. 嘗試抓取 時間 (HH:mm)
+                    // 4. Stations
+                    const stations = ['南港', '台北', '板橋', '桃園', '新竹', '苗栗', '台中', '彰化', '雲林', '嘉義', '台南', '左營'];
+                    const foundStations = stations.filter(s => text.includes(s));
+                    if (foundStations.length >= 2) {
+                        const s1Index = text.indexOf(foundStations[0]);
+                        const s2Index = text.indexOf(foundStations[1]);
+                        if (s1Index < s2Index) {
+                            this.currentTripInput.origin = foundStations[0];
+                            this.currentTripInput.destination = foundStations[1];
+                        } else {
+                            this.currentTripInput.origin = foundStations[1];
+                            this.currentTripInput.destination = foundStations[0];
+                        }
+                    }
+
+                    // 5. Times (HH:mm)
                     const timeMatches = text.match(/([01]?[0-9]|2[0-3]):([0-5][0-9])/g);
                     if (timeMatches && timeMatches.length >= 2) {
-                        // 假設先出現的是出發，後出現的是抵達
                         this.currentTripInput.depTime = timeMatches[0];
                         this.currentTripInput.arrTime = timeMatches[1];
                     }
 
-                    // 4. 嘗試抓取 日期 (YYYY/MM/DD 或 MM/DD)
-                    // Tesseract 對斜線有時會誤判，需寬容處理
-                    const dateMatch = text.match(/(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
-                    if (dateMatch) {
-                        const y = dateMatch[1];
-                        const m = dateMatch[2].padStart(2, '0');
-                        const d = dateMatch[3].padStart(2, '0');
-                        this.currentTripInput.date = `${y}-${m}-${d}`;
+                    // 6. Car Type
+                    if (text.includes("商務")) this.currentTripInput.carType = "商務車廂";
+                    else if (text.includes("標準")) this.currentTripInput.carType = "標準車廂";
+
+                    // 7. Passengers (ID anchor)
+                    const idMatches = text.match(/[A-Z][1-2]\d{8}/g);
+                    if (idMatches && idMatches.length > 0) {
+                        if (this.passengers.length === 0 || (this.passengers.length === 1 && !this.passengers[0].id)) {
+                            this.passengers = [];
+                        }
+                        idMatches.forEach(id => {
+                            if (!this.passengers.find(p => p.id === id)) {
+                                this.passengers.push({
+                                    name: '', 
+                                    id: id,
+                                    passport: '',
+                                    birthDate: ''
+                                });
+                            }
+                        });
+                    }
+
+                    // 8. Ticket Counts
+                    const types = ['全票', '孩童', '敬老', '愛心'];
+                    const newTickets = [];
+                    types.forEach(type => {
+                        // Regex: Type followed by optional chars/spaces then number
+                        const regex = new RegExp(`${type}[:\\s]*(\\d+)`);
+                        const match = text.match(regex);
+                        if (match) {
+                            newTickets.push({ type: type, count: parseInt(match[1]), price: 0 });
+                        }
+                    });
+                    
+                    if (newTickets.length > 0) {
+                        this.currentTripInput.tickets = newTickets;
+                        this.updateInputPrices(); 
+                        this.updatePassengerCount();
                     }
                 },
 
@@ -893,6 +946,7 @@
                         return;
                     }
                     const currentLen = this.passengers.length;
+                    
                     if (count > currentLen) {
                         for (let i = 0; i < count - currentLen; i++) {
                             this.passengers.push({ name: '', id: '', passport: '', birthDate: '' });
