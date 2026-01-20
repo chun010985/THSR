@@ -291,17 +291,6 @@
                     </div>
                     
                     <div class="flex gap-2 ml-auto sm:ml-0">
-                        <!-- 圖片上傳按鈕 -->
-                        <div class="relative">
-                            <input type="file" ref="fileInput" @change="handleFileUpload" accept="image/*" class="hidden">
-                            <button @click="$refs.fileInput.click()" class="text-stone-400 hover:text-teal-600 transition-colors p-1 rounded hover:bg-teal-50" title="上傳截圖自動辨識 (或直接按 Ctrl+V)">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            </button>
-                        </div>
-
                         <!-- 垃圾桶圖示 -->
                         <button @click="resetForm" class="text-stone-400 hover:text-red-500 transition-colors p-1 rounded hover:bg-stone-100" title="清空所有資料">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -332,7 +321,23 @@
                     <div class="flex items-center gap-2 mb-4">
                         <span class="w-1.5 h-5 bg-stone-700 rounded-sm"></span>
                         <h3 class="font-bold text-stone-700 text-sm">新增行程設定</h3>
-                        <span class="text-[10px] text-teal-600 bg-teal-50 px-2 py-0.5 rounded ml-2 hidden md:inline-block">💡 提示：可直接貼上圖片自動辨識</span>
+                    </div>
+
+                    <!-- OCR 圖片上傳/貼上區塊 (新增) -->
+                    <div 
+                        class="mb-6 border-2 border-dashed border-stone-300 rounded-lg p-4 text-center cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition-colors group"
+                        @click="$refs.fileInput.click()"
+                        @dragover.prevent
+                        @drop.prevent="handleDrop"
+                    >
+                        <input type="file" ref="fileInput" @change="handleFileUpload" accept="image/*" class="hidden">
+                        <div class="flex flex-col items-center justify-center text-stone-400 group-hover:text-teal-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span class="text-sm font-medium">點擊上傳 或 直接在此處貼上(Ctrl+V) 高鐵截圖</span>
+                            <span class="text-xs mt-1 opacity-70">系統將自動辨識 車次、日期、時間 與 PNR</span>
+                        </div>
                     </div>
 
                     <!-- 行程方向 -->
@@ -818,6 +823,12 @@
                             e.preventDefault(); // 防止重複貼上
                             break;
                         }
+                    }
+                },
+                handleDrop(e) {
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        this.recognizeImage(file);
                     }
                 },
                 recognizeImage(imageBlob) {
