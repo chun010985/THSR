@@ -242,8 +242,8 @@
         <!-- Loading Overlay -->
         <div v-if="isRecognizing" class="loading-overlay">
             <div class="spinner"></div>
-            <div class="text-stone-700 font-bold text-lg">正在分析圖片中的行程資訊...</div>
-            <div class="text-sm text-stone-500 mt-2">辨識項目：訂單編號 / PNR / 車次 / 票種 / 旅客ID</div>
+            <div class="text-stone-700 font-bold text-lg">正在分析圖片中的資訊...</div>
+            <div class="text-sm text-stone-500 mt-2">辨識項目：訂單編號 / PNR / 車次 / 時間 / 旅客(隱碼)</div>
             <div class="text-xs text-stone-400 mt-1">請稍候，速度取決於圖片清晰度</div>
         </div>
 
@@ -337,7 +337,7 @@
                             點擊上傳 或 直接貼上(Ctrl+V) 高鐵訂單截圖
                         </div>
                         <div class="text-xs text-stone-400 mt-1">
-                            支援辨識：訂單編號 / PNR / 車次 / 時間 / 票種 / 旅客身分證
+                            支援辨識：車次 / PNR / 日期 / 時間 / 旅客 (支援隱碼 R*****0733)
                         </div>
                     </div>
 
@@ -446,7 +446,7 @@
                                 </div>
                                 <div>
                                     <label class="input-label">身分證字號 <span class="required-mark">*</span></label>
-                                    <input type="text" v-model="p.id" class="input-minimal uppercase" placeholder="必填">
+                                    <input type="text" v-model="p.id" class="input-minimal uppercase" placeholder="必填 (可為隱碼)">
                                 </div>
                                 <div>
                                     <label class="input-label">出生年月日 (選填)</label>
@@ -849,50 +849,67 @@
                     });
                 },
                 parseOCRText(text) {
-                    // 1. PNR (8 chars, alphanumeric)
-                    const pnrMatch = text.match(/[A-Z0-9]{8}/);
+                    // 1. PNR (8 chars alphanumeric)
+                    const pnrMatch = text.match(/\b[A-Z0-9]{8}\b/);
                     if (pnrMatch) this.currentTripInput.pnr = pnrMatch[0];
 
-                    // 2. High Speed Rail Order ID (8-12 digits)
-                    const orderIdMatch = text.match(/訂單編號[:\s]*(\d{8,12})/);
+                    // 2. High Speed Rail Order ID
+                    const orderIdMatch = text.match(/(?:訂單編號|編號)[\D]*(\d{8,12})/);
                     if (orderIdMatch) {
                         this.orderId = orderIdMatch[1];
                     } else {
-                        // Fallback: search for 8+ digits if labeled
+                        // Fallback search for 8+ digit number
                         const numMatch = text.match(/\b\d{8,10}\b/);
                         if(numMatch) this.orderId = numMatch[0];
                     }
 
                     // 3. Train Number
-                    const trainMatch = text.match(/車次[:\s]*(\d{3,4})/);
-                    if (trainMatch) {
-                        this.currentTripInput.trainNumber = trainMatch[1];
+                    // Look for 3-4 digit number, prioritizing labeled one or one that looks like a train no.
+                    // Try labeled first
+                    const labeledTrain = text.match(/(?:車\s*次)[\D]*(\d{3,4})/);
+                    if (labeledTrain) {
+                        this.currentTripInput.trainNumber = labeledTrain[1];
                     } else {
-                         // Fallback search for 3-4 digit number that is likely a train number
-                         const likelyTrain = text.match(/\b[0-9]{3,4}\b/g)?.find(n => {
-                            const num = parseInt(n);
-                            return num < 2000 && num > 100;
-                         });
-                         if(likelyTrain) this.currentTripInput.trainNumber = likelyTrain;
+                        // Heuristic search
+                        const nums = text.match(/\b\d{3,4}\b/g);
+                        if (nums) {
+                            const validTrains = nums.filter(n => {
+                                const v = parseInt(n);
+                                return v > 100 && v < 2000 && v !== 2023 && v !== 2024 && v !== 2025; 
+                            });
+                            if (validTrains.length > 0) this.currentTripInput.trainNumber = validTrains[0];
+                        }
                     }
 
                     // 4. Stations
                     const stations = ['南港', '台北', '板橋', '桃園', '新竹', '苗栗', '台中', '彰化', '雲林', '嘉義', '台南', '左營'];
-                    const foundStations = stations.filter(s => text.includes(s));
-                    if (foundStations.length >= 2) {
-                        const s1Index = text.indexOf(foundStations[0]);
-                        const s2Index = text.indexOf(foundStations[1]);
+                    const foundStations = [];
+                    // Remove whitespace to help matching
+                    const cleanText = text.replace(/\s/g, '');
+                    stations.forEach(s => {
+                        if (cleanText.includes(s)) foundStations.push(s);
+                    });
+                    // Remove duplicates
+                    const uniqueStations = [...new Set(foundStations)];
+                    
+                    if (uniqueStations.length >= 2) {
+                        // Heuristic: First found in original text might be origin? 
+                        // Tesseract output order is generally top-left to bottom-right.
+                        // Let's rely on detection order from original text.
+                        const s1Index = text.indexOf(uniqueStations[0]);
+                        const s2Index = text.indexOf(uniqueStations[1]);
+                        
                         if (s1Index < s2Index) {
-                            this.currentTripInput.origin = foundStations[0];
-                            this.currentTripInput.destination = foundStations[1];
+                            this.currentTripInput.origin = uniqueStations[0];
+                            this.currentTripInput.destination = uniqueStations[1];
                         } else {
-                            this.currentTripInput.origin = foundStations[1];
-                            this.currentTripInput.destination = foundStations[0];
+                            this.currentTripInput.origin = uniqueStations[1];
+                            this.currentTripInput.destination = uniqueStations[0];
                         }
                     }
 
                     // 5. Times (HH:mm)
-                    const timeMatches = text.match(/([01]?[0-9]|2[0-3]):([0-5][0-9])/g);
+                    const timeMatches = text.match(/([0-2]?\d):([0-5]\d)/g);
                     if (timeMatches && timeMatches.length >= 2) {
                         this.currentTripInput.depTime = timeMatches[0];
                         this.currentTripInput.arrTime = timeMatches[1];
@@ -902,40 +919,76 @@
                     if (text.includes("商務")) this.currentTripInput.carType = "商務車廂";
                     else if (text.includes("標準")) this.currentTripInput.carType = "標準車廂";
 
-                    // 7. Passengers (ID anchor)
-                    const idMatches = text.match(/[A-Z][1-2]\d{8}/g);
-                    if (idMatches && idMatches.length > 0) {
-                        if (this.passengers.length === 0 || (this.passengers.length === 1 && !this.passengers[0].id)) {
-                            this.passengers = [];
-                        }
-                        idMatches.forEach(id => {
-                            if (!this.passengers.find(p => p.id === id)) {
-                                this.passengers.push({
-                                    name: '', 
+                    // 7. Passengers (Name & ID)
+                    // Strategy: Look for IDs, then try to extract Name from text preceding it.
+                    const lines = text.split(/\r?\n/);
+                    const newPassengers = [];
+                    
+                    lines.forEach(line => {
+                        // Find ID in line: A123456789 OR A*****0733
+                        // Using a slightly more robust regex for OCR (allowing spaces)
+                        const idRegex = /[A-Z]\s?(?:[12]\d{8}|[*]{5}\d{4})/;
+                        // Clean whitespace to make regex matching easier on the ID part itself for the final value
+                        const cleanLineForID = line.replace(/\s/g, '');
+                        const idMatch = cleanLineForID.match(/[A-Z](?:[12]\d{8}|[*]{5}\d{4})/);
+                        
+                        if (idMatch) {
+                            const id = idMatch[0];
+                            let name = '';
+                            
+                            // Try to get text before ID on the same line
+                            let cleanLine = line;
+                            
+                            // Remove the ID sequence loosely from the original line to isolate name
+                            // Match pattern with optional spaces for removal
+                            cleanLine = cleanLine.replace(/[A-Z]\s?(?:[12]\s?\d{8}|(?:\*\s?){5}\d{4})/g, '');
+                            
+                            // Remove keywords
+                            const keywords = ['全票', '孩童', '敬老', '愛心', '票', 'TWD', '$', '早鳥', '商務', '標準', '車廂', '座位'];
+                            keywords.forEach(k => cleanLine = cleanLine.replace(new RegExp(k, 'g'), ''));
+                            // Remove digits and symbols
+                            cleanLine = cleanLine.replace(/[0-9:.,]/g, '');
+                            
+                            // What remains should be the name + noise
+                            const tokens = cleanLine.trim().split(/\s+/);
+                            // Take the longest token or the one that looks like a name (2-4 chars)
+                            const nameCandidate = tokens.find(t => t.length >= 2 && t.length <= 4);
+                            
+                            if (nameCandidate) {
+                                name = nameCandidate;
+                            }
+
+                            if (!newPassengers.find(p => p.id === id)) {
+                                newPassengers.push({
+                                    name: name,
                                     id: id,
                                     passport: '',
                                     birthDate: ''
                                 });
                             }
-                        });
-                    }
-
-                    // 8. Ticket Counts
-                    const types = ['全票', '孩童', '敬老', '愛心'];
-                    const newTickets = [];
-                    types.forEach(type => {
-                        // Regex: Type followed by optional chars/spaces then number
-                        const regex = new RegExp(`${type}[:\\s]*(\\d+)`);
-                        const match = text.match(regex);
-                        if (match) {
-                            newTickets.push({ type: type, count: parseInt(match[1]), price: 0 });
                         }
                     });
+
+                    if (newPassengers.length > 0) {
+                        if (this.passengers.length === 1 && !this.passengers[0].id) {
+                            this.passengers = newPassengers;
+                        } else {
+                            // Merge
+                            newPassengers.forEach(np => {
+                                if (!this.passengers.find(p => p.id === np.id)) {
+                                    this.passengers.push(np);
+                                }
+                            });
+                        }
+                    }
                     
-                    if (newTickets.length > 0) {
-                        this.currentTripInput.tickets = newTickets;
-                        this.updateInputPrices(); 
-                        this.updatePassengerCount();
+                    // 8. Date (YYYY/MM/DD)
+                    const dateMatch = text.match(/(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
+                    if (dateMatch) {
+                        const y = dateMatch[1];
+                        const m = dateMatch[2].padStart(2, '0');
+                        const d = dateMatch[3].padStart(2, '0');
+                        this.currentTripInput.date = `${y}-${m}-${d}`;
                     }
                 },
 
@@ -1081,7 +1134,9 @@
                     return `${(date.getMonth()+1)}/${date.getDate()}`;
                 },
                 maskID(id) {
-                    if (!id || id.length < 4) return id;
+                    if (!id) return '';
+                    if (id.includes('*')) return id; // If already masked, return as is
+                    if (id.length < 4) return id;
                     return id.substring(0, 3) + '*****' + id.substring(id.length - 2);
                 },
                 resetForm() {
