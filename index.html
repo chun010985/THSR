@@ -57,7 +57,6 @@
         .btn-add:hover {
             background-color: #44403c;
         }
-        
         /* 彈窗樣式 */
         .modal-overlay {
             position: fixed;
@@ -82,7 +81,7 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
-        /* 預覽確認單專用樣式 (A5 Optimized - Redesigned) */
+        /* 預覽確認單專用樣式 (A5 Optimized - New Style) */
         .a5-container {
             width: 148mm;  /* A5 width */
             min-height: 210mm; /* A5 height */
@@ -101,7 +100,7 @@
         .doc-header-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             border-bottom: 1px solid #cbd5e1;
         }
         .doc-header-table td {
@@ -110,7 +109,7 @@
         }
         .doc-label {
             color: #94a3b8;
-            font-size: 0.5rem; /* 很小的標籤字 */
+            font-size: 0.5rem; 
             display: block;
             line-height: 1;
             margin-bottom: 1px;
@@ -118,59 +117,65 @@
         .doc-val {
             font-weight: 600;
             color: #475569;
-            font-size: 0.7rem; /* 內容字稍大 */
+            font-size: 0.7rem; 
             border-bottom: 1px solid #f1f5f9;
             display: block;
             width: 100%;
         }
 
-        /* 2. 行程區塊 (Simplified style based on user image) */
-        .trip-section-simple {
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px dashed #cbd5e1;
-        }
-        .trip-section-simple:last-of-type {
-            border-bottom: none;
+        /* 2. 行程區塊 (Picture Style) */
+        .trip-section-style {
+            margin-bottom: 20px;
+            /* 移除外框線，改為純文字排版風格 */
         }
         
-        .trip-header-simple {
-            font-size: 0.75rem;
+        .trip-sep-line {
             font-weight: bold;
             color: #4b5563;
-            margin-bottom: 4px;
-            background-color: #f3f4f6;
-            padding: 2px 6px;
-            border-radius: 4px;
-            display: inline-block;
-        }
-        
-        .trip-detail-row {
+            margin-bottom: 6px;
             font-size: 0.8rem;
-            color: #1e293b;
-            margin-bottom: 4px;
+            border-bottom: 1px dashed #e2e8f0;
+            padding-bottom: 2px;
+            width: 100%;
+            display: block;
+        }
+
+        .trip-id-row {
+            font-size: 0.75rem;
+            color: #475569;
+            margin-bottom: 2px;
+            font-family: monospace; /* 等寬字體讓編號對齊 */
+        }
+
+        .trip-main-info {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 4px;
+            margin-bottom: 8px;
             display: flex;
-            gap: 10px;
+            gap: 12px;
             align-items: baseline;
             flex-wrap: wrap;
         }
-        
-        .trip-info-text {
-            font-weight: 600;
-        }
 
-        .passenger-list-simple {
-            margin-top: 6px;
-            padding-left: 2px;
+        .passenger-block {
+            margin-top: 4px;
+            margin-bottom: 10px;
         }
-        .p-item-simple {
+        .passenger-label {
             font-size: 0.7rem;
+            color: #64748b;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        .p-item-style {
+            font-size: 0.75rem;
             margin-bottom: 2px;
             color: #334155;
-            display: flex;
-            align-items: center;
+            padding-left: 0; 
         }
-        
+
         /* 總金額 */
         .total-row {
             text-align: right;
@@ -205,6 +210,32 @@
         .no-scrollbar {
             -ms-overflow-style: none;
             scrollbar-width: none;
+        }
+        
+        /* 預覽摘要區塊樣式 (右側欄用) */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .info-cell {
+            background: #fff;
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+        }
+        .info-cell-label {
+            font-size: 0.65rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
+        }
+        .info-cell-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #334155;
         }
     </style>
 </head>
@@ -514,9 +545,9 @@
                     <!-- A5 紙張模擬容器 (A5 Optimized: 148x210mm) -->
                     <div ref="captureArea" class="a5-container mx-auto shadow-2xl mb-20">
                         
-                        <!-- 1. 表頭 -->
+                        <!-- 1. 表頭 (Row 1) - 小字版 -->
                         <div class="mb-4">
-                            <h2 class="text-xl font-bold tracking-widest text-stone-800 text-center border-b-2 border-stone-800 pb-2 mb-3">訂位確認單</h2>
+                            <h2 class="text-xl font-bold tracking-widest text-stone-800 text-center border-b-2 border-stone-800 pb-2 mb-3">【訂位確認單】</h2>
                             
                             <table class="doc-header-table">
                                 <tr>
@@ -550,41 +581,31 @@
                             </table>
                         </div>
                         
-                        <!-- 2. 行程區塊 (Simplified style based on user request) -->
-                        <div v-for="(trip, idx) in trips" :key="'preview-'+idx" class="trip-section-simple">
+                        <!-- 2. 行程區塊 (Picture Style - Clean) -->
+                        <div v-for="(trip, idx) in trips" :key="'preview-'+idx" class="trip-section-style">
                             
-                            <div class="trip-meta-line">
-                                <span>--- {{ trip.direction }} ---</span>
-                            </div>
+                            <span class="trip-sep-line">--- {{ trip.direction }} ---</span>
 
                             <!-- 訂單資訊：高鐵訂單 / PNR -->
-                            <div class="trip-detail-row">
-                                <span>高鐵訂單: <span class="trip-info-text">{{ trip.hsrOrderId || '-' }}</span></span>
-                                <span class="ml-4">PNR: <span class="trip-info-text">{{ trip.pnr || '-' }}</span></span>
+                            <div class="trip-id-row">
+                                高鐵訂單: {{ trip.hsrOrderId || '-' }}
+                            </div>
+                            <div class="trip-id-row">
+                                PNR: {{ trip.pnr || '-' }}
                             </div>
                             
                             <!-- 行程資訊：日期 / 起訖 / 班次 / 時間 -->
-                            <div class="trip-detail-row">
-                                <span class="trip-info-text">{{ formatDate(trip.date) }}</span>
-                                <span class="trip-info-text ml-2 text-teal-700">{{ trip.origin }}{{ trip.destination }}</span>
-                                <span class="ml-2">班次{{ trip.trainNumber }}</span>
-                                <span class="ml-2 font-mono font-bold">{{ trip.depTime }}-{{ trip.arrTime }}</span>
-                            </div>
-
-                            <div class="trip-detail-row text-xs text-gray-500">
-                                <span>{{ trip.carType.replace('車廂','') }}</span>
-                                <span>
-                                    <span v-for="t in trip.tickets" v-if="t.count > 0" class="mr-1">
-                                        {{ t.type }}x{{ t.count }}
-                                    </span>
-                                </span>
-                                <span class="font-mono">個別金額 ${{ formatPrice(getTripSubtotal(trip)) }}</span>
+                            <div class="trip-main-info">
+                                <span>{{ formatDate(trip.date) }}</span>
+                                <span>{{ trip.origin }}{{ trip.destination }}</span>
+                                <span>班次{{ trip.trainNumber }}</span>
+                                <span>{{ trip.depTime }}-{{ trip.arrTime }}</span>
                             </div>
 
                             <!-- 旅客清單 (條列式) -->
-                            <div class="passenger-list-simple">
-                                <div class="text-[0.6rem] text-gray-400 mb-1">旅客資料:</div>
-                                <div v-for="(p, pIdx) in trip.passengers" :key="pIdx" class="p-item-simple">
+                            <div class="passenger-block">
+                                <div class="passenger-label">旅客資料:</div>
+                                <div v-for="(p, pIdx) in trip.passengers" :key="pIdx" class="p-item-style">
                                     <span class="mr-1">{{ pIdx+1 }}.</span>
                                     <span class="mr-1 font-bold">{{ getPassengerTicketType(trip.tickets, pIdx) }}</span>
                                     <span>{{ p.name }} / {{ maskID(p.id) }} / {{ p.birthDate ? formatDate(p.birthDate).replace(/\//g,'.') : '-' }} / {{ p.passport || '-' }}</span>
@@ -796,7 +817,6 @@
                         if(previewSection) previewSection.scrollTop = previewSection.scrollHeight;
                     });
                 },
-                
                 generateTicket() {
                     if (this.trips.length === 0) { alert("請先加入至少一筆行程！"); return; }
                     this.showModal = true;
@@ -819,7 +839,7 @@
                     text += `訂票人員: ${this.booker}\n`;
                     text += `訂票日期: ${this.formatDate(this.bookingDate)}\n`;
                     text += `D/L開票期限: ${this.formatDate(this.deadlineDate)} 18:00前\n`;
-                    text += `業務員: ${this.salesperson || '-'}\n\n`;
+                    text += `業務員: ${this.salesperson || '-'}\n`;
                     
                     if(this.cowayOrderId) text += `訂單編號: ${this.cowayOrderId}\n`;
                     if(this.groupNumber) text += `團號: ${this.groupNumber}\n`;
@@ -829,12 +849,13 @@
                         text += `--- ${trip.direction} ---\n`;
                         text += `高鐵訂單: ${trip.hsrOrderId || '-'}\n`;
                         text += `PNR: ${trip.pnr || '-'}\n`;
+                        // 格式：2026/02/11  苗栗左營  班次0809  08:58-10:25
                         text += `${this.formatDate(trip.date)}  ${trip.origin}${trip.destination}  班次${trip.trainNumber}  ${trip.depTime}-${trip.arrTime}\n\n`;
                         
                         text += `旅客資料:\n`;
                         trip.passengers.forEach((p, i) => {
                             let pType = this.getPassengerTicketType(trip.tickets, i);
-                            // Format requested: 1. 全票 呂文彰 / K*****5303 / - / - 
+                            // 格式：1. 全票 呂文彰 / K*****5303 / - / - 
                             text += `${i+1}. ${pType} ${p.name} / ${this.maskID(p.id)} / ${p.birthDate ? this.formatDate(p.birthDate).replace(/\//g,'.') : '-'} / ${p.passport || '-'}\n`;
                         });
                         text += `\n`;
