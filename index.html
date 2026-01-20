@@ -88,7 +88,7 @@
         /* 預覽確認單專用樣式 (A5 Optimized - Table Design) */
         .a5-container {
             width: 148mm;  /* A5 width */
-            min-height: 210mm; /* A5 height */
+            height: 210mm; /* A5 height (Fixed) */
             background: white;
             padding: 10mm; 
             box-sizing: border-box;
@@ -98,6 +98,14 @@
             font-size: 11px; /* Smaller base font for A5 */
             margin: 0 auto;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden; /* Hide overflow, scale instead */
+        }
+
+        /* 縮放容器 */
+        .scale-wrapper {
+            width: 100%;
+            transform-origin: top center;
+            /* transform 會由 Vue 動態控制 */
         }
 
         /* 1. 極簡表頭 */
@@ -113,7 +121,7 @@
         }
         .doc-label {
             color: #64748b;
-            font-size: 0.55rem; 
+            font-size: 0.5rem; 
             display: block;
             line-height: 1;
             margin-bottom: 1px;
@@ -121,7 +129,7 @@
         .doc-val {
             font-weight: 600;
             color: #1e293b;
-            font-size: 0.75rem; 
+            font-size: 0.7rem; 
             border-bottom: 1px solid #e2e8f0;
             display: block;
             width: 100%;
@@ -129,7 +137,7 @@
 
         /* 2. 行程區塊 (Table Design) */
         .trip-section-table {
-            margin-bottom: 15px;
+            margin-bottom: 10px; /* 縮小區塊間距 */
             border: 1px solid #94a3b8; /* 外框 */
             border-radius: 4px;
             overflow: hidden;
@@ -137,7 +145,7 @@
         
         .trip-meta-header {
             background-color: #f1f5f9;
-            padding: 4px 8px;
+            padding: 3px 8px; /* 縮小內距 */
             border-bottom: 1px solid #94a3b8;
             display: flex;
             justify-content: space-between;
@@ -173,12 +181,12 @@
             background-color: #e2e8f0;
             font-weight: 600;
             color: #475569;
-            padding: 3px;
+            padding: 2px 3px; /* 縮小內距 */
             border: 1px solid #cbd5e1;
             font-size: 0.65rem;
         }
         .confirm-table td {
-            padding: 4px;
+            padding: 3px; /* 縮小內距 */
             border: 1px solid #cbd5e1;
             color: #1e293b;
         }
@@ -193,7 +201,7 @@
             background-color: #f8fafc;
             border-top: 1px solid #cbd5e1;
             border-bottom: 1px solid #cbd5e1;
-            padding: 4px 8px;
+            padding: 3px 8px; /* 縮小內距 */
             font-size: 0.75rem;
             display: flex;
             align-items: center;
@@ -220,7 +228,7 @@
         }
         .p-table th {
             text-align: left;
-            padding: 3px 6px;
+            padding: 2px 6px; /* 縮小內距 */
             background-color: #f1f5f9;
             color: #64748b;
             font-weight: 600;
@@ -228,7 +236,7 @@
             font-size: 0.6rem;
         }
         .p-table td {
-            padding: 3px 6px;
+            padding: 2px 6px; /* 縮小內距 */
             border-bottom: 1px dashed #e2e8f0;
             color: #334155;
         }
@@ -239,17 +247,17 @@
         /* 總金額 */
         .total-row {
             text-align: right;
-            padding: 8px 0;
+            padding: 6px 0; /* 縮小內距 */
             font-weight: 800;
             font-size: 1rem;
             color: #0f172a;
             border-top: 2px solid #0f172a;
-            margin-top: 10px;
+            margin-top: 8px;
         }
         
         /* 底部備註 */
         .footer-note {
-            margin-top: 15px;
+            margin-top: 10px;
             font-size: 0.6rem;
             color: #64748b;
             line-height: 1.4;
@@ -297,7 +305,7 @@
             font-weight: 600;
             color: #334155;
         }
-
+        
         /* 列印設定 */
         @media print {
             .input-section, .no-print-btn, .modal-overlay button, .no-print {
@@ -315,6 +323,7 @@
                 margin: 0 !important;
                 padding: 0 !important;
                 transform: none !important;
+                /* Print scaling is handled by browser usually, but we ensure content fits */
             }
         }
     </style>
@@ -569,7 +578,7 @@
                             </button>
                             <div class="flex items-center gap-3 mb-2">
                                 <span class="px-2 py-0.5 rounded text-xs font-bold tracking-wider" :class="trip.direction === '去程' ? 'bg-teal-100 text-teal-800' : 'bg-stone-200 text-stone-600'">{{ trip.direction }}</span>
-                                <span class="text-sm text-stone-500 font-medium">{{ formatDate(trip.date) }}</span>
+                                <span class="text-sm text-stone-500 font-medium">{{ formatDateShort(trip.date) }}</span>
                                 <span class="text-xs font-mono text-stone-400 bg-stone-100 px-2 py-0.5 rounded">{{ trip.trainNumber }}車次</span>
                             </div>
                             <div class="flex items-baseline gap-2 mb-1">
@@ -584,132 +593,134 @@
                     </button>
                 </div>
 
-                <!-- 模式 2: A5 確認單預覽 (Table Style) -->
+                <!-- 模式 2: A5 確認單預覽 (Table Style + Auto Scale) -->
                 <div v-else class="flex-1 flex flex-col items-center">
                     
-                    <!-- A5 紙張 (148x210mm) -->
-                    <div ref="captureArea" class="a5-container shadow-lg mb-8 transform origin-top scale-90 sm:scale-100 transition-transform">
+                    <!-- A5 紙張 (148x210mm) - 固定大小容器 -->
+                    <div ref="captureArea" class="a5-container shadow-lg mb-8 mx-auto flex flex-col justify-start relative">
                         
-                        <!-- 1. 表頭 (Clean) -->
-                        <div class="mb-4">
-                            <h2 class="text-xl font-bold tracking-widest text-stone-800 text-center border-b-2 border-stone-800 pb-2 mb-3">訂位確認單</h2>
-                            
-                            <table class="doc-header-table">
-                                <tr>
-                                    <td><span class="doc-label">訂票人員</span><span class="doc-val">{{ booker }}</span></td>
-                                    <td><span class="doc-label">訂票日期</span><span class="doc-val">{{ formatDate(bookingDate) }}</span></td>
-                                    <td><span class="doc-label">D/L開票期限</span><span class="doc-val text-red-600">{{ formatDate(deadlineDate) }} 18:00前</span></td>
-                                </tr>
-                                <tr>
-                                    <td><span class="doc-label">業務員</span><span class="doc-val">{{ salesperson || '-' }}</span></td>
-                                    <td><span class="doc-label">訂單編號</span><span class="doc-val">{{ cowayOrderId || '-' }}</span></td>
-                                    <td><span class="doc-label">團號</span><span class="doc-val font-mono">{{ groupNumber || '-' }}</span></td>
-                                </tr>
-                            </table>
-                        </div>
-                        
-                        <!-- 2. 行程區塊 (Table Design) -->
-                        <div v-for="(trip, idx) in trips" :key="'preview-'+idx" class="trip-section-table">
-                            
-                            <!-- 標題列 -->
-                            <div class="trip-meta-header">
-                                <span class="direction-label">{{ trip.direction }}</span>
-                                <div class="trip-ids-right">
-                                    <span>訂單: {{ trip.hsrOrderId || '-' }}</span>
-                                    <span>PNR: {{ trip.pnr || '-' }}</span>
-                                </div>
+                        <!-- 縮放包覆層 -->
+                        <div ref="contentWrapper" class="scale-wrapper" :style="{ transform: `scale(${contentScale})` }">
+                            <!-- 1. 表頭 (Clean) -->
+                            <div class="mb-4">
+                                <h2 class="text-xl font-bold tracking-widest text-stone-800 text-center border-b-2 border-stone-800 pb-2 mb-3">訂位確認單</h2>
+                                
+                                <table class="doc-header-table">
+                                    <tr>
+                                        <td><span class="doc-label">訂票人員</span><span class="doc-val">{{ booker }}</span></td>
+                                        <td><span class="doc-label">訂票日期</span><span class="doc-val">{{ formatDate(bookingDate) }}</span></td>
+                                        <td><span class="doc-label">D/L開票期限</span><span class="doc-val text-red-600">{{ formatDate(deadlineDate) }} 18:00前</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="doc-label">業務員</span><span class="doc-val">{{ salesperson || '-' }}</span></td>
+                                        <td><span class="doc-label">訂單編號</span><span class="doc-val">{{ cowayOrderId || '-' }}</span></td>
+                                        <td><span class="doc-label">團號</span><span class="doc-val font-mono">{{ groupNumber || '-' }}</span></td>
+                                    </tr>
+                                </table>
                             </div>
                             
-                            <!-- 第一排：表格化行程 -->
-                            <table class="confirm-table">
-                                <thead>
-                                    <tr>
-                                        <th>日期</th>
-                                        <th>班次</th>
-                                        <th>起程車站</th>
-                                        <th>到達車站</th>
-                                        <th>起程時間</th>
-                                        <th>到達時間</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <!-- 使用 formatDate 確保顯示西元年 -->
-                                        <td>{{ formatDate(trip.date) }}</td>
-                                        <td>{{ trip.trainNumber }}</td>
-                                        <td>{{ trip.origin }}</td>
-                                        <td>{{ trip.destination }}</td>
-                                        <td class="font-mono">{{ trip.depTime }}</td>
-                                        <td class="font-mono">{{ trip.arrTime }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <!-- 第二排：票務資訊 (Bar) -->
-                            <div class="ticket-info-bar">
-                                <div>
-                                    <span class="car-type-badge">{{ trip.carType.replace('車廂','') }}</span>
-                                    <span class="ticket-breakdown">
-                                        <span v-for="t in trip.tickets" v-if="t.count > 0" class="mr-2">
-                                            {{ t.type }} {{ t.count }}張
-                                        </span>
-                                    </span>
+                            <!-- 2. 行程區塊 (Table Design) -->
+                            <div v-for="(trip, idx) in trips" :key="'preview-'+idx" class="trip-section-table">
+                                
+                                <!-- 標題列 -->
+                                <div class="trip-meta-header">
+                                    <span class="direction-label">{{ trip.direction }}</span>
+                                    <div class="trip-ids-right">
+                                        <span>訂單: {{ trip.hsrOrderId || '-' }}</span>
+                                        <span>PNR: {{ trip.pnr || '-' }}</span>
+                                    </div>
                                 </div>
-                                <div class="font-mono font-bold text-stone-800">${{ formatPrice(getTripSubtotal(trip)) }}</div>
-                            </div>
-
-                            <!-- 第三排：旅客資料 (Table) -->
-                            <div class="passenger-table-container">
-                                <table class="p-table">
+                                
+                                <!-- 第一排：表格化行程 -->
+                                <table class="confirm-table">
                                     <thead>
                                         <tr>
-                                            <th>票種</th>
-                                            <th>姓名</th>
-                                            <th>身分證字號</th>
-                                            <th class="text-right">護照號碼</th>
+                                            <th>日期</th>
+                                            <th>班次</th>
+                                            <th>起程車站</th>
+                                            <th>到達車站</th>
+                                            <th>起程時間</th>
+                                            <th>到達時間</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="(p, pIdx) in trip.passengers" :key="pIdx">
-                                            <td>{{ getPassengerTicketType(trip.tickets, pIdx) }}</td>
-                                            <td>{{ p.name }}</td>
-                                            <!-- 使用 maskID 確保顯示，並可選擇性在此處也加大寫轉換 (雖然 input 已處理) -->
-                                            <td class="font-mono">{{ maskID(p.id) }}</td>
-                                            <td class="font-mono text-right">{{ p.passport || '-' }}</td>
+                                        <tr>
+                                            <!-- 使用 formatDate 確保顯示西元年 -->
+                                            <td>{{ formatDate(trip.date) }}</td>
+                                            <td>{{ trip.trainNumber }}</td>
+                                            <td>{{ trip.origin }}</td>
+                                            <td>{{ trip.destination }}</td>
+                                            <td class="font-mono">{{ trip.depTime }}</td>
+                                            <td class="font-mono">{{ trip.arrTime }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
+
+                                <!-- 第二排：票務資訊 (Bar) -->
+                                <div class="ticket-info-bar">
+                                    <div>
+                                        <span class="car-type-badge">{{ trip.carType.replace('車廂','') }}</span>
+                                        <span class="ticket-breakdown">
+                                            <span v-for="t in trip.tickets" v-if="t.count > 0" class="mr-2">
+                                                {{ t.type }} {{ t.count }}張
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div class="font-mono font-bold text-stone-800">${{ formatPrice(getTripSubtotal(trip)) }}</div>
+                                </div>
+
+                                <!-- 第三排：旅客資料 (Table) -->
+                                <div class="passenger-table-container">
+                                    <table class="p-table">
+                                        <thead>
+                                            <tr>
+                                                <th>票種</th>
+                                                <th>姓名</th>
+                                                <th>身分證字號</th>
+                                                <th class="text-right">護照號碼</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(p, pIdx) in trip.passengers" :key="pIdx">
+                                                <td>{{ getPassengerTicketType(trip.tickets, pIdx) }}</td>
+                                                <td>{{ p.name }}</td>
+                                                <td class="font-mono">{{ maskID(p.id) }}</td>
+                                                <td class="font-mono text-right">{{ p.passport || '-' }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Price Summary -->
-                        <div class="total-row">
-                            總金額 Total: TWD ${{ formatPrice(totalPrice) }}
-                        </div>
-
-                        <!-- Footer -->
-                        <div class="footer-note">
-                             <div class="bg-red-50 border border-red-200 rounded p-1.5 text-center mb-2">
-                                <p class="text-red-700 font-bold text-[0.6rem] leading-tight">
-                                    請業務們務必再次核對 票種/張數/金額 是否正確，如有錯誤 請於「出票前」告知，<br>
-                                    出票後告知請自行負責，高鐵訂票服務窗口感謝您的配合。
-                                </p>
+                            <!-- Price Summary -->
+                            <div class="total-row">
+                                總金額 Total: TWD ${{ formatPrice(totalPrice) }}
                             </div>
 
-                            <p class="text-center font-bold mb-1 text-[0.7rem]">【 請務必於D/L前告知可開票 與 取票方式  紙本 / 電子票(搭配APP使用) 】</p>
-                            <p class="text-center text-[0.6rem] mb-2 text-stone-500">掛帳全票會先掛85折的價格，優待票(孩童、敬老、愛心)都是半價，如果售價有調整需要更改再請通知唷 謝謝</p>
-                            
-                            <h5 class="font-bold border-b pb-0.5 mb-1 text-[0.65rem]">注意事項與退票說明:</h5>
-                            <ol class="list-decimal list-inside pl-1 text-[0.6rem] leading-tight text-stone-500">
-                                <li>座位皆由電腦自動劃位，恕無法指定座位，亦無法保證同行者可安排相鄰座位。</li>
-                                <li>若因逾時未能搭乘，請自行洽詢站務人員是否可改搭當日其他車次之自由座，恕無法辦理退票。</li>
-                                <li>高鐵車票須於搭乘當日使用，逾期視同廢票，恕不受理退票。</li>
-                                <li>如需辦理退票，請於 4個工作日前 申請，並提供紙本票根或 APP 電子票截圖（天災導致高鐵停駛者不在此限）。</li>
-                                <li>退票將酌收手續費 每張新台幣 50 元。</li>
-                                <li>辦理退票時，請務必提供 紙本票根或電子票（APP 截圖），未提供者將視同正常搭乘，相關費用須自行負擔。</li>
-                                <li>因航班延誤或取消等非高鐵因素致無法搭乘者，車票 恕無法改期或退票，敬請見諒。</li>
-                            </ol>
-                        </div>
+                            <!-- Footer -->
+                            <div class="footer-note">
+                                 <div class="bg-red-50 border border-red-200 rounded p-1.5 text-center mb-2">
+                                    <p class="text-red-700 font-bold text-[0.6rem] leading-tight">
+                                        請業務們務必再次核對 票種/張數/金額 是否正確，如有錯誤 請於「出票前」告知，<br>
+                                        出票後告知請自行負責，高鐵訂票服務窗口感謝您的配合。
+                                    </p>
+                                </div>
+
+                                <p class="text-center font-bold mb-1 text-[0.7rem]">【 請務必於D/L前告知可開票 與 取票方式  紙本 / 電子票(搭配APP使用) 】</p>
+                                <p class="text-center text-[0.6rem] mb-2 text-stone-500">掛帳全票會先掛85折的價格，優待票(孩童、敬老、愛心)都是半價，如果售價有調整需要更改再請通知唷 謝謝</p>
+                                
+                                <h5 class="font-bold border-b pb-0.5 mb-1 text-[0.65rem]">注意事項與退票說明:</h5>
+                                <ol class="list-decimal list-inside pl-1 text-[0.6rem] leading-tight text-stone-500">
+                                    <li>座位皆由電腦自動劃位，恕無法指定座位，亦無法保證同行者可安排相鄰座位。</li>
+                                    <li>若因逾時未能搭乘，請自行洽詢站務人員是否可改搭當日其他車次之自由座，恕無法辦理退票。</li>
+                                    <li>高鐵車票須於搭乘當日使用，逾期視同廢票，恕不受理退票。</li>
+                                    <li>如需辦理退票，請於 4個工作日前 申請，並提供紙本票根或 APP 電子票截圖（天災導致高鐵停駛者不在此限）。</li>
+                                    <li>退票將酌收手續費 每張新台幣 50 元。</li>
+                                    <li>辦理退票時，請務必提供 紙本票根或電子票（APP 截圖），未提供者將視同正常搭乘，相關費用須自行負擔。</li>
+                                    <li>因航班延誤或取消等非高鐵因素致無法搭乘者，車票 恕無法改期或退票，敬請見諒。</li>
+                                </ol>
+                            </div>
+                        </div> <!-- End Scale Wrapper -->
                     </div>
 
                     <div class="fixed bottom-8 left-0 right-0 flex justify-center pointer-events-none gap-4">
@@ -719,7 +730,7 @@
                             </svg>
                             下載純文字 (TXT)
                         </button>
-                        <button @click="generateImage" class="pointer-events-auto bg-stone-800 hover:bg-stone-900 text-white px-6 py-2 rounded-full shadow-md flex items-center gap-2 transform transition-all hover:-translate-y-1">
+                        <button @click="generateImage" class="pointer-events-auto bg-stone-800 hover:bg-stone-900 text-white px-6 py-2 rounded-full shadow-md flex items-center gap-2 transform transition-transform hover:-translate-y-0.5 text-sm font-medium no-print">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
@@ -737,6 +748,7 @@
             el: '#app',
             data: {
                 viewMode: 'list', // 'list' or 'preview'
+                contentScale: 1, // 自動縮放比例
                 stations: ['南港', '台北', '板橋', '桃園', '新竹', '苗栗', '台中', '彰化', '雲林', '嘉義', '台南', '左營'],
                 standardFares: {
                     '南港': { '台北': 40, '板橋': 70, '桃園': 200, '新竹': 330, '苗栗': 480, '台中': 750, '彰化': 870, '雲林': 930, '嘉義': 1120, '台南': 1390, '左營': 1530 },
@@ -802,7 +814,42 @@
                     return new Date().toLocaleDateString('zh-TW');
                 }
             },
+            watch: {
+                trips: {
+                    handler() { this.adjustScale(); },
+                    deep: true
+                },
+                viewMode(val) {
+                    if(val === 'preview') {
+                        setTimeout(this.adjustScale, 100);
+                    }
+                }
+            },
             methods: {
+                adjustScale() {
+                    this.$nextTick(() => {
+                        const container = this.$refs.captureArea;
+                        const content = this.$refs.contentWrapper;
+                        if (container && content) {
+                            // Reset to 1 to measure natural height
+                            this.contentScale = 1;
+                            this.$nextTick(() => {
+                                const containerHeight = container.clientHeight; // Fixed A5 height in px
+                                const contentHeight = content.scrollHeight; 
+                                const paddingH = 76; // Approx padding top+bottom in px (20mm)
+                                const availableH = containerHeight - paddingH;
+                                
+                                if (contentHeight > availableH) {
+                                    // Scale down to fit, max scale 1, min scale 0.6 to prevent too small text
+                                    const scale = Math.max(0.6, availableH / contentHeight);
+                                    this.contentScale = scale;
+                                } else {
+                                    this.contentScale = 1;
+                                }
+                            });
+                        }
+                    });
+                },
                 swapStations() {
                     const temp = this.currentTripInput.origin;
                     this.currentTripInput.origin = this.currentTripInput.destination;
