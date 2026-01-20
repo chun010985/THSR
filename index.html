@@ -19,6 +19,9 @@
     <!-- html2canvas (用於生成圖片) -->
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
+    <!-- Tesseract.js (用於圖片文字辨識) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
@@ -97,11 +100,36 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
-        /* 預覽確認單專用樣式 (美化版) */
-        .ticket-header-bg {
-            background-color: #f8fafc; /* Slate 50 */
-            border-bottom: 2px solid #0d9488; /* Teal 600 */
+        /* 讀取中遮罩 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 60;
+            backdrop-filter: blur(2px);
         }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0d9488;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 預覽確認單專用樣式 (美化版) */
         .info-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -144,12 +172,6 @@
         }
         .trip-body {
             padding: 1rem;
-        }
-        .route-display {
-            display: flex;
-            align-items: baseline;
-            gap: 1rem;
-            margin-bottom: 0.75rem;
         }
         .station-name {
             font-size: 1.25rem;
@@ -214,10 +236,17 @@
         }
     </style>
 </head>
-<body class="text-stone-700 h-screen overflow-hidden">
+<body class="text-stone-700 h-screen overflow-hidden" @paste="handlePaste">
 
     <div id="app" class="h-full flex flex-col">
         
+        <!-- Loading Overlay -->
+        <div v-if="isRecognizing" class="loading-overlay">
+            <div class="spinner"></div>
+            <div class="text-stone-600 font-bold">正在辨識圖片中的文字...</div>
+            <div class="text-xs text-stone-400 mt-2">請稍候，辨識速度取決於圖片清晰度</div>
+        </div>
+
         <!-- 標題 (固定頂部) -->
         <header class="py-4 text-center no-print bg-[#f5f5f4] shrink-0 border-b border-stone-200 shadow-sm z-20">
             <h1 class="text-2xl font-light tracking-widest text-stone-800">高鐵訂位確認單生成器</h1>
@@ -261,12 +290,25 @@
                         </div>
                     </div>
                     
-                    <!-- 垃圾桶圖示 (清空重填) -->
-                    <button @click="resetForm" class="text-stone-400 hover:text-red-500 transition-colors ml-auto sm:ml-0 p-1 rounded hover:bg-stone-100" title="清空所有資料">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
+                    <div class="flex gap-2 ml-auto sm:ml-0">
+                        <!-- 圖片上傳按鈕 -->
+                        <div class="relative">
+                            <input type="file" ref="fileInput" @change="handleFileUpload" accept="image/*" class="hidden">
+                            <button @click="$refs.fileInput.click()" class="text-stone-400 hover:text-teal-600 transition-colors p-1 rounded hover:bg-teal-50" title="上傳截圖自動辨識 (或直接按 Ctrl+V)">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- 垃圾桶圖示 -->
+                        <button @click="resetForm" class="text-stone-400 hover:text-red-500 transition-colors p-1 rounded hover:bg-stone-100" title="清空所有資料">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- 1. 全域設定 -->
@@ -290,6 +332,7 @@
                     <div class="flex items-center gap-2 mb-4">
                         <span class="w-1.5 h-5 bg-stone-700 rounded-sm"></span>
                         <h3 class="font-bold text-stone-700 text-sm">新增行程設定</h3>
+                        <span class="text-[10px] text-teal-600 bg-teal-50 px-2 py-0.5 rounded ml-2 hidden md:inline-block">💡 提示：可直接貼上圖片自動辨識</span>
                     </div>
 
                     <!-- 行程方向 -->
@@ -348,7 +391,7 @@
                         </div>
                     </div>
 
-                    <!-- 票種輸入 (控制旅客數量) -->
+                    <!-- 票種輸入 -->
                     <div class="bg-white p-3 rounded-lg border border-stone-200 mb-6">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-xs font-bold text-stone-500">票種與張數 (上限 10 位)</label>
@@ -375,7 +418,7 @@
                         </div>
                     </div>
 
-                    <!-- 動態旅客資料輸入 (根據票數顯示) -->
+                    <!-- 動態旅客資料輸入 -->
                     <div class="mb-6">
                         <div class="flex items-center justify-between mb-3 px-1">
                             <div class="flex items-center gap-2">
@@ -509,10 +552,9 @@
                         </svg>
                     </button>
 
-                    <!-- A4 紙張模擬容器 (美化版) -->
+                    <!-- A4 紙張模擬容器 -->
                     <div ref="captureArea" class="bg-white shadow-2xl w-full max-w-[210mm] min-h-[297mm] relative box-border mx-auto mb-20 overflow-hidden">
                         
-                        <!-- 頂部裝飾條 -->
                         <div class="h-3 w-full bg-teal-600"></div>
 
                         <div class="p-[12mm] md:p-[15mm]">
@@ -529,7 +571,7 @@
                                 </div>
                             </div>
                             
-                            <!-- 2. 訂單資訊摘要 (Grid Style) -->
+                            <!-- 2. 訂單資訊摘要 -->
                             <div class="info-grid mb-8">
                                 <div class="info-cell">
                                     <div class="info-cell-label">訂票人員</div>
@@ -557,10 +599,9 @@
                                 </div>
                             </div>
 
-                            <!-- 3. 行程區塊 (美化版) -->
+                            <!-- 3. 行程區塊 -->
                             <div v-for="(trip, idx) in trips" :key="'preview-'+idx" class="trip-card">
                                 
-                                <!-- 行程標頭 -->
                                 <div class="trip-header">
                                     <div class="flex items-center gap-3">
                                         <span class="px-3 py-1 rounded text-xs font-bold text-white tracking-wider" 
@@ -580,7 +621,6 @@
                                 </div>
 
                                 <div class="trip-body">
-                                    <!-- 起訖站與時間 -->
                                     <div class="flex justify-between items-center mb-6 px-2">
                                         <div class="text-center">
                                             <div class="station-name">{{ trip.origin }}</div>
@@ -598,7 +638,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- 票種統計 -->
                                     <div class="mb-4 bg-stone-50 rounded p-2 text-sm flex gap-4 justify-center border border-stone-100">
                                         <div v-if="getTicketCount(trip.tickets, '全票') !== '-'" class="flex gap-1">
                                             <span class="text-stone-500">全票:</span>
@@ -618,7 +657,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- 旅客清單表格 -->
                                     <table class="passenger-table">
                                         <thead>
                                             <tr>
@@ -648,7 +686,6 @@
 
                             <!-- 5. 頁尾備註 -->
                             <div class="border-t-2 border-stone-100 pt-6 space-y-6">
-                                
                                 <div class="bg-red-50 border-l-4 border-red-400 rounded-r p-4">
                                     <p class="text-red-700 font-bold text-sm leading-relaxed text-center">
                                         請業務們務必再次核對 票種/張數/金額 是否正確，如有錯誤 請於「出票前」告知，<br>
@@ -700,6 +737,7 @@
             el: '#app',
             data: {
                 showModal: false,
+                isRecognizing: false,
                 stations: ['南港', '台北', '板橋', '桃園', '新竹', '苗栗', '台中', '彰化', '雲林', '嘉義', '台南', '左營'],
                 standardFares: {
                     '南港': { '台北': 40, '板橋': 70, '桃園': 200, '新竹': 330, '苗栗': 480, '台中': 750, '彰化': 870, '雲林': 930, '嘉義': 1120, '台南': 1390, '左營': 1530 },
@@ -765,19 +803,85 @@
                 }
             },
             methods: {
-                updatePassengerCount() {
-                    let count = this.currentTripInput.tickets.reduce((sum, t) => sum + (t.count || 0), 0);
-                    
-                    // 限制每筆行程最多 10 位旅客
-                    if (count > 10) {
-                        alert("每筆行程最多只能有 10 位旅客！");
-                        // 簡單將 count 強制設為 10，但實際操作上可能需要調整 inputs
-                        // 這裡僅做提示，使用者需自行調整
-                        return;
+                // OCR 圖片處理
+                handleFileUpload(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    this.recognizeImage(file);
+                },
+                handlePaste(e) {
+                    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                    for (let item of items) {
+                        if (item.kind === 'file' && item.type.startsWith('image/')) {
+                            const blob = item.getAsFile();
+                            this.recognizeImage(blob);
+                            e.preventDefault(); // 防止重複貼上
+                            break;
+                        }
+                    }
+                },
+                recognizeImage(imageBlob) {
+                    this.isRecognizing = true;
+                    Tesseract.recognize(
+                        imageBlob,
+                        'eng+chi_tra', 
+                        { logger: m => console.log(m) }
+                    ).then(({ data: { text } }) => {
+                        console.log('Recognized Text:', text);
+                        this.parseOCRText(text);
+                        this.isRecognizing = false;
+                        alert('辨識完成！請檢查並修正欄位資料。');
+                    }).catch(err => {
+                        console.error(err);
+                        this.isRecognizing = false;
+                        alert('辨識失敗，請稍後再試或手動輸入。');
+                    });
+                },
+                parseOCRText(text) {
+                    // 1. 嘗試抓取 PNR (8碼英數)
+                    const pnrMatch = text.match(/\b[A-Z0-9]{8}\b/);
+                    if (pnrMatch) {
+                        this.currentTripInput.pnr = pnrMatch[0];
                     }
 
+                    // 2. 嘗試抓取 車次 (3-4碼數字，常在 "車次" 附近)
+                    // 這裡簡化抓取 3-4 碼數字，排除可能是時間的部分
+                    const trainMatches = text.match(/\b[0-9]{3,4}\b/g);
+                    if (trainMatches) {
+                        // 過濾掉明顯像年份或時間的
+                        const likelyTrain = trainMatches.find(n => {
+                            const num = parseInt(n);
+                            return num < 2000 && num > 100; 
+                        });
+                        if (likelyTrain) this.currentTripInput.trainNumber = likelyTrain;
+                    }
+
+                    // 3. 嘗試抓取 時間 (HH:mm)
+                    const timeMatches = text.match(/([01]?[0-9]|2[0-3]):([0-5][0-9])/g);
+                    if (timeMatches && timeMatches.length >= 2) {
+                        // 假設先出現的是出發，後出現的是抵達
+                        this.currentTripInput.depTime = timeMatches[0];
+                        this.currentTripInput.arrTime = timeMatches[1];
+                    }
+
+                    // 4. 嘗試抓取 日期 (YYYY/MM/DD 或 MM/DD)
+                    // Tesseract 對斜線有時會誤判，需寬容處理
+                    const dateMatch = text.match(/(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
+                    if (dateMatch) {
+                        const y = dateMatch[1];
+                        const m = dateMatch[2].padStart(2, '0');
+                        const d = dateMatch[3].padStart(2, '0');
+                        this.currentTripInput.date = `${y}-${m}-${d}`;
+                    }
+                },
+
+                updatePassengerCount() {
+                    const count = this.currentTripInput.tickets.reduce((sum, t) => sum + (t.count || 0), 0);
+                    if (count > 10) {
+                        alert("每筆行程最多只能有 10 位旅客！");
+                        return;
+                    }
                     const currentLen = this.passengers.length;
-                    
                     if (count > currentLen) {
                         for (let i = 0; i < count - currentLen; i++) {
                             this.passengers.push({ name: '', id: '', passport: '', birthDate: '' });
@@ -787,7 +891,6 @@
                     }
                 },
                 addTicketInput() {
-                    // 檢查是否超過 10 人 (預先檢查)
                     let currentCount = this.currentTripInput.tickets.reduce((sum, t) => sum + (t.count || 0), 0);
                     if (currentCount >= 10) {
                         alert("已達到 10 位旅客上限！");
@@ -817,14 +920,12 @@
                         alert("每筆行程最多只能有 10 位旅客！請減少票數。");
                         return;
                     }
-
                     for(let i=0; i<this.passengers.length; i++) {
                         if(!this.passengers[i].name || !this.passengers[i].id) {
                             alert(`請填寫第 ${i+1} 位旅客的姓名與身分證字號`);
                             return;
                         }
                     }
-
                     const tripToAdd = JSON.parse(JSON.stringify(this.currentTripInput));
                     tripToAdd.passengers = JSON.parse(JSON.stringify(this.passengers));
                     this.trips.push(tripToAdd);
@@ -920,7 +1021,7 @@
                 },
                 resetForm() {
                     if(confirm('確定要清空所有資料嗎？')) {
-                        this.pnr = ''; this.orderId = ''; this.groupNumber = ''; this.cowayOrderId = '';
+                        this.orderId = ''; this.groupNumber = ''; this.cowayOrderId = '';
                         this.trips = []; this.showModal = false;
                         this.passengers = []; 
                         
@@ -930,9 +1031,9 @@
                         const dlDate = new Date(todayDate);
                         dlDate.setDate(todayDate.getDate() + 2);
                         
-                        if (dlDate.getDay() === 6) { // Saturday
+                        if (dlDate.getDay() === 6) { 
                             dlDate.setDate(dlDate.getDate() - 1);
-                        } else if (dlDate.getDay() === 0) { // Sunday
+                        } else if (dlDate.getDay() === 0) { 
                             dlDate.setDate(dlDate.getDate() - 2);
                         }
                         
@@ -961,9 +1062,9 @@
                 const dlDate = new Date(todayDate);
                 dlDate.setDate(todayDate.getDate() + 2);
                 
-                if (dlDate.getDay() === 6) { // Saturday
+                if (dlDate.getDay() === 6) { 
                     dlDate.setDate(dlDate.getDate() - 1);
-                } else if (dlDate.getDay() === 0) { // Sunday
+                } else if (dlDate.getDay() === 0) { 
                     dlDate.setDate(dlDate.getDate() - 2);
                 }
                 
