@@ -211,7 +211,7 @@
                     </div>
                     <!-- PNR 已移至行程設定，此處移除 -->
                     <div>
-                        <label class="input-label">訂單編號 (8碼)</label>
+                        <label class="input-label">訂單編號</label>
                         <input type="text" v-model="cowayOrderId" maxlength="8" class="input-minimal tracking-wider" placeholder="12345678">
                     </div>
                     <div>
@@ -455,19 +455,22 @@
                             <div class="bg-stone-50 rounded-lg p-4 mb-2 border border-stone-200 text-left">
                                 <div class="grid grid-cols-2 md:grid-cols-5 gap-y-4 gap-x-2 text-sm">
                                     <div>
-                                        <span class="text-xs text-stone-400 block mb-1">D/L 日期</span>
-                                        <div class="bg-teal-50 text-teal-800 font-bold px-2 py-0.5 rounded border border-teal-100 w-fit">
-                                            {{ formatDate(deadlineDate) }} 18:00前
-                                        </div>
+                                        <span class="text-xs text-stone-400 block mb-1">訂票人員</span>
+                                        <span class="font-medium text-stone-700">{{ booker }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs text-stone-400 block mb-1">訂票日期</span>
+                                        <span class="font-medium text-stone-700">{{ formatDate(bookingDate) }}</span>
+                                    </div>
+                                    <div class="bg-teal-50 border border-teal-100 rounded px-2 -mx-2 py-1">
+                                        <span class="text-xs text-teal-600 block mb-1 font-bold">D/L (最後開票期限)</span>
+                                        <span class="font-bold text-teal-800">{{ formatDate(deadlineDate) }} 18:00前</span>
                                     </div>
                                     <div>
                                         <span class="text-xs text-stone-400 block mb-1">高鐵訂單編號</span>
                                         <span class="font-medium font-mono text-stone-800">{{ orderId }}</span>
                                     </div>
-                                    <div>
-                                        <span class="text-xs text-stone-400 block mb-1">訂位代號 (PNR)</span>
-                                        <span class="font-medium font-mono text-stone-400 italic">詳見下方行程</span>
-                                    </div>
+                                    <!-- 已移除訂位代號 (PNR) 顯示區塊 -->
                                     <div>
                                         <span class="text-xs text-stone-400 block mb-1">訂單編號</span>
                                         <span class="font-medium text-stone-700">{{ cowayOrderId || '-' }}</span>
