@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高鐵訂位確認單生成器</title>
+    
+    <!-- 引入字體 Noto Sans TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Vue.js 2 (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f5f5f4; /* Stone 100 */
+        }
+        /* 自定義日系輸入框樣式 */
+        .input-minimal {
+            background-color: transparent;
+            border-bottom: 1px solid #d6d3d1; /* Stone 300 */
+            padding: 0.5rem 0;
+            width: 100%;
+            transition: all 0.3s ease;
+            color: #44403c; /* Stone 700 */
+            outline: none;
+        }
+        .input-minimal:focus {
+            border-color: #5eead4; /* Teal 300 */
+            border-bottom-width: 2px;
+        }
+        .input-label {
+            font-size: 0.75rem;
+            color: #78716c; /* Stone 500 */
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+        /* 列印設定 */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-container {
+                box-shadow: none !important;
+                border: none !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            body {
+                background-color: white;
+            }
+        }
+    </style>
+</head>
+<body class="text-stone-700">
+
+    <div id="app" class="min-h-screen py-8 px-4 md:px-8 flex flex-col items-center">
+        
+        <!-- 標題 -->
+        <header class="mb-10 text-center no-print">
+            <h1 class="text-3xl font-light tracking-widest text-stone-800 mb-2">旅程確認</h1>
+            <p class="text-xs text-stone-500 tracking-wider">JOURNEY CONFIRMATION</p>
+        </header>
+
+        <main class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- 左側：輸入表單區 -->
+            <section class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-stone-100 no-print transition-all hover:shadow-md">
+                <div class="flex justify-between items-center mb-6 border-b border-stone-100 pb-4">
+                    <h2 class="text-lg font-medium text-stone-600">行程資訊設定</h2>
+                    <button @click="resetForm" class="text-xs text-stone-400 hover:text-stone-600 underline">重置表格</button>
+                </div>
+
+                <!-- PNR 輸入 -->
+                <div class="mb-6">
+                    <label class="input-label">訂位代號 (PNR)</label>
+                    <input type="text" v-model="pnr" class="input-minimal text-lg font-bold tracking-widest uppercase" placeholder="例如：06082412">
+                </div>
+
+                <!-- 去程資訊 -->
+                <div class="mb-8">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="w-2 h-6 bg-stone-800 rounded-sm"></span>
+                        <h3 class="font-bold text-stone-800">去程資訊</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label class="input-label">日期</label>
+                            <input type="date" v-model="outbound.date" class="input-minimal">
+                        </div>
+                        <div>
+                            <label class="input-label">車次</label>
+                            <input type="text" v-model="outbound.trainNumber" class="input-minimal" placeholder="ex: 1205">
+                        </div>
+                        <div>
+                            <label class="input-label">車廂種類</label>
+                            <select v-model="outbound.carType" class="input-minimal">
+                                <option>標準車廂</option>
+                                <option>商務車廂</option>
+                                <option>自由座</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="input-label">出發站</label>
+                            <select v-model="outbound.origin" class="input-minimal">
+                                <option v-for="st in stations" :value="st">{{ st }}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="input-label">抵達站</label>
+                            <select v-model="outbound.destination" class="input-minimal">
+                                <option v-for="st in stations" :value="st">{{ st }}</option>
+                            </select>
+                        </div>
+                         <div>
+                            <label class="input-label">票種</label>
+                             <select v-model="outbound.ticketType" class="input-minimal">
+                                <option>全票</option>
+                                <option>早鳥65折</option>
+                                <option>早鳥8折</option>
+                                <option>早鳥9折</option>
+                                <option>大學生優惠</option>
+                                <option>孩童票</option>
+                                <option>敬老票</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="input-label">出發時間</label>
+                            <input type="time" v-model="outbound.depTime" class="input-minimal">
+                        </div>
+                        <div>
+                            <label class="input-label">抵達時間</label>
+                            <input type="time" v-model="outbound.arrTime" class="input-minimal">
+                        </div>
+                       
+                        <div>
+                            <label class="input-label">張數</label>
+                            <input type="number" v-model.number="outbound.count" min="1" class="input-minimal" @change="adjustPassengers">
+                        </div>
+                         <div class="col-span-2">
+                            <label class="input-label">單張價格</label>
+                            <input type="number" v-model.number="outbound.price" class="input-minimal" placeholder="1490">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 回程開關 -->
+                <div class="flex items-center gap-3 mb-6">
+                    <input type="checkbox" id="hasReturn" v-model="hasReturn" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-gray-300">
+                    <label for="hasReturn" class="text-stone-700 cursor-pointer select-none">包含回程</label>
+                </div>
+
+                <!-- 回程資訊 (條件渲染) -->
+                <transition name="fade">
+                    <div v-if="hasReturn" class="mb-8 bg-stone-50 p-4 rounded-xl">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="w-2 h-6 bg-stone-400 rounded-sm"></span>
+                            <h3 class="font-bold text-stone-600">回程資訊</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                            <div>
+                                <label class="input-label">日期</label>
+                                <input type="date" v-model="returnTrip.date" class="input-minimal">
+                            </div>
+                            <div>
+                                <label class="input-label">車次</label>
+                                <input type="text" v-model="returnTrip.trainNumber" class="input-minimal" placeholder="ex: 0622">
+                            </div>
+                            <div>
+                                <label class="input-label">車廂種類</label>
+                                <select v-model="returnTrip.carType" class="input-minimal">
+                                    <option>標準車廂</option>
+                                    <option>商務車廂</option>
+                                    <option>自由座</option>
+                                </select>
+                            </div>
+                             <div>
+                                <label class="input-label">出發站</label>
+                                <select v-model="returnTrip.origin" class="input-minimal">
+                                    <option v-for="st in stations" :value="st">{{ st }}</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="input-label">抵達站</label>
+                                <select v-model="returnTrip.destination" class="input-minimal">
+                                    <option v-for="st in stations" :value="st">{{ st }}</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="input-label">票種</label>
+                                 <select v-model="returnTrip.ticketType" class="input-minimal">
+                                    <option>全票</option>
+                                    <option>早鳥65折</option>
+                                    <option>早鳥8折</option>
+                                    <option>早鳥9折</option>
+                                    <option>大學生優惠</option>
+                                    <option>孩童票</option>
+                                    <option>敬老票</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="input-label">出發時間</label>
+                                <input type="time" v-model="returnTrip.depTime" class="input-minimal">
+                            </div>
+                            <div>
+                                <label class="input-label">抵達時間</label>
+                                <input type="time" v-model="returnTrip.arrTime" class="input-minimal">
+                            </div>
+                            
+                            <div>
+                                <label class="input-label">張數</label>
+                                <input type="number" v-model.number="returnTrip.count" min="1" class="input-minimal">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="input-label">單張價格</label>
+                                <input type="number" v-model.number="returnTrip.price" class="input-minimal" placeholder="1490">
+                            </div>
+                        </div>
+                    </div>
+                </transition>
+
+                <!-- 旅客資訊 -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-6 bg-teal-600 rounded-sm"></span>
+                            <h3 class="font-bold text-stone-800">旅客資訊</h3>
+                        </div>
+                        <button @click="addPassenger" class="text-xs bg-stone-200 px-2 py-1 rounded hover:bg-stone-300 transition">+ 增加旅客</button>
+                    </div>
+                    
+                    <div v-for="(p, index) in passengers" :key="index" class="mb-3 flex gap-2 items-end group">
+                        <div class="flex-1">
+                            <label class="input-label">旅客姓名 {{ index + 1 }}</label>
+                            <input type="text" v-model="p.name" class="input-minimal" placeholder="王小明">
+                        </div>
+                        <div class="flex-1">
+                            <label class="input-label">身分證字號 / 護照號碼</label>
+                            <input type="text" v-model="p.id" class="input-minimal uppercase" placeholder="A123456789">
+                        </div>
+                        <button v-if="passengers.length > 1" @click="removePassenger(index)" class="text-stone-300 hover:text-red-400 pb-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- 右側：即時預覽 / 確認表格 -->
+            <section class="bg-white p-8 md:p-12 rounded-2xl shadow-lg print-container relative overflow-hidden">
+                <!-- 裝飾背景圓圈 -->
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-stone-50 rounded-full opacity-50 pointer-events-none"></div>
+
+                <!-- 預覽區標題 -->
+                <div class="text-center mb-8 border-b border-stone-200 pb-6">
+                    <h2 class="text-2xl font-bold tracking-widest text-stone-800 mb-2">訂位確認單</h2>
+                    <p class="text-xs text-stone-500 uppercase tracking-[0.2em]">Booking Confirmation</p>
+                </div>
+
+                <!-- 核心表格：行程 (根據要求) -->
+                <div class="mb-8">
+                    <h4 class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-3">Itinerary Details</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-stone-400 text-xs border-b border-stone-200">
+                                    <th class="pb-2 font-medium w-12">行程</th>
+                                    <th class="pb-2 font-medium w-20">PNR</th>
+                                    <th class="pb-2 font-medium w-24">搭乘日期</th>
+                                    <th class="pb-2 font-medium w-16">車次</th>
+                                    <th class="pb-2 font-medium">啟程車站</th>
+                                    <th class="pb-2 font-medium text-right">到達車站</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-stone-700">
+                                <!-- 去程行 -->
+                                <tr class="group hover:bg-stone-50 transition-colors">
+                                    <td class="py-4 border-b border-stone-100 font-bold">去程</td>
+                                    <td class="py-4 border-b border-stone-100 font-mono text-teal-700">{{ pnr }}</td>
+                                    <td class="py-4 border-b border-stone-100">{{ formatDate(outbound.date) }}</td>
+                                    <td class="py-4 border-b border-stone-100">{{ outbound.trainNumber }}</td>
+                                    <td class="py-4 border-b border-stone-100">
+                                        <div class="font-bold">{{ outbound.origin }}</div>
+                                        <div class="text-xs text-stone-400">{{ outbound.depTime }}</div>
+                                    </td>
+                                    <td class="py-4 border-b border-stone-100 text-right">
+                                        <div class="font-bold">{{ outbound.destination }}</div>
+                                        <div class="text-xs text-stone-400">{{ outbound.arrTime }}</div>
+                                    </td>
+                                </tr>
+                                <!-- 回程行 -->
+                                <tr v-if="hasReturn" class="group hover:bg-stone-50 transition-colors">
+                                    <td class="py-4 border-b border-stone-100 font-bold">回程</td>
+                                    <td class="py-4 border-b border-stone-100 font-mono text-teal-700">{{ pnr }}</td>
+                                    <td class="py-4 border-b border-stone-100">{{ formatDate(returnTrip.date) }}</td>
+                                    <td class="py-4 border-b border-stone-100">{{ returnTrip.trainNumber }}</td>
+                                    <td class="py-4 border-b border-stone-100">
+                                        <div class="font-bold">{{ returnTrip.origin }}</div>
+                                        <div class="text-xs text-stone-400">{{ returnTrip.depTime }}</div>
+                                    </td>
+                                    <td class="py-4 border-b border-stone-100 text-right">
+                                        <div class="font-bold">{{ returnTrip.destination }}</div>
+                                        <div class="text-xs text-stone-400">{{ returnTrip.arrTime }}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 詳細資訊與乘客 (補充資訊) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+                    <!-- 票務詳情 -->
+                    <div class="bg-stone-50 p-5 rounded-lg">
+                        <h4 class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-3">Ticket Details</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-stone-500">票種</span>
+                                <span class="font-medium">{{ outbound.ticketType }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-stone-500">車廂種類</span>
+                                <span class="font-medium">{{ outbound.carType }}</span>
+                            </div>
+                            <div class="border-t border-stone-200 my-2 pt-2 flex justify-between items-end">
+                                <span class="text-stone-500">總金額</span>
+                                <span class="text-xl font-bold text-stone-800">TWD ${{ formatPrice(totalPrice) }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 旅客名單 -->
+                    <div>
+                         <h4 class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-3">Passengers</h4>
+                         <ul class="space-y-3">
+                             <li v-for="p in passengers" class="text-sm flex justify-between items-center border-b border-dashed border-stone-200 pb-2 last:border-0">
+                                 <span class="font-medium text-stone-700">{{ p.name || '尚未輸入' }}</span>
+                                 <span class="font-mono text-stone-400 text-xs">{{ maskID(p.id) }}</span>
+                             </li>
+                         </ul>
+                    </div>
+                </div>
+
+                <!-- 頁尾 QR Code 模擬 -->
+                <div class="mt-12 pt-6 border-t border-stone-100 flex justify-between items-center">
+                    <div class="text-xs text-stone-400">
+                        <p>Ticket generated on {{ today }}</p>
+                        <p class="mt-1">電子票證僅供確認使用</p>
+                    </div>
+                    <!-- 裝飾用假 QR Code -->
+                    <div class="w-16 h-16 bg-stone-800 p-1">
+                         <div class="w-full h-full bg-white flex items-center justify-center text-[8px] text-center text-stone-300 leading-none overflow-hidden">
+                             QR<br>CODE
+                         </div>
+                    </div>
+                </div>
+                
+                <!-- 列印按鈕 -->
+                <button onclick="window.print()" class="no-print absolute top-6 right-6 text-stone-300 hover:text-stone-600 transition-colors p-2" title="列印此頁">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                </button>
+
+            </section>
+        </main>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                stations: ['南港', '台北', '板橋', '桃園', '新竹', '苗栗', '台中', '彰化', '雲林', '嘉義', '台南', '左營'],
+                pnr: '',
+                hasReturn: false,
+                outbound: {
+                    date: '',
+                    trainNumber: '',
+                    carType: '標準車廂',
+                    origin: '南港',
+                    destination: '左營',
+                    depTime: '09:00',
+                    arrTime: '10:45',
+                    ticketType: '全票',
+                    count: 1,
+                    price: 1490
+                },
+                returnTrip: {
+                    date: '',
+                    trainNumber: '',
+                    carType: '標準車廂',
+                    origin: '左營',
+                    destination: '南港',
+                    depTime: '18:00',
+                    arrTime: '19:45',
+                    ticketType: '全票',
+                    count: 1,
+                    price: 1490
+                },
+                passengers: [
+                    { name: '', id: '' }
+                ]
+            },
+            computed: {
+                totalPrice() {
+                    let total = (this.outbound.count * this.outbound.price);
+                    if (this.hasReturn) {
+                        total += (this.returnTrip.count * this.returnTrip.price);
+                    }
+                    return total;
+                },
+                today() {
+                    return new Date().toLocaleDateString('zh-TW');
+                }
+            },
+            methods: {
+                addPassenger() {
+                    this.passengers.push({ name: '', id: '' });
+                },
+                removePassenger(index) {
+                    this.passengers.splice(index, 1);
+                },
+                adjustPassengers() {
+                    // 當改變去程張數時，若旅客數少於張數，自動補齊（選用功能）
+                    // 這裡暫時保持手動增加，避免太過干擾使用者
+                },
+                formatPrice(value) {
+                    if (!value) return '0';
+                    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                },
+                formatDate(dateStr) {
+                    if (!dateStr) return '----/--/--';
+                    const date = new Date(dateStr);
+                    // 格式化為 YYYY/MM/DD
+                    return `${date.getFullYear()}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+                },
+                maskID(id) {
+                    if (!id || id.length < 4) return id;
+                    return id.substring(0, 3) + '*****' + id.substring(id.length - 2);
+                },
+                resetForm() {
+                    if(confirm('確定要清空所有資料嗎？')) {
+                        this.pnr = '';
+                        this.outbound.date = '';
+                        this.outbound.trainNumber = '';
+                        this.passengers = [{ name: '', id: '' }];
+                    }
+                }
+            },
+            mounted() {
+                // 初始化今天的日期
+                const today = new Date().toISOString().split('T')[0];
+                this.outbound.date = today;
+                
+                // 產生一個隨機的 PNR 範例
+                this.pnr = Math.random().toString(36).substring(2, 10).toUpperCase();
+            }
+        });
+    </script>
+</body>
+</html>
