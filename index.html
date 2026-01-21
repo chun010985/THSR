@@ -41,7 +41,7 @@
             transition: all 0.2s;
             width: 100%;
             color: #4a4a46;
-            height: 42px; /* 統一輸入框高度 */
+            height: 42px;
         }
         input:focus, select:focus {
             border-color: #4a4a46;
@@ -106,6 +106,17 @@
             color: #4a4a46;
             text-transform: uppercase;
         }
+        .icon-btn-action {
+            color: #a0aec0;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+        .icon-btn-action:hover {
+            color: #4a4a46;
+        }
+        .icon-btn-danger:hover {
+            color: #ef4444;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -126,14 +137,24 @@
             <div class="lg:col-span-8 space-y-6">
                 <!-- 基本資料 -->
                 <div class="japanese-card p-6 md:p-8">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-1.5 h-6 bg-[#4a4a46]"></div>
-                        <h2 class="text-lg font-bold text-[#4a4a46]">基本資料管理</h2>
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-1.5 h-6 bg-[#4a4a46]"></div>
+                            <h2 class="text-lg font-bold text-[#4a4a46]">基本資料管理</h2>
+                        </div>
+                        <div class="flex gap-4">
+                            <button @click="focusInput('staffInput')" class="icon-btn-action" title="開始編輯">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                            </button>
+                            <button @click="clearBasicInfo" class="icon-btn-action icon-btn-danger" title="清除內容">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                         <div class="flex flex-col">
                             <label class="form-label">訂票人員</label>
-                            <input type="text" v-model="baseInfo.staff">
+                            <input ref="staffInput" type="text" v-model="baseInfo.staff">
                         </div>
                         <div class="flex flex-col">
                             <label class="form-label">訂票日期</label>
@@ -163,16 +184,26 @@
 
                 <!-- 行程詳細設定 -->
                 <div class="japanese-card p-6 md:p-8 relative">
-                    <div v-if="editingIndex !== null" class="absolute top-4 right-8 bg-[#4a4a46] text-[#f4f4f2] px-3 py-1 text-xs font-bold rounded">編輯模式中</div>
+                    <div v-if="editingIndex !== null" class="absolute top-4 right-24 bg-[#4a4a46] text-[#f4f4f2] px-3 py-1 text-xs font-bold rounded">編輯模式中</div>
                     
                     <div class="flex items-center justify-between mb-8">
                         <div class="flex items-center gap-3">
                             <div class="w-1.5 h-6 bg-[#4a4a46]"></div>
                             <h2 class="text-lg font-bold text-[#4a4a46]">行程詳細設定</h2>
                         </div>
-                        <div class="flex bg-[#f4f4f2] p-1 rounded">
-                            <button @click="tripMode = 'one-way'" :class="tripMode === 'one-way' ? 'bg-[#4a4a46] text-[#f4f4f2]' : 'text-[#8c8c88]'" class="px-4 py-1 text-sm font-bold transition-all rounded">單程</button>
-                            <button @click="tripMode = 'round-trip'" :class="tripMode === 'round-trip' ? 'bg-[#4a4a46] text-[#f4f4f2]' : 'text-[#8c8c88]'" class="px-4 py-1 text-sm font-bold transition-all rounded">來回</button>
+                        <div class="flex items-center gap-6">
+                            <div class="flex gap-4">
+                                <button @click="focusInput('hsrOrderInput')" class="icon-btn-action" title="開始編輯">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                                </button>
+                                <button @click="resetCurrentTripForm" class="icon-btn-action icon-btn-danger" title="清除內容">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                                </button>
+                            </div>
+                            <div class="flex bg-[#f4f4f2] p-1 rounded">
+                                <button @click="tripMode = 'one-way'" :class="tripMode === 'one-way' ? 'bg-[#4a4a46] text-[#f4f4f2]' : 'text-[#8c8c88]'" class="px-4 py-1 text-sm font-bold transition-all rounded">單程</button>
+                                <button @click="tripMode = 'round-trip'" :class="tripMode === 'round-trip' ? 'bg-[#4a4a46] text-[#f4f4f2]' : 'text-[#8c8c88]'" class="px-4 py-1 text-sm font-bold transition-all rounded">來回</button>
+                            </div>
                         </div>
                     </div>
 
@@ -183,7 +214,7 @@
                                 <span class="text-sm font-bold text-[#4a4a46]">去程段設定</span>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-                                <div class="md:col-span-4"><label class="form-label">高鐵訂單編號</label><input type="text" v-model="outbound.hsrOrderId" @input="syncOrderId"></div>
+                                <div class="md:col-span-4"><label class="form-label">高鐵訂單編號</label><input ref="hsrOrderInput" type="text" v-model="outbound.hsrOrderId" @input="syncOrderId"></div>
                                 <div class="md:col-span-4"><label class="form-label font-bold text-[#4a4a46]">PNR 代碼</label><input type="text" v-model="outbound.pnr" class="font-bold tracking-widest uppercase"></div>
                                 <div class="md:col-span-4"><label class="form-label">乘車日期</label><input type="date" v-model="outbound.date"></div>
                                 <div class="md:col-span-3">
@@ -197,8 +228,9 @@
                                 <div class="md:col-span-3">
                                     <label class="form-label">起訖站點</label>
                                     <div class="flex items-center gap-1">
-                                        <select v-model="outbound.from" class="text-xs"><option v-for="s in stations" :value="s">{{s}}</option></select>
-                                        <select v-model="outbound.to" class="text-xs"><option v-for="s in stations" :value="s">{{s}}</option></select>
+                                        <select v-model="outbound.from" class="text-xs shrink"><option v-for="s in stations" :value="s">{{s}}</option></select>
+                                        <button @click="swapStations(outbound)" class="p-1 text-[#a0aec0] hover:text-[#4a4a46] transition-colors" title="交換站點">⇆</button>
+                                        <select v-model="outbound.to" class="text-xs shrink"><option v-for="s in stations" :value="s">{{s}}</option></select>
                                     </div>
                                 </div>
                                 <div class="md:col-span-3"><label class="form-label">時間 (24H)</label><div class="flex items-center gap-1"><input type="text" v-model="outbound.depTime" class="time-input text-xs"><input type="text" v-model="outbound.arrTime" class="time-input text-xs"></div></div>
@@ -225,8 +257,9 @@
                                 <div class="md:col-span-3">
                                     <label class="form-label">起訖站點</label>
                                     <div class="flex items-center gap-1">
-                                        <select v-model="returnTrip.from" class="text-xs"><option v-for="s in stations" :value="s">{{s}}</option></select>
-                                        <select v-model="returnTrip.to" class="text-xs"><option v-for="s in stations" :value="s">{{s}}</option></select>
+                                        <select v-model="returnTrip.from" class="text-xs shrink"><option v-for="s in stations" :value="s">{{s}}</option></select>
+                                        <button @click="swapStations(returnTrip)" class="p-1 text-[#a0aec0] hover:text-[#4a4a46] transition-colors" title="交換站點">⇆</button>
+                                        <select v-model="returnTrip.to" class="text-xs shrink"><option v-for="s in stations" :value="s">{{s}}</option></select>
                                     </div>
                                 </div>
                                 <div class="md:col-span-3"><label class="form-label">時間 (24H)</label><div class="flex items-center gap-1"><input type="text" v-model="returnTrip.depTime" class="time-input text-xs"><input type="text" v-model="returnTrip.arrTime" class="time-input text-xs"></div></div>
@@ -270,9 +303,13 @@
                         <div v-for="(trip, idx) in addedTrips" :key="idx" class="p-4 bg-[#f4f4f2] border border-[#a0aec0] rounded relative transition-shadow hover:shadow-sm">
                             <div class="flex justify-between items-start mb-2">
                                 <span class="text-[10px] bg-[#4a4a46] text-[#f4f4f2] px-2 py-0.5 rounded font-mono font-bold">#{{ idx + 1 }}</span>
-                                <div class="flex gap-3 text-xs">
-                                    <button @click="startEdit(idx)" class="text-[#4a4a46] font-bold underline">編輯</button>
-                                    <button @click="removeTrip(idx)" class="text-red-500 font-bold">✕</button>
+                                <div class="flex gap-4">
+                                    <button @click="startEdit(idx)" class="text-[#4a4a46] hover:text-blue-600 transition-colors" title="編輯">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                                    </button>
+                                    <button @click="removeTrip(idx)" class="text-red-400 hover:text-red-600 transition-colors" title="刪除">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                                    </button>
                                 </div>
                             </div>
                             <div class="text-sm font-bold text-[#4a4a46] mb-1">PNR: {{ trip.outbound.pnr }}</div>
@@ -333,7 +370,7 @@
 
                 <div class="p-8">
                     <!-- 標頭 -->
-                    <div class="flex justify-between items-start mb-4">
+                    <div class="flex justify-between items-start mb-6">
                         <div>
                             <h1 class="text-2xl font-black tracking-[0.2em] mb-1 text-[#4a4a46]">高鐵訂位確認單</h1>
                             <div class="flex items-center gap-3">
@@ -371,13 +408,13 @@
                     </div>
 
                     <!-- 開票期限區 -->
-                    <div class="mb-6 bg-orange-50 border-l-[6px] border-orange-500 rounded-r-xl p-4 flex items-center justify-between shadow-sm">
+                    <div class="mb-8 bg-[#f4f4f2] border-l-[6px] border-[#4a4a46] rounded-r p-5 flex items-center justify-between shadow-sm">
                         <div class="flex-1">
                             <div class="flex items-center gap-3 mb-1">
                                 <span class="text-xs font-black text-red-600 tracking-wider">開票期限 (DEADLINE)</span>
                                 <span class="text-xs font-black text-red-600 font-mono">{{ formattedDeadline }}</span>
                             </div>
-                            <div class="text-[9.5px] text-orange-600 font-bold flex flex-col gap-0.5 leading-tight">
+                            <div class="text-[9.5px] text-[#8c8c88] font-bold flex flex-col gap-0.5 leading-tight">
                                 <p>請於D/L前通知 可開票 與 取票方式 ｜ 取票方式：1. 紙本票&nbsp;&nbsp;2. 電子票(每位乘客須配合APP使用)&nbsp;&nbsp;3. 超商取票 (有手續費)</p>
                                 <p class="text-[#4a4a46] font-black tracking-widest">** 一筆訂單 統一取票方式 **</p>
                             </div>
@@ -390,10 +427,10 @@
                     </div>
 
                     <!-- 訂票紀錄清單 -->
-                    <div v-for="(trip, tIdx) in addedTrips" :key="tIdx" class="mb-6">
+                    <div v-for="(trip, tIdx) in addedTrips" :key="tIdx" class="mb-8">
                         <div class="flex items-center gap-4 mb-2">
                             <div class="h-[2px] w-6 bg-[#4a4a46]"></div>
-                            <span class="text-[11px] font-black text-[#4a4a46] font-mono tracking-tighter uppercase">Itinerary Record #{{ tIdx + 1 }}</span>
+                            <span class="text-[11px] font-black text-[#4a4a46] font-mono tracking-tighter uppercase">訂票紀錄 #{{ tIdx + 1 }}</span>
                             <div class="h-[1px] flex-1 bg-[#a0aec0]"></div>
                         </div>
                         
@@ -529,7 +566,6 @@
                                 <p>掛帳全票會先掛85折的價格，優待票(孩童、敬老、愛心)都是半價。如果售價有調整需要更改再請通知唷 謝謝。</p>
                             </div>
                             <div>
-                                <!-- 標題更新為 退票/改票 -->
                                 <p class="img-section-title inline-block mb-1 text-[#4a4a46] font-black">注意事項與退票/改票說明</p>
                                 <ul class="list-none space-y-0.5">
                                     <li>1. 座位皆由電腦自動劃位,恕無法指定座位,亦無法保證同行者為相鄰座位。</li>
@@ -585,9 +621,17 @@
                 const passengersRet = ref([]);
                 const addedTrips = ref([]);
 
+                const staffInput = ref(null);
+                const hsrOrderInput = ref(null);
+
+                const focusInput = (refName) => {
+                    const el = refName === 'staffInput' ? staffInput.value : hsrOrderInput.value;
+                    if (el) el.focus();
+                };
+
                 const showToast = (msg) => {
                     toastMsg.value = msg;
-                    setTimeout(() => { toastMsg.value = ''; }, 3000);
+                    setTimeout(() => { if (toastMsg.value === msg) toastMsg.value = ''; }, 3000);
                 };
 
                 const calculateDeadline = () => {
@@ -602,6 +646,10 @@
                     let finalDeadline = (plusTwoDays <= thisFriday) ? plusTwoDays : thisFriday;
                     if (finalDeadline < bookingDateObj) finalDeadline = bookingDateObj;
                     baseInfo.deadlineDate = finalDeadline.toISOString().split('T')[0];
+                };
+
+                const syncOrderId = () => { 
+                    if(tripMode.value === 'round-trip') returnTrip.hsrOrderId = outbound.hsrOrderId; 
                 };
 
                 const getSingleFare = (f, t, carClass) => {
@@ -637,6 +685,38 @@
                     return `${s.slice(0, 3)}****${s.slice(-3)}`;
                 };
 
+                const swapStations = (trip) => {
+                    const temp = trip.from;
+                    trip.from = trip.to;
+                    trip.to = temp;
+                };
+
+                const clearBasicInfo = () => {
+                    if (confirm("確定要重設基本資料管理區嗎？")) {
+                        baseInfo.sales = '';
+                        baseInfo.orderId = '';
+                        baseInfo.groupId = '';
+                        showToast("基本資料已重設");
+                    }
+                };
+
+                const resetForm = () => {
+                    outbound.pnr = ''; 
+                    outbound.hsrOrderId = '';
+                    returnTrip.pnr = '';
+                    returnTrip.hsrOrderId = '';
+                    tickets.adult = 0; tickets.child = 0; tickets.senior = 0; tickets.disability = 0;
+                };
+
+                const resetCurrentTripForm = () => {
+                    if (confirm("確定要清空行程詳細設定區嗎？")) {
+                        resetForm();
+                        showToast("行程輸入已重設");
+                    }
+                };
+
+                const openPassengerModal = () => { showPassengerModal.value = true; };
+
                 const addTripToList = () => {
                     if (!outbound.pnr) { showToast("請輸入 PNR 代碼"); return; }
                     const outAmount = calcAmount(outbound);
@@ -670,6 +750,7 @@
 
                 const updateTripInList = () => {
                     const idx = editingIndex.value;
+                    if (idx === null) return;
                     const outAmount = calcAmount(outbound);
                     const retAmount = tripMode.value === 'round-trip' ? calcAmount(returnTrip) : 0;
                     addedTrips.value[idx] = {
@@ -689,17 +770,14 @@
                     showToast("更新成功");
                 };
 
-                const resetForm = () => {
-                    outbound.pnr = ''; returnTrip.pnr = '';
-                    tickets.adult = 0; tickets.child = 0; tickets.senior = 0; tickets.disability = 0;
+                const cancelEdit = () => { resetForm(); editingIndex.value = null; };
+                const removeTrip = (i) => {
+                    if (confirm("確定要刪除此筆摘要紀錄嗎？")) {
+                        addedTrips.value.splice(i, 1);
+                    }
                 };
 
-                const cancelEdit = () => { resetForm(); editingIndex.value = null; };
-                const removeTrip = (i) => addedTrips.value.splice(i, 1);
-                const openPassengerModal = () => showPassengerModal.value = true;
-                const syncOrderId = () => { if(tripMode.value === 'round-trip') returnTrip.hsrOrderId = outbound.hsrOrderId; };
-
-                const totalPersonCount = computed(() => tickets.adult + tickets.child + tickets.senior + tickets.disability);
+                const totalPersonCount = computed(() => (tickets.adult || 0) + (tickets.child || 0) + (tickets.senior || 0) + (tickets.disability || 0));
                 const totalTicketCountInCurrent = computed(() => tripMode.value === 'one-way' ? totalPersonCount.value : totalPersonCount.value * 2);
                 const isOverLimit = computed(() => totalPersonCount.value > 10);
                 const totalOrderAmount = computed(() => addedTrips.value.reduce((s, t) => s + t.totalAmount, 0));
@@ -755,7 +833,7 @@
                     });
 
                     text += `應收總計金額：TWD ${totalOrderAmount.value.toLocaleString()}\n\n`;
-                    text += `【注意事項與退票/改票說明】\n`; // 文字範本標題同步更新
+                    text += `【注意事項與退票/改票說明】\n`;
                     text += `1. 座位皆由電腦自動劃位,恕無法指定座位,亦無法保證同行者為相鄰座位。\n`;
                     text += `2. 若因逾時未能搭乘,請自行洽詢站務人員是否可改搭當日其他車次之自由座,恕無法辦理退票。\n`;
                     text += `3. 高鐵車票須於搭乘當日使用,逾期視同廢票,恕不受理退票。\n`;
@@ -795,7 +873,13 @@
 
                 onMounted(() => { calculateDeadline(); });
 
-                return { baseInfo, outbound, returnTrip, tickets, passengersOut, passengersRet, passengerTab, stations, tripMode, showPassengerModal, openPassengerModal, formattedDeadline, totalPersonCount, totalTicketCountInCurrent, isOverLimit, addedTrips, addTripToList, startEdit, updateTripInList, cancelEdit, editingIndex, removeTrip, totalOrderAmount, syncOrderId, downloadTxt, downloadImage, copyToClipboard, manualTimestamp, toastMsg, maskId };
+                return { 
+                    baseInfo, outbound, returnTrip, tickets, passengersOut, passengersRet, passengerTab, stations, 
+                    tripMode, showPassengerModal, openPassengerModal, formattedDeadline, totalPersonCount, totalTicketCountInCurrent, 
+                    isOverLimit, addedTrips, addTripToList, startEdit, updateTripInList, cancelEdit, editingIndex, removeTrip, 
+                    totalOrderAmount, syncOrderId, downloadTxt, downloadImage, copyToClipboard, manualTimestamp, toastMsg, 
+                    maskId, swapStations, clearBasicInfo, resetCurrentTripForm, staffInput, hsrOrderInput, focusInput 
+                };
             }
         }).mount('#app');
     </script>
