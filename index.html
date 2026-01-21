@@ -120,7 +120,7 @@
         <!-- 主要佈局 -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            <!-- 左側輸入區域 -->
+            <!-- 左側輸入 -->
             <div class="lg:col-span-8 space-y-8">
                 
                 <!-- 基本資料 -->
@@ -313,7 +313,7 @@
                                 <button v-if="editingIndex === null" @click="addTripToList" :disabled="isOverLimit || totalPersonCount === 0" class="flex-1 md:flex-none btn-primary px-8 py-2.5 rounded text-[11px] shadow-sm uppercase tracking-widest">
                                     新增行程
                                 </button>
-                                <button v-else @click="updateTripInList" :disabled="isOverLimit || totalPersonCount === 0" class="flex-1 md:flex-none btn-update px-8 py-2.5 rounded text-[11px] shadow-sm uppercase tracking-widest">
+                                <button v-else @click="updateTripInList" :disabled="isOverLimit || totalPersonCount === 0" class="flex-1 md:flex-none btn-update px-8 py-2.5 rounded text-[11px] font-bold shadow-sm uppercase tracking-widest">
                                     更新紀錄
                                 </button>
                                 <button v-if="editingIndex !== null" @click="cancelEdit" class="p-2 text-stone-400 hover:text-stone-600">取消</button>
@@ -325,7 +325,7 @@
 
             <!-- 右側摘要 -->
             <div class="lg:col-span-4 h-full font-medium">
-                <div class="japanese-card p-6 flex flex-col h-[calc(100vh-160px)] sticky top-8 shadow-sm text-sm">
+                <div class="japanese-card p-6 flex flex-col h-[calc(100vh-160px)] sticky top-8 shadow-sm text-sm font-sans">
                     <div class="flex justify-between items-end mb-6 pb-2 border-b border-stone-100">
                         <h2 class="text-xs font-bold text-stone-500 tracking-[0.2em]">行程摘要紀錄</h2>
                         <span v-if="addedTrips.length > 0" @click="clearAllTrips" class="text-[10px] text-stone-300 hover:text-red-400 cursor-pointer transition-colors font-medium">全部清空</span>
@@ -399,7 +399,7 @@
                             💡 回程資料預設與去程同步。若在此手動修改，則該項資料將停止同步。
                         </div>
 
-                        <div v-for="(p, index) in (passengerTab === 'out' ? passengersOut : passengersRet)" :key="index" class="p-4 border border-stone-100 rounded bg-stone-50 grid grid-cols-1 md:grid-cols-5 gap-4 items-end relative shadow-sm text-xs font-medium">
+                        <div v-for="(p, index) in (passengerTab === 'out' ? passengersOut : passengersRet)" :key="index" class="p-4 border border-stone-100 rounded bg-stone-50 grid grid-cols-1 md:grid-cols-5 gap-4 items-end relative shadow-sm text-xs font-medium font-sans">
                             <div class="absolute -top-2 left-2 px-1.5 py-0.5 bg-stone-200 text-stone-600 text-[8px] rounded font-bold uppercase flex items-center gap-2">
                                 序號 P{{index + 1}}
                                 <span v-if="passengerTab === 'ret' && !p.isDirty" class="sync-badge">同步中</span>
@@ -435,7 +435,7 @@
             </div>
         </transition>
 
-        <!-- 導出圖片預覽區 -->
+        <!-- 導出圖片預覽區 (隱藏) -->
         <div id="capture-area" class="fixed -left-[4000px] top-0">
             <div class="w-[900px] bg-white p-12 text-[#2d2d2a]" id="image-node">
                 
@@ -446,11 +446,11 @@
                     </div>
                     <div class="text-right">
                         <div class="inline-block bg-[#2d2d2a] text-white px-4 py-1 text-[10px] tracking-widest mb-1 font-mono uppercase font-bold">OFFICIAL COPY</div>
-                        <p class="text-[9px] text-gray-400 font-mono tracking-tighter uppercase">系統時間: {{ manualTimestamp }}</p>
+                        <p class="text-[9px] text-gray-400 font-mono tracking-tighter uppercase font-sans">系統時間: {{ manualTimestamp }}</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-x-4 gap-y-1 text-[10px] mb-4 bg-stone-50 p-3 rounded border border-stone-100 shadow-sm font-medium">
+                <div class="grid grid-cols-3 gap-x-4 gap-y-1 text-[10px] mb-4 bg-stone-50 p-3 rounded border border-stone-100 shadow-sm font-medium font-sans">
                     <div class="flex gap-2"><span class="text-gray-400">訂單編號：</span><span class="text-gray-700 font-bold font-mono">{{baseInfo.orderId}}</span></div>
                     <div class="flex gap-2"><span class="text-gray-400">團號：</span><span class="text-gray-700 font-bold font-mono">{{baseInfo.groupId}}</span></div>
                     <div class="flex gap-2"><span class="text-gray-400">訂票日期：</span><span class="text-gray-700 font-medium font-mono text-[11px]">{{baseInfo.bookingDate}}</span></div>
@@ -460,62 +460,63 @@
 
                 <div class="mb-4 py-3 px-4 border-l-4 border-red-500 bg-red-50 flex items-center justify-between shadow-sm rounded-r">
                     <div class="flex items-center gap-3 font-bold text-red-700">
-                        <span class="text-[12px] tracking-widest uppercase font-bold">開票期限</span>
+                        <span class="text-[12px] tracking-widest uppercase font-bold font-sans">開票期限</span>
                     </div>
-                    <span class="text-red-600 font-bold text-xl underline underline-offset-4 decoration-red-300 font-mono tracking-tighter uppercase">{{ formattedDeadline }}</span>
+                    <span class="text-red-600 font-bold text-xl underline underline-offset-4 decoration-red-300 font-mono tracking-tighter uppercase font-sans">{{ formattedDeadline }}</span>
                 </div>
 
-                <div class="mb-8 px-4 py-2 text-stone-600 border-stone-100 border-l-2 font-medium">
+                <!-- 合併後的提醒事項 -->
+                <div class="mb-8 px-4 py-2 text-stone-600 border-stone-100 border-l-2 font-medium font-sans">
                     <ul class="text-[10px] space-y-1 leading-relaxed">
                         <li class="font-bold tracking-tight">【 請務必於D/L前告知可開票 與 取票方式  紙本 / 電子票(搭配APP使用) 】</li>
                         <li class="tracking-tight">掛帳全票會先掛85折的價格，優待票(孩童、敬老、愛心)都是半價。 <span class="opacity-80 italic text-[9px] font-normal">※如果售價有調整需要更改再請通知唷 謝謝</span></li>
                     </ul>
                 </div>
 
-                <div v-for="(trip, tIdx) in addedTrips" :key="tIdx" class="mb-10 font-medium text-stone-700">
-                    <div class="flex items-center gap-4 mb-3 text-xs font-bold">
+                <div v-for="(trip, tIdx) in addedTrips" :key="tIdx" class="mb-10 font-medium text-stone-700 font-sans">
+                    <div class="flex items-center gap-4 mb-3 text-xs font-bold font-sans">
                         <span class="text-md text-stone-800 tracking-tighter uppercase font-mono uppercase font-bold">訂票紀錄 #{{ tIdx + 1 }}</span>
-                        <div class="h-[1px] flex-1 bg-stone-100"></div>
+                        <div class="h-[1px] flex-1 bg-stone-100 font-sans"></div>
                     </div>
 
                     <!-- 去程段 -->
-                    <div class="mb-5 overflow-hidden rounded-sm border border-stone-100 shadow-sm bg-[#fafafa]">
-                        <div class="bg-stone-800 text-white px-3 py-1.5 flex justify-between items-center text-[10px] font-bold tracking-widest uppercase">
+                    <div class="mb-5 overflow-hidden rounded-sm border border-stone-100 shadow-sm bg-[#fafafa] font-sans">
+                        <div class="bg-stone-800 text-white px-3 py-1.5 flex justify-between items-center text-[10px] font-bold tracking-widest uppercase font-sans">
                             <span>去程</span>
                             <div class="flex gap-6 opacity-80 font-mono tracking-tighter uppercase font-bold">
                                 <span>高鐵訂單：{{ trip.outbound.hsrOrderId }}</span>
                                 <span>PNR: {{ trip.outbound.pnr }}</span>
                             </div>
                         </div>
-                        <table class="w-full text-[10px] text-left text-stone-700 border-b border-stone-50">
+                        <table class="w-full text-[10px] text-left text-stone-700 border-b border-stone-50 font-sans">
                             <tr class="bg-white">
                                 <th class="p-2 w-24 text-stone-400 font-light border-r font-sans">日期</th>
                                 <td class="p-2 border-r font-medium font-mono text-stone-800">{{ trip.outbound.date }}</td>
                                 <th class="p-2 w-20 text-stone-400 font-light border-r font-sans">車次</th>
                                 <td class="p-2 border-r font-bold font-mono text-stone-800">{{ trip.outbound.trainNo }} 次</td>
                                 <th class="p-2 w-24 text-stone-400 font-light border-r font-sans">區間</th>
-                                <td class="p-2 border-r font-bold text-stone-800">{{ trip.outbound.from }} → {{ trip.outbound.to }}</td>
+                                <td class="p-2 border-r font-bold text-stone-800 font-sans">{{ trip.outbound.from }} → {{ trip.outbound.to }}</td>
                                 <th class="p-2 w-24 text-stone-400 font-light border-r text-center font-sans">時間 (24H)</th>
-                                <td class="p-2 border-r font-bold font-mono text-stone-800 tracking-tighter text-center">{{ trip.outbound.depTime }} - {{ trip.outbound.arrTime }}</td>
+                                <td class="p-2 border-r font-bold font-mono text-stone-800 tracking-tighter text-center font-mono">{{ trip.outbound.depTime }} - {{ trip.outbound.arrTime }}</td>
                                 <th class="p-2 w-20 text-stone-400 font-light border-r text-center font-sans">車廂</th>
                                 <td class="p-2 font-bold text-stone-800 text-center font-sans">{{ trip.outbound.carClass }}</td>
                             </tr>
                         </table>
                         <div class="px-3 py-1.5 bg-stone-50/50 border-b border-stone-100 text-[9px] text-stone-500 italic font-medium font-sans">
-                            <span class="font-bold mr-2 not-italic">票價明細：</span>{{ trip.outBreakdown }} <span class="float-right not-italic font-bold text-stone-700">小計: NT$ {{ trip.outAmount.toLocaleString() }}</span>
+                            <span class="font-bold mr-2 not-italic font-sans">票價明細：</span>{{ trip.outBreakdown }} <span class="float-right not-italic font-bold text-stone-700 font-sans">小計: NT$ {{ trip.outAmount.toLocaleString() }}</span>
                         </div>
-                        <div class="p-3 bg-white">
-                            <table class="w-full text-[10px] leading-tight text-stone-700 font-medium">
-                                <thead class="text-stone-400 border-b border-stone-50">
+                        <div class="p-3 bg-white font-sans">
+                            <table class="w-full text-[10px] leading-tight text-stone-700 font-medium font-sans">
+                                <thead class="text-stone-400 border-b border-stone-50 font-sans">
                                     <tr>
                                         <th class="pb-1 text-left w-24 font-normal font-sans">票種</th>
                                         <th class="pb-1 text-left w-24 font-bold text-stone-500 font-sans">旅客姓名</th>
-                                        <th class="pb-1 text-left w-36 font-bold text-stone-500 font-sans">身分證字號</th>
+                                        <th class="pb-1 text-left w-36 font-bold text-stone-500 font-sans">身分證字號 (隱碼)</th>
                                         <th class="pb-1 text-left w-32 font-bold text-stone-500 font-sans">護照號碼</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr v-for="(p, pIdx) in trip.passengersOut" :key="pIdx" class="border-b border-stone-50 last:border-0 text-xs">
+                                <tbody class="font-sans">
+                                    <tr v-for="(p, pIdx) in trip.passengersOut" :key="pIdx" class="border-b border-stone-50 last:border-0 text-xs font-sans">
                                         <td class="py-1.5 text-stone-400 text-[9px] font-medium font-sans">{{ p.type }}</td>
                                         <td class="py-1.5 font-bold text-stone-800 font-sans">{{ p.name }}</td>
                                         <td class="py-1.5 font-mono text-stone-500 tracking-tighter font-mono">{{ maskId(p.idNumber) }}</td>
@@ -527,34 +528,34 @@
                     </div>
 
                     <!-- 回程段 -->
-                    <div v-if="trip.mode === 'round-trip'" class="mb-5 overflow-hidden rounded-sm border border-orange-100 shadow-sm bg-[#fffbf9]">
-                        <div class="bg-orange-400 text-white px-3 py-1.5 flex justify-between items-center text-[10px] font-bold tracking-widest uppercase">
+                    <div v-if="trip.mode === 'round-trip'" class="mb-5 overflow-hidden rounded-sm border border-orange-100 shadow-sm bg-[#fffbf9] font-sans">
+                        <div class="bg-orange-400 text-white px-3 py-1.5 flex justify-between items-center text-[10px] font-bold tracking-widest uppercase font-sans">
                             <span>回程</span>
-                            <div class="flex gap-6 opacity-90 font-mono font-bold tracking-tighter uppercase">
+                            <div class="flex gap-6 opacity-90 font-mono font-bold tracking-tighter uppercase font-mono">
                                 <span>高鐵訂單：{{ trip.returnTrip.hsrOrderId || trip.outbound.hsrOrderId }}</span>
                                 <span>PNR: {{ trip.returnTrip.pnr }}</span>
                             </div>
                         </div>
-                        <table class="w-full text-[10px] text-left text-stone-700 border-b border-orange-50 font-sans">
+                        <table class="w-full text-[10px] text-left text-stone-700 border-b border-orange-50 font-sans font-sans">
                             <tr class="bg-white">
-                                <th class="p-2 w-24 text-stone-400 font-light border-r font-sans">日期</th>
+                                <th class="p-2 w-24 text-stone-400 font-light border-r font-mono font-sans">日期</th>
                                 <td class="p-2 border-r font-medium font-mono text-stone-800">{{ trip.returnTrip.date }}</td>
-                                <th class="p-2 w-20 text-stone-400 font-light border-r font-sans">車次</th>
-                                <td class="p-2 border-r font-bold font-mono text-stone-800">{{ trip.returnTrip.trainNo }} 次</td>
-                                <th class="p-2 w-24 text-stone-400 font-light border-r font-sans">區間</th>
-                                <td class="p-2 border-r font-bold text-orange-700/80">{{ trip.returnTrip.from }} → {{ trip.returnTrip.to }}</td>
-                                <th class="p-2 w-24 text-stone-400 font-light border-r text-center text-[9px] font-sans">時間 (24H)</th>
+                                <th class="p-2 w-20 text-stone-400 font-light border-r font-mono font-sans">車次</th>
+                                <td class="p-2 border-r font-bold font-mono text-stone-800 font-mono">{{ trip.returnTrip.trainNo }} 次</td>
+                                <th class="p-2 w-24 text-stone-400 font-light border-r font-sans font-sans">區間</th>
+                                <td class="p-2 border-r font-bold text-orange-700/80 font-sans">{{ trip.returnTrip.from }} → {{ trip.returnTrip.to }}</td>
+                                <th class="p-2 w-24 text-stone-400 font-light border-r text-center text-[9px] font-sans font-sans">時間 (24H)</th>
                                 <td class="p-2 border-r font-bold font-mono text-orange-700/80 tracking-tighter text-center font-mono">{{ trip.returnTrip.depTime }} - {{ trip.returnTrip.arrTime }}</td>
-                                <th class="p-2 w-20 text-stone-400 font-light border-r text-center font-sans">車廂</th>
+                                <th class="p-2 w-20 text-stone-400 font-light border-r text-center font-sans font-sans">車廂</th>
                                 <td class="p-2 font-bold text-orange-700/80 text-center font-sans">{{ trip.returnTrip.carClass }}</td>
                             </tr>
                         </table>
-                        <div class="px-3 py-1.5 bg-orange-50/30 border-b border-orange-50 text-[9px] text-orange-600/70 italic font-medium font-sans">
-                            <span class="font-bold mr-2 not-italic">票價明細：</span>{{ trip.retBreakdown }} <span class="float-right not-italic font-bold text-orange-700/90">小計: NT$ {{ trip.retAmount.toLocaleString() }}</span>
+                        <div class="px-3 py-1.5 bg-orange-50/30 border-b border-orange-50 text-[9px] text-orange-600/70 italic font-medium font-sans font-sans">
+                            <span class="font-bold mr-2 not-italic font-sans">票價明細：</span>{{ trip.retBreakdown }} <span class="float-right not-italic font-bold text-orange-700/90 font-sans">小計: NT$ {{ trip.retAmount.toLocaleString() }}</span>
                         </div>
-                        <div class="p-3 bg-white text-stone-700 font-medium">
+                        <div class="p-3 bg-white text-stone-700 font-medium font-sans">
                             <table class="w-full text-[10px] leading-tight font-sans">
-                                <thead class="text-orange-300 border-b border-orange-50 font-bold">
+                                <thead class="text-orange-300 border-b border-orange-50 font-bold font-sans">
                                     <tr>
                                         <th class="pb-1 text-left w-24 font-normal font-sans">票種</th>
                                         <th class="pb-1 text-left w-24 font-bold text-orange-400/80 font-sans">旅客姓名</th>
@@ -562,12 +563,12 @@
                                         <th class="pb-1 text-left w-32 font-bold text-orange-400/80 font-sans">護照號碼</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr v-for="(p, pIdx) in trip.passengersRet" :key="pIdx" class="border-b border-orange-50 last:border-0 text-xs">
-                                        <td class="py-1.5 text-stone-400 text-[9px] font-sans">{{ p.type }}</td>
-                                        <td class="py-1.5 font-bold text-orange-700/80 font-sans">{{ p.name }}</td>
-                                        <td class="py-1.5 font-mono text-stone-500 tracking-tighter font-mono">{{ maskId(p.idNumber) }}</td>
-                                        <td class="py-1.5 font-mono text-stone-500 uppercase font-mono">{{ p.passportNo || '' }}</td>
+                                <tbody class="font-sans">
+                                    <tr v-for="(p, pIdx) in trip.passengersRet" :key="pIdx" class="border-b border-orange-50 last:border-0 text-xs font-sans">
+                                        <td class="py-1.5 text-stone-400 text-[9px] font-sans font-sans">{{ p.type }}</td>
+                                        <td class="py-1.5 font-bold text-orange-700/80 font-sans font-sans">{{ p.name }}</td>
+                                        <td class="py-1.5 font-mono text-stone-500 tracking-tighter font-mono font-mono font-mono">{{ maskId(p.idNumber) }}</td>
+                                        <td class="py-1.5 font-mono text-stone-500 uppercase font-mono font-mono font-mono">{{ p.passportNo || '' }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -575,35 +576,35 @@
                     </div>
                 </div>
 
-                <!-- 注意事項與退票說明 (更新為最新的 7 點) -->
-                <div class="flex justify-between items-end border-t border-stone-200 pt-6 mb-6 text-sm font-medium font-sans">
-                    <div class="w-3/5 text-gray-500 font-light">
-                        <h4 class="font-bold text-[10px] text-stone-800 mb-1.5 underline decoration-stone-200 underline-offset-4 tracking-widest uppercase font-bold font-sans">注意事項與退票說明:</h4>
-                        <ul class="notes-text grid grid-cols-1 gap-0.5 italic text-stone-400 tracking-tighter font-sans">
+                <!-- 注意事項與退票說明 -->
+                <div class="flex justify-between items-end border-t border-stone-200 pt-6 mb-6 text-sm font-medium font-sans font-sans font-sans font-sans">
+                    <div class="w-3/5 text-gray-500 font-light font-sans font-sans font-sans font-sans font-sans">
+                        <h4 class="font-bold text-[10px] text-stone-800 mb-1.5 underline decoration-stone-200 underline-offset-4 tracking-widest uppercase font-bold font-sans font-sans font-sans">注意事項與退票說明:</h4>
+                        <ul class="notes-text grid grid-cols-1 gap-0.5 italic text-stone-400 tracking-tighter font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">
                             <li>1. 座位皆由電腦自動劃位，恕無法指定座位，亦無法保證同行者可安排相鄰座位。</li>
                             <li>2. 若因逾時未能搭乘，請自行洽詢站務人員是否可改搭當日其他車次之自由座，恕無法辦理退票。</li>
-                            <li>3. 高鐵車票須於搭乘當日使用，逾期視同廢票，恕不受理退票。</li>
+                            <li>3. 高鐵車票限搭乘當日使用，逾期視同廢票，恕不受理退票。</li>
                             <li>4. 如需辦理退票，請於 <b>4個工作日前</b> 申請，並提供紙本票根或 APP 電子票截圖（天災導致高鐵停駛者不在此限）。</li>
-                            <li>5. 退票將酌收手續費 <b>每張新台幣 50 元</b>。</li>
+                            <li>5. 退票將酌收手續費 每張 <b>新台幣 50 元</b>。</li>
                             <li>6. 辦理退票時，請務必提供 <b>紙本票根或電子票（APP 截圖）</b>，未提供者將視同正常搭乘，相關費用須自行負擔。</li>
                             <li>7. 因航班延誤或取消等非高鐵因素致無法搭乘者，車票 恕無法改期或退票，敬請見諒。</li>
                         </ul>
                     </div>
-                    <div class="text-right border-l border-stone-100 pl-10 font-bold">
-                        <p class="text-[9px] text-stone-400 mb-0.5 font-bold uppercase tracking-widest tracking-tighter font-mono">Grand Total (TWD)</p>
-                        <p class="text-4xl font-bold text-stone-900 tracking-tighter font-mono font-bold"><span class="text-xl font-light">NT$</span> {{totalOrderAmount.toLocaleString()}}</p>
+                    <div class="text-right border-l border-stone-100 pl-10 font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">
+                        <p class="text-[9px] text-stone-400 mb-0.5 uppercase tracking-widest tracking-tighter font-mono font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">Grand Total (TWD)</p>
+                        <p class="text-4xl font-bold text-stone-900 tracking-tighter font-mono font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans"><span class="text-xl font-light font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">NT$</span> {{totalOrderAmount.toLocaleString()}}</p>
                     </div>
                 </div>
 
-                <div class="mt-4 p-4 border-2 border-stone-800 rounded-sm bg-stone-50 shadow-sm font-bold font-sans">
-                    <p class="text-[11px] font-bold text-stone-900 leading-relaxed text-center tracking-tighter font-sans">
+                <div class="mt-4 p-4 border-2 border-stone-800 rounded-sm bg-stone-50 shadow-sm font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">
+                    <p class="text-[11px] font-bold text-stone-900 leading-relaxed text-center tracking-tighter font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">
                         請業務們務必再次核對 票種/張數/金額 是否正確，如有錯誤 請於「出票前」告知，<br>
                         出票後告知請自行負責，高鐵訂票服務窗口感謝您的配合。
                     </p>
                 </div>
 
-                <div class="text-center pt-4 border-t border-dotted border-stone-100 opacity-40 font-mono text-[8px] text-stone-300">
-                    <p class="tracking-[0.2em] uppercase font-light font-bold">SYSTEM GENERATED V1.3 · FOR INTERNAL AUDIT ONLY</p>
+                <div class="text-center pt-4 border-t border-dotted border-stone-100 opacity-40 font-mono text-[8px] text-stone-300 font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">
+                    <p class="tracking-[0.2em] uppercase font-light font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">SYSTEM GENERATED V1.3 · FOR INTERNAL AUDIT ONLY</p>
                 </div>
             </div>
         </div>
@@ -667,23 +668,30 @@
                 
                 const getBreakdown = (tripObj, tks) => {
                     const unit = getSingleFare(tripObj.from, tripObj.to, tripObj.carClass);
-                    const adultDiscount = tripObj.carClass === '標準車廂' ? 0.85 : 0.9;
+                    const discount = tripObj.carClass === '標準車廂' ? 0.85 : 0.9;
+                    const adultPrice = Math.round(unit * discount); // 四捨五入
+                    const concessionPrice = Math.round(unit * 0.5); // 四捨五入
+                    
                     const res = [];
-                    if (tks.adult > 0) res.push(`全票 ${tks.adult}張 ($${unit}x${adultDiscount})`);
-                    if (tks.child > 0) res.push(`孩童 ${tks.child}張 ($${unit}x0.5)`);
-                    if (tks.senior > 0) res.push(`敬老 ${tks.senior}張 ($${unit}x0.5)`);
-                    if (tks.disability > 0) res.push(`愛心 ${tks.disability}張 ($${unit}x0.5)`);
+                    if (tks.adult > 0) res.push(`全票 ${tks.adult}張 ($${adultPrice})`);
+                    if (tks.child > 0) res.push(`孩童 ${tks.child}張 ($${concessionPrice})`);
+                    if (tks.senior > 0) res.push(`敬老 ${tks.senior}張 ($${concessionPrice})`);
+                    if (tks.disability > 0) res.push(`愛心 ${tks.disability}張 ($${concessionPrice})`);
                     return res.join(' + ');
                 };
 
                 const calcAmount = (tripObj) => {
                     const unit = getSingleFare(tripObj.from, tripObj.to, tripObj.carClass);
                     const discount = tripObj.carClass === '標準車廂' ? 0.85 : 0.9;
-                    const adultAmount = Math.round(tickets.adult * (unit * discount)); 
-                    const childAmount = tickets.child * Math.round(unit * 0.5);
-                    const seniorAmount = tickets.senior * Math.round(unit * 0.5);
-                    const disabilityAmount = tickets.disability * Math.round(unit * 0.5);
-                    return adultAmount + childAmount + seniorAmount + disabilityAmount;
+                    
+                    // 單張票價先四捨五入再乘張數
+                    const adultPrice = Math.round(unit * discount);
+                    const concessionPrice = Math.round(unit * 0.5);
+                    
+                    const adultAmount = tickets.adult * adultPrice;
+                    const concessionAmount = (tickets.child + tickets.senior + tickets.disability) * concessionPrice;
+                    
+                    return adultAmount + concessionAmount;
                 };
 
                 const maskId = (id) => {
@@ -814,8 +822,8 @@
                 };
 
                 const downloadTxt = () => {
-                    let text = `【高鐵訂票紀錄單】\r\n訂單：${baseInfo.orderId}\r\n訂票日期：${baseInfo.bookingDate}\r\n業務：${baseInfo.sales}\r\n開票期限：${formattedDeadline.value}\r\n\r\n`;
-                    text += `【提醒事項】\r\n1. 請務必於期限前告知可開票與取票方式(紙本/電子)。\r\n2. 掛帳全票按車廂等級計價(標準85折/商務9折)，優待票均為半價計。 ※如果售價有調整需要更改再請通知唷 謝謝\r\n\r\n`;
+                    let text = `【高鐵訂票紀錄單】\r\n訂單：${baseInfo.orderId}\r\n訂票日期：${baseInfo.bookingDate}\r\n業務：${baseInfo.sales}\r\n★開票期限：${formattedDeadline.value}\r\n\r\n`;
+                    text += `【提醒事項】\r\n1. 請務必於期限前告知可開票與取票方式(紙本/電子)。\r\n2. 掛帳全票會先掛85折的價格，優待票(孩童、敬老、愛心)均為半價計。 ※如果售價有調整需要更改再請通知唷 謝謝\r\n\r\n`;
                     addedTrips.value.forEach((t, i) => {
                         text += `[紀錄 #${i+1}] PNR: ${t.outbound.pnr}\r\n【去程 ${t.outbound.carClass}】` + t.passengersOut.map(p => p.name).join(', ') + '\r\n';
                         text += `去程明細：${t.outBreakdown} = NT$ ${t.outAmount}\r\n`;
@@ -845,4 +853,3 @@
     </script>
 </body>
 </html>
-
