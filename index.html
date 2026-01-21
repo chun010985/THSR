@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高鐵訂位確認單生成器</title>
+    <title>高鐵訂位確認單生成器 - 專業現代版</title>
     <!-- Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <!-- Tailwind CSS -->
@@ -341,7 +341,6 @@
                         <div>
                             <h1 class="text-2xl font-black tracking-[0.2em] mb-1 text-gray-900">高鐵訂位確認單</h1>
                             <div class="flex items-center gap-3">
-                                <!-- OFFICIAL 移除 -->
                                 <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">BOOKING CONFIRMATION SLIP</p>
                             </div>
                         </div>
@@ -379,7 +378,6 @@
                     <div class="mb-6 bg-orange-50 border-l-[6px] border-orange-500 rounded-r-xl p-4 flex items-center justify-between shadow-sm">
                         <div class="flex-1">
                             <div class="flex items-center gap-3 mb-1">
-                                <!-- 移除星號，統一顏色大小 -->
                                 <span class="text-xs font-black text-orange-700 tracking-wider">開票期限 (DEADLINE)</span>
                                 <span class="text-xs font-black text-orange-700 font-mono">{{ formattedDeadline }}</span>
                             </div>
@@ -406,33 +404,33 @@
                         <!-- 去程段卡片 -->
                         <div class="mb-4 rounded-xl border-2 border-gray-100 overflow-hidden shadow-sm">
                             <div class="bg-gray-900 text-white px-4 py-2 flex justify-between items-center">
-                                <!-- 去程 英文移除 -->
                                 <span class="text-[10px] font-bold tracking-[0.2em]">去程</span>
                                 <div class="flex gap-6 text-[10px] font-mono">
                                     <span class="opacity-70 text-white/80">高鐵訂單編號: <span class="text-white font-bold">{{ trip.outbound.hsrOrderId || 'N/A' }}</span></span>
                                     <span class="opacity-70 text-white/80">PNR: <span class="text-white font-bold">{{ trip.outbound.pnr }}</span></span>
                                 </div>
                             </div>
+                            <!-- 行程細節列：調整字體大小統一 -->
                             <div class="grid grid-cols-5 bg-white py-3 border-b border-gray-50 text-center">
                                 <div class="px-1">
                                     <p class="text-[9px] text-gray-400 font-bold">搭乘日期</p>
-                                    <p class="text-[12px] font-black font-mono">{{ trip.outbound.date.replace(/-/g, '/') }}</p>
+                                    <p class="text-[13px] font-black font-mono text-gray-900">{{ trip.outbound.date.replace(/-/g, '/') }}</p>
                                 </div>
                                 <div class="px-1 border-l border-gray-50">
                                     <p class="text-[9px] text-gray-400 font-bold">班次</p>
-                                    <p class="text-[12px] font-black">{{ trip.outbound.trainNo }} 次</p>
+                                    <p class="text-[13px] font-black text-gray-900">{{ trip.outbound.trainNo }} 次</p>
                                 </div>
                                 <div class="px-1 border-l border-gray-50">
                                     <p class="text-[9px] text-gray-400 font-bold">起訖站</p>
-                                    <p class="text-[13px] font-black">{{ trip.outbound.from }} ➜ {{ trip.outbound.to }}</p>
+                                    <p class="text-[13px] font-black text-gray-900">{{ trip.outbound.from }} ➜ {{ trip.outbound.to }}</p>
                                 </div>
                                 <div class="px-1 border-l border-gray-50">
                                     <p class="text-[9px] text-gray-400 font-bold">搭乘時間</p>
-                                    <p class="text-[12px] font-black font-mono">{{ trip.outbound.depTime }} - {{ trip.outbound.arrTime }}</p>
+                                    <p class="text-[13px] font-black font-mono text-gray-900">{{ trip.outbound.depTime }} - {{ trip.outbound.arrTime }}</p>
                                 </div>
                                 <div class="px-1 border-l border-gray-50">
                                     <p class="text-[9px] text-gray-400 font-bold">車廂等級</p>
-                                    <p class="text-[12px] font-black text-blue-600">{{ trip.outbound.carClass }}</p>
+                                    <p class="text-[13px] font-black text-blue-600">{{ trip.outbound.carClass }}</p>
                                 </div>
                             </div>
                             <div class="px-4 py-1.5 bg-gray-50 flex justify-between text-[10px] font-bold text-gray-500 border-b border-gray-100">
@@ -465,36 +463,36 @@
                         <!-- 回程段卡片 -->
                         <div v-if="trip.mode === 'round-trip'" class="rounded-xl border-2 border-orange-100 overflow-hidden shadow-sm">
                             <div class="bg-orange-500 text-white px-4 py-2 flex justify-between items-center">
-                                <!-- 回程 英文移除 -->
                                 <span class="text-[10px] font-bold tracking-[0.2em]">回程</span>
                                 <div class="flex gap-6 text-[10px] font-mono">
                                     <span class="opacity-90 text-white/90">高鐵訂單編號: <span class="text-white font-bold">{{ trip.returnTrip.hsrOrderId || trip.outbound.hsrOrderId || 'N/A' }}</span></span>
                                     <span class="opacity-90 text-white/90">PNR: <span class="text-white font-bold">{{ trip.returnTrip.pnr }}</span></span>
                                 </div>
                             </div>
+                            <!-- 行程細節列：調整字體大小統一 -->
                             <div class="grid grid-cols-5 bg-white py-3 border-b border-orange-50 text-center">
                                 <div class="px-1">
                                     <p class="text-[9px] text-orange-300 font-bold">搭乘日期</p>
-                                    <p class="text-[12px] font-black font-mono">{{ trip.returnTrip.date.replace(/-/g, '/') }}</p>
+                                    <p class="text-[13px] font-black font-mono text-gray-900">{{ trip.returnTrip.date.replace(/-/g, '/') }}</p>
                                 </div>
                                 <div class="px-1 border-l border-orange-50">
                                     <p class="text-[9px] text-orange-300 font-bold">班次</p>
-                                    <p class="text-[12px] font-black">{{ trip.returnTrip.trainNo }} 次</p>
+                                    <p class="text-[13px] font-black text-gray-900">{{ trip.returnTrip.trainNo }} 次</p>
                                 </div>
                                 <div class="px-1 border-l border-orange-50">
                                     <p class="text-[9px] text-orange-300 font-bold">起訖站</p>
-                                    <p class="text-[13px] font-black">{{ trip.returnTrip.from }} ➜ {{ trip.returnTrip.to }}</p>
+                                    <p class="text-[13px] font-black text-gray-900">{{ trip.returnTrip.from }} ➜ {{ trip.returnTrip.to }}</p>
                                 </div>
                                 <div class="px-1 border-l border-orange-50">
                                     <p class="text-[9px] text-orange-300 font-bold">搭乘時間</p>
-                                    <p class="text-[12px] font-black font-mono">{{ trip.returnTrip.depTime }} - {{ trip.returnTrip.arrTime }}</p>
+                                    <p class="text-[13px] font-black font-mono text-gray-900">{{ trip.returnTrip.depTime }} - {{ trip.returnTrip.arrTime }}</p>
                                 </div>
                                 <div class="px-1 border-l border-orange-50">
                                     <p class="text-[9px] text-orange-300 font-bold">車廂等級</p>
-                                    <p class="text-[12px] font-black text-blue-600">{{ trip.returnTrip.carClass }}</p>
+                                    <p class="text-[13px] font-black text-blue-600">{{ trip.returnTrip.carClass }}</p>
                                 </div>
                             </div>
-                            <div class="px-6 py-1.5 bg-orange-50/50 flex justify-between text-[10px] font-bold text-orange-600 border-b border-orange-50">
+                            <div class="px-4 py-1.5 bg-orange-50/50 flex justify-between text-[10px] font-bold text-orange-600 border-b border-orange-50">
                                 <span>票價明細：{{ trip.retBreakdown }}</span>
                                 <span class="text-orange-700">小計: NT$ {{ trip.retAmount.toLocaleString() }}</span>
                             </div>
@@ -550,8 +548,6 @@
                             <p class="text-4xl font-black text-gray-900 font-mono tracking-tighter"><span class="text-lg font-light align-top mr-1">TWD</span>{{totalOrderAmount.toLocaleString()}}</p>
                         </div>
                     </div>
-
-                    <!-- 頁尾移除英文字水印 -->
                 </div>
             </div>
         </div>
@@ -582,9 +578,10 @@
                     }
                 };
 
+                // 預設起訖站：台北/左營
                 const baseInfo = reactive({ staff: '陳侑君', bookingDate: today, deadlineDate: '', deadlineTime: '18:00', sales: '', orderId: '', groupId: '' });
-                const outbound = reactive({ hsrOrderId: '', pnr: '', date: today, trainNo: '', from: '左營', to: '新竹', depTime: '07:00', arrTime: '08:23', carClass: '標準車廂' });
-                const returnTrip = reactive({ hsrOrderId: '', pnr: '', date: today, trainNo: '', from: '新竹', to: '左營', depTime: '21:22', arrTime: '22:45', carClass: '標準車廂' });
+                const outbound = reactive({ hsrOrderId: '', pnr: '', date: today, trainNo: '', from: '台北', to: '左營', depTime: '07:00', arrTime: '08:34', carClass: '標準車廂' });
+                const returnTrip = reactive({ hsrOrderId: '', pnr: '', date: today, trainNo: '', from: '左營', to: '台北', depTime: '17:00', arrTime: '18:34', carClass: '標準車廂' });
                 const tickets = reactive({ adult: 0, child: 0, senior: 0, disability: 0 });
                 const passengersOut = ref([]);
                 const passengersRet = ref([]);
