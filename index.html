@@ -118,22 +118,22 @@
             color: #ef4444;
         }
 
-        /* 圖檔專用表格樣式 - 行高設定為 1 */
+        /* 圖檔專用表格樣式 - 極致緊湊版 */
         .img-table-container {
             border: 2px solid #4a4a46;
-            margin-bottom: 16px;
-            border-radius: 4px;
+            margin-bottom: 8px;
             overflow: hidden;
+            border-radius: 2px;
         }
         .img-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 11px;
+            font-size: 10px;
             text-align: center;
-            line-height: 1; /* 設定行高為 1 */
+            line-height: 1.5;
         }
         .img-table th {
-            padding: 8px 4px; 
+            padding: 6px 4px;
             border-bottom: 1.5px solid #4a4a46;
             color: #f4f4f2;
             background-color: #4a4a46;
@@ -144,34 +144,35 @@
         .img-table th:last-child { border-right: none; }
 
         .img-table td {
-            padding: 10px 4px;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 8px 4px;
+            border-bottom: 1px solid #d1d5db;
             color: #4a4a46;
             font-weight: 900;
-            border-right: 1px solid #e5e7eb;
+            border-right: 1px solid #d1d5db;
             vertical-align: middle !important;
         }
         .img-table td:last-child { border-right: none; }
 
         .img-row-summary {
-            padding: 8px 12px;
-            font-size: 10px;
+            padding: 4px 8px;
+            font-size: 9px;
             font-weight: 500;
             color: #4a4a46;
             border-bottom: 1px solid #d1d5db;
-            line-height: 1; /* 設定行高為 1 */
+            line-height: 1.4;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background-color: #ffffff;
         }
         .img-row-breakdown {
-            padding: 8px 12px;
-            font-size: 10px;
+            padding: 4px 8px;
+            font-size: 9px;
             color: #6b7280;
             border-bottom: 1px dashed #d1d5db;
             background-color: #ffffff;
             text-align: left;
-            line-height: 1; /* 設定行高為 1 */
+            line-height: 1.4;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -183,10 +184,10 @@
             border-collapse: collapse;
             font-size: 10px;
             text-align: left;
-            line-height: 1; /* 設定行高為 1 */
+            line-height: 1.4;
         }
         .pax-table th {
-            padding: 6px 8px;
+            padding: 4px 6px;
             border-bottom: 1px solid #4a4a46;
             color: #4a4a46;
             background-color: #e2e8f0;
@@ -195,7 +196,7 @@
             vertical-align: middle !important;
         }
         .pax-table td {
-            padding: 8px 8px; /* 稍微增加內距以平衡 line-height: 1 */
+            padding: 4px 6px;
             border-bottom: 1px solid #f0f0f0;
             color: #4a4a46;
             font-weight: bold;
@@ -293,6 +294,7 @@
                     </div>
 
                     <div class="space-y-10">
+                        <!-- 去程 -->
                         <div>
                             <div class="flex items-center gap-2 mb-4">
                                 <span class="bg-[#4a4a46] text-[#f4f4f2] text-[10px] px-2 py-0.5 rounded font-mono">01</span>
@@ -304,10 +306,7 @@
                                 <div class="md:col-span-4"><label class="form-label">乘車日期</label><input type="date" v-model="outbound.date"></div>
                                 <div class="md:col-span-3">
                                     <label class="form-label">車廂艙等</label>
-                                    <select v-model="outbound.carClass">
-                                        <option value="標準車廂">標準車廂</option>
-                                        <option value="商務車廂">商務車廂</option>
-                                    </select>
+                                    <select v-model="outbound.carClass"><option value="標準車廂">標準車廂</option><option value="商務車廂">商務車廂</option></select>
                                 </div>
                                 <div class="md:col-span-3"><label class="form-label">車次</label><input type="text" v-model="outbound.trainNo"></div>
                                 <div class="md:col-span-3">
@@ -322,6 +321,7 @@
                             </div>
                         </div>
 
+                        <!-- 回程 -->
                         <div v-if="tripMode === 'round-trip'" class="pt-8 border-t border-[#a0aec0]/30">
                             <div class="flex items-center gap-2 mb-4">
                                 <span class="bg-[#8c8c88] text-[#f4f4f2] text-[10px] px-2 py-0.5 rounded font-mono">02</span>
@@ -333,10 +333,7 @@
                                 <div class="md:col-span-4"><label class="form-label">乘車日期</label><input type="date" v-model="returnTrip.date"></div>
                                 <div class="md:col-span-3">
                                     <label class="form-label">車廂艙等</label>
-                                    <select v-model="returnTrip.carClass">
-                                        <option value="標準車廂">標準車廂</option>
-                                        <option value="商務車廂">商務車廂</option>
-                                    </select>
+                                    <select v-model="returnTrip.carClass"><option value="標準車廂">標準車廂</option><option value="商務車廂">商務車廂</option></select>
                                 </div>
                                 <div class="md:col-span-3"><label class="form-label">車次</label><input type="text" v-model="returnTrip.trainNo"></div>
                                 <div class="md:col-span-3">
@@ -351,21 +348,40 @@
                             </div>
                         </div>
 
+                        <!-- 票數與旅客按鈕區 -->
                         <div class="bg-[#f4f4f2] rounded p-6 border border-[#a0aec0]">
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                <div><label class="form-label">全票</label><input type="number" v-model.number="tickets.adult"></div>
-                                <div><label class="form-label">孩童</label><input type="number" v-model.number="tickets.child"></div>
-                                <div><label class="form-label">敬老</label><input type="number" v-model.number="tickets.senior"></div>
-                                <div><label class="form-label">愛心</label><input type="number" v-model.number="tickets.disability"></div>
+                            <div class="mb-4">
+                                <label class="form-label mb-2 block font-bold text-[#4a4a46] text-sm border-b border-[#a0aec0] pb-1">去程票種數量</label>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div><label class="form-label">全票</label><input type="number" v-model.number="ticketsOut.adult" min="0"></div>
+                                    <div><label class="form-label">孩童</label><input type="number" v-model.number="ticketsOut.child" min="0"></div>
+                                    <div><label class="form-label">敬老</label><input type="number" v-model.number="ticketsOut.senior" min="0"></div>
+                                    <div><label class="form-label">愛心</label><input type="number" v-model.number="ticketsOut.disability" min="0"></div>
+                                </div>
                             </div>
-                            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+
+                            <div v-if="tripMode === 'round-trip'" class="mb-4 pt-4 border-t border-[#a0aec0]/30">
+                                <div class="flex justify-between items-center mb-2 border-b border-[#a0aec0] pb-1">
+                                    <label class="form-label font-bold text-[#4a4a46] text-sm">回程票種數量</label>
+                                    <button @click="copyOutboundTickets" class="text-xs text-[#4a4a46] underline hover:text-[#8c8c88]">同去程設定</button>
+                                </div>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div><label class="form-label">全票</label><input type="number" v-model.number="ticketsRet.adult" min="0"></div>
+                                    <div><label class="form-label">孩童</label><input type="number" v-model.number="ticketsRet.child" min="0"></div>
+                                    <div><label class="form-label">敬老</label><input type="number" v-model.number="ticketsRet.senior" min="0"></div>
+                                    <div><label class="form-label">愛心</label><input type="number" v-model.number="ticketsRet.disability" min="0"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
                                 <div class="text-sm font-medium text-[#8c8c88]">
-                                    合計：<span class="text-[#4a4a46] font-bold">{{ totalPersonCount }}</span> 位旅客 / 共 <span class="text-[#4a4a46] font-bold">{{ totalTicketCountInCurrent }}</span> 張車票
+                                    <span v-if="isOverLimit" class="text-red-600 font-bold block mb-1">⚠️ 單程人數限制 10 位</span>
+                                    <span>去程：{{ countOut }} 位 / 回程：{{ tripMode === 'round-trip' ? countRet : '-' }} 位</span>
                                 </div>
                                 <div class="flex gap-2">
-                                    <button @click="openPassengerModal" :disabled="totalPersonCount === 0" class="btn-outline px-6 py-2 text-sm">編輯名單</button>
-                                    <button v-if="editingIndex === null" @click="addTripToList" :disabled="isOverLimit || totalPersonCount === 0" class="btn-primary px-8 py-2 text-sm">新增紀錄</button>
-                                    <button v-else @click="updateTripInList" :disabled="isOverLimit || totalPersonCount === 0" class="btn-update px-8 py-2 text-sm font-bold">儲存更新</button>
+                                    <button @click="openPassengerModal" :disabled="countOut === 0 && countRet === 0" class="btn-outline px-6 py-2 text-sm">編輯名單</button>
+                                    <button v-if="editingIndex === null" @click="addTripToList" :disabled="isOverLimit || countOut === 0" class="btn-primary px-8 py-2 text-sm">新增紀錄</button>
+                                    <button v-else @click="updateTripInList" :disabled="isOverLimit || countOut === 0" class="btn-update px-8 py-2 text-sm font-bold">儲存更新</button>
                                     <button v-if="editingIndex !== null" @click="cancelEdit" class="px-4 py-2 text-[#8c8c88] font-bold text-sm">取消</button>
                                 </div>
                             </div>
@@ -389,12 +405,8 @@
                             <div class="flex justify-between items-start mb-2">
                                 <span class="text-[10px] bg-[#4a4a46] text-[#f4f4f2] px-2 py-0.5 rounded font-mono font-bold">#{{ idx + 1 }}</span>
                                 <div class="flex gap-4">
-                                    <button @click="startEdit(idx)" class="text-[#4a4a46] hover:text-blue-600 transition-colors" title="編輯">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
-                                    </button>
-                                    <button @click="removeTrip(idx)" class="text-red-400 hover:text-red-600 transition-colors" title="刪除">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
-                                    </button>
+                                    <button @click="startEdit(idx)" class="text-[#4a4a46] hover:text-blue-600 transition-colors" title="編輯"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>
+                                    <button @click="removeTrip(idx)" class="text-red-400 hover:text-red-600 transition-colors" title="刪除"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>
                                 </div>
                             </div>
                             <div class="text-sm font-bold text-[#4a4a46] mb-1">PNR: {{ trip.outbound.pnr }}</div>
@@ -504,7 +516,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    <tr style="background-color: #f1f4f6;">
                                         <td>去程</td>
                                         <td class="font-mono font-black">{{ trip.outbound.pnr }}</td>
                                         <td class="font-mono">{{ trip.outbound.date.replace(/-/g, '/') }}</td>
@@ -516,11 +528,11 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <div class="img-row-summary bg-blue-50/50">
+                            <div class="img-row-summary bg-[#f4f4f2]">
                                 <span>車廂：{{ trip.outbound.carClass }}</span>
-                                <span>票數：｜全票 {{ trip.tickets.adult }} 張｜孩童票 {{ trip.tickets.child }} 張｜敬老票 {{ trip.tickets.senior }} 張｜愛心票 {{ trip.tickets.disability }} 張</span>
+                                <span>票數：｜全票 {{ trip.ticketsOut.adult }} 張｜孩童票 {{ trip.ticketsOut.child }} 張｜敬老票 {{ trip.ticketsOut.senior }} 張｜愛心票 {{ trip.ticketsOut.disability }} 張</span>
                             </div>
-                            <div class="img-row-breakdown flex justify-between">
+                            <div class="img-row-breakdown flex justify-between items-center">
                                 <span class="font-bold">票價明細：</span>
                                 <span>{{ trip.outBreakdown }} <span class="ml-4 font-black">小計: NT$ {{ trip.outAmount.toLocaleString() }}</span></span>
                             </div>
@@ -554,7 +566,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    <tr style="background-color: #f6f4f1;">
                                         <td>回程</td>
                                         <td class="font-mono font-black">{{ trip.returnTrip.pnr }}</td>
                                         <td class="font-mono">{{ trip.returnTrip.date.replace(/-/g, '/') }}</td>
@@ -566,9 +578,9 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <div class="img-row-summary bg-orange-50/50">
+                            <div class="img-row-summary bg-[#f4f4f2]">
                                 <span>車廂：{{ trip.returnTrip.carClass }}</span>
-                                <span>票數：｜全票 {{ trip.tickets.adult }} 張｜孩童票 {{ trip.tickets.child }} 張｜敬老票 {{ trip.tickets.senior }} 張｜愛心票 {{ trip.tickets.disability }} 張</span>
+                                <span>票數：｜全票 {{ trip.ticketsRet.adult }} 張｜孩童票 {{ trip.ticketsRet.child }} 張｜敬老票 {{ trip.ticketsRet.senior }} 張｜愛心票 {{ trip.ticketsRet.disability }} 張</span>
                             </div>
                             <div class="img-row-breakdown flex justify-between">
                                 <span class="font-bold">票價明細：</span>
@@ -662,7 +674,11 @@
                 const baseInfo = reactive({ staff: '陳侑君', bookingDate: today, deadlineDate: '', deadlineTime: '18:00', sales: '', orderId: '', groupId: '' });
                 const outbound = reactive({ hsrOrderId: '', pnr: '', date: today, trainNo: '', from: '台北', to: '左營', depTime: '07:00', arrTime: '08:34', carClass: '標準車廂' });
                 const returnTrip = reactive({ hsrOrderId: '', pnr: '', date: today, trainNo: '', from: '左營', to: '台北', depTime: '17:00', arrTime: '18:34', carClass: '標準車廂' });
-                const tickets = reactive({ adult: 0, child: 0, senior: 0, disability: 0 });
+                
+                // 分離去回程票數
+                const ticketsOut = reactive({ adult: 0, child: 0, senior: 0, disability: 0 });
+                const ticketsRet = reactive({ adult: 0, child: 0, senior: 0, disability: 0 });
+
                 const passengersOut = ref([]);
                 const passengersRet = ref([]);
                 const addedTrips = ref([]);
@@ -703,14 +719,16 @@
                     return matrix[f]?.[t] || matrix[t]?.[f] || 1000;
                 };
 
-                const calcAmount = (tripObj) => {
+                // 計算金額需傳入票數物件
+                const calcAmount = (tripObj, tks) => {
                     const unit = getSingleFare(tripObj.from, tripObj.to, tripObj.carClass);
                     const discount = tripObj.carClass === '標準車廂' ? 0.85 : 0.9;
                     const adultPrice = Math.round(unit * discount);
                     const concessionPrice = Math.round(unit * 0.5);
-                    return (tickets.adult * adultPrice) + ((tickets.child + tickets.senior + tickets.disability) * concessionPrice);
+                    return (tks.adult * adultPrice) + ((tks.child + tks.senior + tks.disability) * concessionPrice);
                 };
 
+                // 產生票價明細需傳入票數物件
                 const getBreakdown = (tripObj, tks) => {
                     const unit = getSingleFare(tripObj.from, tripObj.to, tripObj.carClass);
                     const discount = tripObj.carClass === '標準車廂' ? 0.85 : 0.9;
@@ -747,7 +765,8 @@
                 const resetForm = () => {
                     outbound.pnr = ''; outbound.hsrOrderId = '';
                     returnTrip.pnr = ''; returnTrip.hsrOrderId = '';
-                    tickets.adult = 0; tickets.child = 0; tickets.senior = 0; tickets.disability = 0;
+                    Object.assign(ticketsOut, { adult: 0, child: 0, senior: 0, disability: 0 });
+                    Object.assign(ticketsRet, { adult: 0, child: 0, senior: 0, disability: 0 });
                 };
 
                 const resetCurrentTripForm = () => {
@@ -755,24 +774,30 @@
                         resetForm(); showToast("行程輸入已重設");
                     }
                 };
+                
+                const copyOutboundTickets = () => {
+                    Object.assign(ticketsRet, JSON.parse(JSON.stringify(ticketsOut)));
+                    showToast("已複製去程票數");
+                };
 
                 const openPassengerModal = () => { showPassengerModal.value = true; };
 
                 const addTripToList = () => {
                     if (!outbound.pnr) { showToast("請輸入 PNR 代碼"); return; }
-                    const outAmount = calcAmount(outbound);
-                    const retAmount = tripMode.value === 'round-trip' ? calcAmount(returnTrip) : 0;
+                    const outAmount = calcAmount(outbound, ticketsOut);
+                    const retAmount = tripMode.value === 'round-trip' ? calcAmount(returnTrip, ticketsRet) : 0;
                     addedTrips.value.push({
                         mode: tripMode.value,
                         outbound: { ...outbound },
                         returnTrip: { ...returnTrip },
-                        tickets: { ...tickets },
+                        ticketsOut: { ...ticketsOut },
+                        ticketsRet: { ...ticketsRet },
                         passengersOut: JSON.parse(JSON.stringify(passengersOut.value)),
                         passengersRet: tripMode.value === 'round-trip' ? JSON.parse(JSON.stringify(passengersRet.value)) : [],
                         totalAmount: outAmount + retAmount,
                         outAmount, retAmount,
-                        outBreakdown: getBreakdown(outbound, tickets),
-                        retBreakdown: tripMode.value === 'round-trip' ? getBreakdown(returnTrip, tickets) : ''
+                        outBreakdown: getBreakdown(outbound, ticketsOut),
+                        retBreakdown: tripMode.value === 'round-trip' ? getBreakdown(returnTrip, ticketsRet) : ''
                     });
                     resetForm();
                     showToast("行程紀錄已儲存");
@@ -784,7 +809,10 @@
                     tripMode.value = t.mode;
                     Object.assign(outbound, t.outbound);
                     Object.assign(returnTrip, t.returnTrip);
-                    Object.assign(tickets, t.tickets);
+                    Object.assign(ticketsOut, t.ticketsOut);
+                    if(t.mode === 'round-trip') Object.assign(ticketsRet, t.ticketsRet);
+                    else Object.assign(ticketsRet, { adult: 0, child: 0, senior: 0, disability: 0 });
+                    
                     passengersOut.value = JSON.parse(JSON.stringify(t.passengersOut));
                     passengersRet.value = JSON.parse(JSON.stringify(t.passengersRet));
                 };
@@ -792,19 +820,20 @@
                 const updateTripInList = () => {
                     const idx = editingIndex.value;
                     if (idx === null) return;
-                    const outAmount = calcAmount(outbound);
-                    const retAmount = tripMode.value === 'round-trip' ? calcAmount(returnTrip) : 0;
+                    const outAmount = calcAmount(outbound, ticketsOut);
+                    const retAmount = tripMode.value === 'round-trip' ? calcAmount(returnTrip, ticketsRet) : 0;
                     addedTrips.value[idx] = {
                         mode: tripMode.value,
                         outbound: { ...outbound },
                         returnTrip: { ...returnTrip },
-                        tickets: { ...tickets },
+                        ticketsOut: { ...ticketsOut },
+                        ticketsRet: { ...ticketsRet },
                         passengersOut: JSON.parse(JSON.stringify(passengersOut.value)),
                         passengersRet: tripMode.value === 'round-trip' ? JSON.parse(JSON.stringify(passengersRet.value)) : [],
                         totalAmount: outAmount + retAmount,
                         outAmount, retAmount,
-                        outBreakdown: getBreakdown(outbound, tickets),
-                        retBreakdown: tripMode.value === 'round-trip' ? getBreakdown(returnTrip, tickets) : ''
+                        outBreakdown: getBreakdown(outbound, ticketsOut),
+                        retBreakdown: tripMode.value === 'round-trip' ? getBreakdown(returnTrip, ticketsRet) : ''
                     };
                     resetForm();
                     editingIndex.value = null;
@@ -818,26 +847,81 @@
                     }
                 };
 
-                const totalPersonCount = computed(() => (tickets.adult || 0) + (tickets.child || 0) + (tickets.senior || 0) + (tickets.disability || 0));
-                const totalTicketCountInCurrent = computed(() => tripMode.value === 'one-way' ? totalPersonCount.value : totalPersonCount.value * 2);
-                const isOverLimit = computed(() => totalPersonCount.value > 10);
+                const countOut = computed(() => (ticketsOut.adult || 0) + (ticketsOut.child || 0) + (ticketsOut.senior || 0) + (ticketsOut.disability || 0));
+                const countRet = computed(() => (ticketsRet.adult || 0) + (ticketsRet.child || 0) + (ticketsRet.senior || 0) + (ticketsRet.disability || 0));
+                
+                const totalPersonCount = computed(() => Math.max(countOut.value, countRet.value));
+                const totalTicketCountInCurrent = computed(() => countOut.value + (tripMode.value === 'round-trip' ? countRet.value : 0));
+                const isOverLimit = computed(() => countOut.value > 10 || (tripMode.value === 'round-trip' && countRet.value > 10));
+
                 const totalOrderAmount = computed(() => addedTrips.value.reduce((s, t) => s + t.totalAmount, 0));
                 const formattedDeadline = computed(() => baseInfo.deadlineDate ? `${baseInfo.deadlineDate.replace(/-/g,'/')} ${baseInfo.deadlineTime}` : '');
                 const manualTimestamp = computed(() => new Date().toLocaleString('zh-TW', { hour12: false }));
 
                 watch(() => baseInfo.bookingDate, () => { calculateDeadline(); });
 
-                watch(tickets, (val) => {
-                    const sync = (list) => {
-                        const types = [{c: val.adult, t:'全票'}, {c: val.child, t:'孩童票'}, {c: val.senior, t:'敬老票'}, {c: val.disability, t:'愛心票'}];
-                        let newList = [];
-                        types.forEach(item => { for(let i=0; i<item.c; i++) newList.push({type: item.t, name:'', idNumber:'', passportNo:'', birthday:'', isDirty: false}) });
-                        newList.forEach((p, i) => { if(list.value[i]) Object.assign(p, list.value[i]) });
-                        list.value = newList.slice(0, 10);
-                    };
-                    sync(passengersOut); sync(passengersRet);
+                // 監聽去程票數 -> 更新去程旅客名單長度
+                watch(ticketsOut, (val) => {
+                    const count = (val.adult||0) + (val.child||0) + (val.senior||0) + (val.disability||0);
+                    const currentLen = passengersOut.value.length;
+                    if (count > currentLen) {
+                        for (let i = currentLen; i < count; i++) {
+                            // 根據票種順序決定類型 (簡化邏輯：新稱的先預設全票，後續可優化)
+                            let type = '全票'; 
+                            // 這裡為了簡單，新稱的空白列預設類型，實際應用可更細緻
+                            if(i < val.adult) type='全票';
+                            else if(i < val.adult+val.child) type='孩童票';
+                            else if(i < val.adult+val.child+val.senior) type='敬老票';
+                            else type='愛心票';
+                            
+                            passengersOut.value.push({type, name:'', idNumber:'', passportNo:'', birthday:'', isDirty: false});
+                        }
+                    } else if (count < currentLen) {
+                        passengersOut.value.splice(count);
+                    }
+                    // 更新現有類型
+                    let idx = 0;
+                    const types = [{c: val.adult, t:'全票'}, {c: val.child, t:'孩童票'}, {c: val.senior, t:'敬老票'}, {c: val.disability, t:'愛心票'}];
+                    types.forEach(item => {
+                        for(let k=0; k<item.c; k++) {
+                            if(passengersOut.value[idx]) passengersOut.value[idx].type = item.t;
+                            idx++;
+                        }
+                    });
                 }, { deep: true });
 
+                // 監聽回程票數 -> 更新回程旅客名單長度
+                watch(ticketsRet, (val) => {
+                    const count = (val.adult||0) + (val.child||0) + (val.senior||0) + (val.disability||0);
+                    const currentLen = passengersRet.value.length;
+                    if (count > currentLen) {
+                        for (let i = currentLen; i < count; i++) {
+                            let type = '全票';
+                            if(i < val.adult) type='全票';
+                            else if(i < val.adult+val.child) type='孩童票';
+                            else if(i < val.adult+val.child+val.senior) type='敬老票';
+                            else type='愛心票';
+                            
+                            // 嘗試從去程同步資料
+                            const syncSource = passengersOut.value[i];
+                            const initData = syncSource ? { ...syncSource, type } : {type, name:'', idNumber:'', passportNo:'', birthday:'', isDirty: false};
+                            passengersRet.value.push(initData);
+                        }
+                    } else if (count < currentLen) {
+                        passengersRet.value.splice(count);
+                    }
+                    // 更新類型
+                    let idx = 0;
+                    const types = [{c: val.adult, t:'全票'}, {c: val.child, t:'孩童票'}, {c: val.senior, t:'敬老票'}, {c: val.disability, t:'愛心票'}];
+                    types.forEach(item => {
+                        for(let k=0; k<item.c; k++) {
+                            if(passengersRet.value[idx]) passengersRet.value[idx].type = item.t;
+                            idx++;
+                        }
+                    });
+                }, { deep: true });
+
+                // 同步去程資料修改至回程 (僅當回程未髒且索引相同時)
                 watch(passengersOut, (val) => {
                     if (tripMode.value === 'round-trip') {
                         val.forEach((p, i) => {
@@ -865,6 +949,7 @@
                         text += `去程｜PNR ${t.outbound.pnr}\n`;
                         text += `${t.outbound.date.replace(/-/g, '/')}  ${t.outbound.from}${t.outbound.to}  班次${t.outbound.trainNo}  ${t.outbound.depTime} - ${t.outbound.arrTime}\n`;
                         text += `${t.outbound.carClass}｜${t.outBreakdown} = NT$ ${t.outAmount.toLocaleString()}\n\n`;
+                        
                         if (t.mode === 'round-trip') {
                             text += `回程｜PNR ${t.returnTrip.pnr}\n`;
                             text += `${t.returnTrip.date.replace(/-/g, '/')}  ${t.returnTrip.from}${t.returnTrip.to}  班次${t.returnTrip.trainNo}  ${t.returnTrip.depTime} - ${t.returnTrip.arrTime}\n`;
@@ -915,11 +1000,11 @@
                 onMounted(() => { calculateDeadline(); });
 
                 return { 
-                    baseInfo, outbound, returnTrip, tickets, passengersOut, passengersRet, passengerTab, stations, 
-                    tripMode, showPassengerModal, openPassengerModal, formattedDeadline, totalPersonCount, totalTicketCountInCurrent, 
+                    baseInfo, outbound, returnTrip, ticketsOut, ticketsRet, passengersOut, passengersRet, passengerTab, stations, 
+                    tripMode, showPassengerModal, openPassengerModal, formattedDeadline, totalPersonCount, totalTicketCountInCurrent, countOut, countRet,
                     isOverLimit, addedTrips, addTripToList, startEdit, updateTripInList, cancelEdit, editingIndex, removeTrip, 
                     totalOrderAmount, syncOrderId, downloadTxt, downloadImage, copyToClipboard, manualTimestamp, toastMsg, 
-                    maskId, swapStations, clearBasicInfo, resetCurrentTripForm, staffInput, hsrOrderInput, focusInput 
+                    maskId, swapStations, clearBasicInfo, resetCurrentTripForm, staffInput, hsrOrderInput, focusInput, copyOutboundTickets
                 };
             }
         }).mount('#app');
