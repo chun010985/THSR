@@ -99,7 +99,7 @@
         }
         .img-section-title {
             background: #f4f4f2;
-            padding: 1px 8px;
+            padding: 2px 10px;
             border-radius: 2px;
             font-size: 10px;
             font-weight: bold;
@@ -118,7 +118,7 @@
             color: #ef4444;
         }
 
-        /* 圖檔專用表格樣式 - 行高 1.5 */
+        /* 圖檔專用表格樣式 - 修正版 (行高1.2) */
         .img-table-container {
             border: 2px solid #4a4a46;
             margin-bottom: 12px;
@@ -129,7 +129,7 @@
             border-collapse: collapse;
             font-size: 10px;
             text-align: center;
-            line-height: 1.5; /* 設定行高為 1.5 */
+            line-height: 1.2;
         }
         .img-table th {
             padding: 6px 4px;
@@ -158,7 +158,7 @@
             font-weight: 500;
             color: #4a4a46;
             border-bottom: 1px solid #d1d5db;
-            line-height: 1.5; /* 設定行高為 1.5 */
+            line-height: 1.2;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -171,7 +171,7 @@
             border-bottom: 1px dashed #d1d5db;
             background-color: #ffffff;
             text-align: left;
-            line-height: 1.5; /* 設定行高為 1.5 */
+            line-height: 1.2;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -183,7 +183,7 @@
             border-collapse: collapse;
             font-size: 10px;
             text-align: left;
-            line-height: 1.5; /* 設定行高為 1.5 */
+            line-height: 1.2;
         }
         .pax-table th {
             padding: 6px 6px;
@@ -667,7 +667,8 @@
                     standard: {
                         '台北': { '左營': 1490, '台南': 1350, '嘉義': 1080, '台中': 700, '桃園': 160, '新竹': 290, '南港': 40, '板橋': 40, '苗栗': 430, '彰化': 820, '雲林': 930 },
                         '左營': { '台北': 1490, '桃園': 1330, '台中': 790, '新竹': 1200, '南港': 1530, '板橋': 1460, '苗栗': 1060, '彰化': 680, '雲林': 560, '嘉義': 410, '台南': 140 },
-                        '新竹': { '左營': 1200, '台北': 290, '南港': 330, '板橋': 260, '桃園': 130, '苗栗': 270, '台中': 390, '彰化': 500, '雲林': 640, '嘉義': 920, '台南': 1060 }
+                        '新竹': { '左營': 1200, '台北': 290, '南港': 330, '板橋': 260, '桃園': 130, '苗栗': 270, '台中': 390, '彰化': 500, '雲林': 640, '嘉義': 920, '台南': 1060 },
+                        '桃園': { '台南': 1190, '嘉義': 920, '雲林': 780, '彰化': 670, '台中': 540, '苗栗': 280, '新竹': 130 }
                     },
                     business: {
                         '台北': { '左營': 2440, '台南': 2230, '嘉義': 1820, '台中': 1250, '桃園': 440, '新竹': 640 },
@@ -678,7 +679,6 @@
                 const baseInfo = reactive({ staff: '陳侑君', bookingDate: today, deadlineDate: '', deadlineTime: '18:00', sales: '', orderId: '', groupId: '' });
                 const outbound = reactive({ hsrOrderId: '', pnr: '', date: today, trainNo: '', from: '台北', to: '左營', depTime: '07:00', arrTime: '08:34', carClass: '標準車廂' });
                 const returnTrip = reactive({ hsrOrderId: '', pnr: '', date: today, trainNo: '', from: '左營', to: '台北', depTime: '17:00', arrTime: '18:34', carClass: '標準車廂' });
-                const tickets = reactive({ adult: 0, child: 0, senior: 0, disability: 0 });
                 const ticketsOut = reactive({ adult: 0, child: 0, senior: 0, disability: 0 });
                 const ticketsRet = reactive({ adult: 0, child: 0, senior: 0, disability: 0 });
                 const passengersOut = ref([]);
@@ -721,6 +721,7 @@
                     return matrix[f]?.[t] || matrix[t]?.[f] || 1000;
                 };
 
+                // 計算金額需傳入票數物件
                 const calcAmount = (tripObj, tks) => {
                     const unit = getSingleFare(tripObj.from, tripObj.to, tripObj.carClass);
                     const discount = tripObj.carClass === '標準車廂' ? 0.85 : 0.9;
@@ -729,6 +730,7 @@
                     return (tks.adult * adultPrice) + ((tks.child + tks.senior + tks.disability) * concessionPrice);
                 };
 
+                // 產生票價明細需傳入票數物件
                 const getBreakdown = (tripObj, tks) => {
                     const unit = getSingleFare(tripObj.from, tripObj.to, tripObj.carClass);
                     const discount = tripObj.carClass === '標準車廂' ? 0.85 : 0.9;
@@ -765,8 +767,6 @@
                 const resetForm = () => {
                     outbound.pnr = ''; outbound.hsrOrderId = '';
                     returnTrip.pnr = ''; returnTrip.hsrOrderId = '';
-                    tickets.adult = 0; tickets.child = 0; tickets.senior = 0; tickets.disability = 0;
-                    // 同步重設 ticketsOut 與 ticketsRet
                     Object.assign(ticketsOut, { adult: 0, child: 0, senior: 0, disability: 0 });
                     Object.assign(ticketsRet, { adult: 0, child: 0, senior: 0, disability: 0 });
                 };
@@ -868,16 +868,20 @@
                     const currentLen = passengersOut.value.length;
                     if (count > currentLen) {
                         for (let i = currentLen; i < count; i++) {
+                            // 根據票種順序決定類型 (簡化邏輯：新稱的先預設全票，後續可優化)
                             let type = '全票'; 
+                            // 這裡為了簡單，新稱的空白列預設類型，實際應用可更細緻
                             if(i < val.adult) type='全票';
                             else if(i < val.adult+val.child) type='孩童票';
                             else if(i < val.adult+val.child+val.senior) type='敬老票';
                             else type='愛心票';
+                            
                             passengersOut.value.push({type, name:'', idNumber:'', passportNo:'', birthday:'', isDirty: false});
                         }
                     } else if (count < currentLen) {
                         passengersOut.value.splice(count);
                     }
+                    // 更新現有類型
                     let idx = 0;
                     const types = [{c: val.adult, t:'全票'}, {c: val.child, t:'孩童票'}, {c: val.senior, t:'敬老票'}, {c: val.disability, t:'愛心票'}];
                     types.forEach(item => {
@@ -899,6 +903,8 @@
                             else if(i < val.adult+val.child) type='孩童票';
                             else if(i < val.adult+val.child+val.senior) type='敬老票';
                             else type='愛心票';
+                            
+                            // 嘗試從去程同步資料
                             const syncSource = passengersOut.value[i];
                             const initData = syncSource ? { ...syncSource, type } : {type, name:'', idNumber:'', passportNo:'', birthday:'', isDirty: false};
                             passengersRet.value.push(initData);
@@ -906,6 +912,7 @@
                     } else if (count < currentLen) {
                         passengersRet.value.splice(count);
                     }
+                    // 更新類型
                     let idx = 0;
                     const types = [{c: val.adult, t:'全票'}, {c: val.child, t:'孩童票'}, {c: val.senior, t:'敬老票'}, {c: val.disability, t:'愛心票'}];
                     types.forEach(item => {
@@ -916,6 +923,7 @@
                     });
                 }, { deep: true });
 
+                // 同步去程資料修改至回程 (僅當回程未髒且索引相同時)
                 watch(passengersOut, (val) => {
                     if (tripMode.value === 'round-trip') {
                         val.forEach((p, i) => {
@@ -993,7 +1001,7 @@
                 onMounted(() => { calculateDeadline(); });
 
                 return { 
-                    baseInfo, outbound, returnTrip, tickets, ticketsOut, ticketsRet, passengersOut, passengersRet, passengerTab, stations, 
+                    baseInfo, outbound, returnTrip, ticketsOut, ticketsRet, passengersOut, passengersRet, passengerTab, stations, 
                     tripMode, showPassengerModal, openPassengerModal, formattedDeadline, totalPersonCount, totalTicketCountInCurrent, countOut, countRet,
                     isOverLimit, addedTrips, addTripToList, startEdit, updateTripInList, cancelEdit, editingIndex, removeTrip, 
                     totalOrderAmount, syncOrderId, downloadTxt, downloadImage, copyToClipboard, manualTimestamp, toastMsg, 
