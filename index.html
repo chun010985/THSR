@@ -118,7 +118,7 @@
             color: #ef4444;
         }
 
-        /* 圖檔專用表格樣式 - 修正版 (確保垂直置中與間距) */
+        /* 圖檔專用表格樣式 - 行高設定為 1 */
         .img-table-container {
             border: 2px solid #4a4a46;
             margin-bottom: 16px;
@@ -130,51 +130,51 @@
             border-collapse: collapse;
             font-size: 11px;
             text-align: center;
-            line-height: 1.5; /* 恢復正常行高 */
+            line-height: 1; /* 設定行高為 1 */
         }
         .img-table th {
-            padding: 8px 4px; /* 增加垂直內距 */
+            padding: 8px 4px; 
             border-bottom: 1.5px solid #4a4a46;
             color: #f4f4f2;
             background-color: #4a4a46;
             font-weight: bold;
             border-right: 1px solid #6b6b6b;
-            vertical-align: middle !important; /* 強制垂直置中 */
+            vertical-align: middle !important;
         }
         .img-table th:last-child { border-right: none; }
 
         .img-table td {
-            padding: 10px 4px; /* 增加垂直內距，避免文字貼邊 */
+            padding: 10px 4px;
             border-bottom: 1px solid #e5e7eb;
             color: #4a4a46;
             font-weight: 900;
             border-right: 1px solid #e5e7eb;
-            vertical-align: middle !important; /* 強制垂直置中 */
+            vertical-align: middle !important;
         }
         .img-table td:last-child { border-right: none; }
 
         .img-row-summary {
-            padding: 6px 12px;
+            padding: 8px 12px;
             font-size: 10px;
             font-weight: 500;
             color: #4a4a46;
             border-bottom: 1px solid #d1d5db;
-            line-height: 1.4;
+            line-height: 1; /* 設定行高為 1 */
             display: flex;
             justify-content: space-between;
-            align-items: center; /* Flex 垂直置中 */
+            align-items: center;
         }
         .img-row-breakdown {
-            padding: 6px 12px;
+            padding: 8px 12px;
             font-size: 10px;
             color: #6b7280;
             border-bottom: 1px dashed #d1d5db;
             background-color: #ffffff;
             text-align: left;
-            line-height: 1.4;
+            line-height: 1; /* 設定行高為 1 */
             display: flex;
             justify-content: space-between;
-            align-items: center; /* Flex 垂直置中 */
+            align-items: center;
         }
         
         /* 旅客表格樣式 */
@@ -183,10 +183,10 @@
             border-collapse: collapse;
             font-size: 10px;
             text-align: left;
-            line-height: 1.4;
+            line-height: 1; /* 設定行高為 1 */
         }
         .pax-table th {
-            padding: 6px 8px; /* 增加內距 */
+            padding: 6px 8px;
             border-bottom: 1px solid #4a4a46;
             color: #4a4a46;
             background-color: #e2e8f0;
@@ -195,7 +195,7 @@
             vertical-align: middle !important;
         }
         .pax-table td {
-            padding: 6px 8px; /* 增加內距 */
+            padding: 8px 8px; /* 稍微增加內距以平衡 line-height: 1 */
             border-bottom: 1px solid #f0f0f0;
             color: #4a4a46;
             font-weight: bold;
@@ -466,11 +466,11 @@
 
                     <!-- 基本資料 -->
                     <div class="mb-3 grid grid-cols-5 border-y-2 border-[#a0aec0] py-2 bg-[#f4f4f2]/30 text-center items-center">
-                        <div class="px-1"><p class="text-[9px] text-[#8c8c88] font-bold mb-0.5">訂單編號</p><p class="text-[12px] font-black font-mono">{{baseInfo.orderId || 'N/A'}}</p></div>
-                        <div class="px-1 border-l border-[#a0aec0]"><p class="text-[9px] text-[#8c8c88] font-bold mb-0.5">團號</p><p class="text-[12px] font-black font-mono">{{baseInfo.groupId || 'N/A'}}</p></div>
-                        <div class="px-1 border-l border-[#a0aec0]"><p class="text-[9px] text-[#8c8c88] font-bold mb-0.5">訂票日期</p><p class="text-[12px] font-black font-mono">{{baseInfo.bookingDate.replace(/-/g, '/')}}</p></div>
-                        <div class="px-1 border-l border-[#a0aec0]"><p class="text-[9px] text-[#8c8c88] font-bold mb-0.5">業務姓名</p><p class="text-[12px] font-black">{{baseInfo.sales || 'N/A'}}</p></div>
-                        <div class="px-1 border-l border-[#a0aec0]"><p class="text-[9px] text-[#8c8c88] font-bold mb-0.5">訂票人員</p><p class="text-[12px] font-black">{{baseInfo.staff}}</p></div>
+                        <div class="px-1 flex flex-col justify-center"><p class="text-[9px] text-[#8c8c88] font-bold mb-0.5">訂單編號</p><p class="text-[12px] font-black font-mono">{{baseInfo.orderId || 'N/A'}}</p></div>
+                        <div class="px-1 border-l border-[#a0aec0] flex flex-col justify-center"><p class="text-[9px] text-[#8c8c88] font-bold mb-0.5">團號</p><p class="text-[12px] font-black font-mono">{{baseInfo.groupId || 'N/A'}}</p></div>
+                        <div class="px-1 border-l border-[#a0aec0] flex flex-col justify-center"><p class="text-[9px] text-[#8c8c88] font-bold mb-0.5">訂票日期</p><p class="text-[12px] font-black font-mono">{{baseInfo.bookingDate.replace(/-/g, '/')}}</p></div>
+                        <div class="px-1 border-l border-[#a0aec0] flex flex-col justify-center"><p class="text-[9px] text-[#8c8c88] font-bold mb-0.5">業務姓名</p><p class="text-[12px] font-black">{{baseInfo.sales || 'N/A'}}</p></div>
+                        <div class="px-1 border-l border-[#a0aec0] flex flex-col justify-center"><p class="text-[9px] text-[#8c8c88] font-bold mb-0.5">訂票人員</p><p class="text-[12px] font-black">{{baseInfo.staff}}</p></div>
                     </div>
 
                     <!-- 開票期限區 -->
