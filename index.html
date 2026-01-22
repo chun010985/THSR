@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高鐵訂位確認單生成器 - 完整功能修復版</title>
+    <title>高鐵訂位確認單生成器 - 完整修復版</title>
     <!-- Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <!-- Tailwind CSS -->
@@ -52,9 +52,6 @@
             font-weight: 600;
             border-radius: 4px;
             transition: opacity 0.2s;
-        }
-        .btn-primary:hover:not(:disabled) {
-            opacity: 0.9;
         }
         .btn-outline {
             border: 1px solid #4a4a46;
@@ -154,12 +151,11 @@
             align-items: center;
         }
         
-        /* 旅客表格樣式 - 水平置中 */
         .pax-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 10px;
-            text-align: center; /* 水平置中 */
+            text-align: center;
             line-height: 1.5;
         }
         .pax-table th {
@@ -214,7 +210,7 @@
                     </div>
                 </div>
 
-                <!-- 行程詳細設定 -->
+                <!-- 行程設定 -->
                 <div class="japanese-card p-6 md:p-8 relative">
                     <div v-if="editingIndex !== null" class="absolute top-4 right-24 bg-[#4a4a46] text-[#f4f4f2] px-3 py-1 text-xs font-bold rounded">編輯模式中</div>
                     <div class="flex justify-between items-center mb-8">
@@ -308,22 +304,22 @@
                                 </div>
                             </div>
                             <p class="text-sm font-bold text-[#4a4a46]">HSR ID: {{ trip.outbound.hsrOrderId || 'N/A' }}</p>
-                            <p class="text-sm font-bold text-gray-500">PNR: {{ trip.outbound.pnr }}</p>
-                            <p class="text-[11px] text-gray-400 font-mono mt-1">{{ trip.outbound.date }} | NT$ {{ trip.totalAmount.toLocaleString() }}</p>
+                            <p class="text-[11px] text-gray-500 font-mono">{{ trip.outbound.date }} | NT$ {{ trip.totalAmount.toLocaleString() }}</p>
                         </div>
                     </div>
                     <div class="pt-4 border-t border-gray-300 mt-4">
                         <div class="flex justify-between items-end mb-4">
-                            <span class="text-xs font-bold text-gray-400">Total Payable</span>
+                            <span class="text-xs font-bold text-gray-400 uppercase">Total Payable</span>
                             <span class="text-2xl font-black">NT$ {{ totalOrderAmount.toLocaleString() }}</span>
                         </div>
                         <button @click="downloadImage" :disabled="addedTrips.length === 0" class="w-full btn-primary py-3 mb-2 shadow-lg">下載確認單圖片</button>
+                        <button @click="copySummaryText" :disabled="addedTrips.length === 0" class="w-full btn-outline py-2 text-xs">複製確認單文字版</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 旅客 Modal -->
+        <!-- 旅客名單 Modal -->
         <transition name="fade">
             <div v-if="showPassengerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
                 <div class="bg-white w-full max-w-5xl max-h-[90vh] rounded shadow-2xl flex flex-col overflow-hidden">
@@ -349,32 +345,58 @@
             </div>
         </transition>
 
-        <!-- 圖檔隱藏渲染區 -->
+        <!-- 圖檔導出區 (隱藏渲染區) -->
         <div id="capture-area-container">
             <div id="image-node" class="w-[850px] bg-white p-6 relative overflow-hidden text-[#4a4a46]">
                 <div class="img-header-line"></div>
                 <div class="p-4">
                     <div class="flex justify-between items-start mb-5">
-                        <div><h1 class="text-2xl font-black tracking-[0.2em] mb-1">高鐵訂位確認單</h1><p class="text-[9px] text-gray-400 font-bold tracking-widest uppercase">HSR Booking Confirmation Slip</p></div>
-                        <div class="text-right"><p class="text-[9px] text-gray-400 font-bold uppercase">Generation Time</p><p class="text-[11px] font-bold font-mono">{{ nowTimestamp }}</p></div>
+                        <div>
+                            <h1 class="text-2xl font-black tracking-[0.2em] mb-1">高鐵訂位確認單</h1>
+                            <p class="text-[9px] text-gray-400 font-bold tracking-widest uppercase">HSR Booking Confirmation Slip</p>
+                        </div>
+                        <div class="text-right"><p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Generation Time</p><p class="text-[11px] font-bold font-mono">{{ nowTimestamp }}</p></div>
                     </div>
-                    <div class="grid grid-cols-5 border-y-2 border-[#a0aec0] py-2 mb-6 text-center items-center">
-                        <div><p class="text-[9px] text-gray-400 font-bold uppercase font-bold">Order ID</p><p class="text-[12px] font-black font-mono">{{baseInfo.orderId || 'N/A'}}</p></div>
-                        <div class="border-l border-gray-300"><p class="text-[9px] text-gray-400 font-bold uppercase font-bold">Group ID</p><p class="text-[12px] font-black font-mono">{{baseInfo.groupId || 'N/A'}}</p></div>
-                        <div class="border-l border-gray-300"><p class="text-[9px] text-gray-400 font-bold uppercase font-bold">Booking Date</p><p class="text-[12px] font-black font-mono">{{baseInfo.bookingDate.replace(/-/g, '/')}}</p></div>
-                        <div class="border-l border-gray-300"><p class="text-[9px] text-gray-400 font-bold uppercase font-bold">Staff</p><p class="text-[12px] font-black">{{baseInfo.staff}}</p></div>
-                        <div class="border-l border-gray-300 text-red-600 font-bold"><p class="text-[9px] uppercase font-bold">Deadline</p><p class="text-[12px] font-black font-mono">{{formattedDeadline}}</p></div>
+
+                    <!-- 完整中文標籤基本資料區 -->
+                    <div class="grid grid-cols-6 border-y-2 border-[#a0aec0] py-2 mb-6 text-center items-center">
+                        <div><p class="text-[9px] text-gray-400 font-bold">訂單編號</p><p class="text-[12px] font-black font-mono">{{baseInfo.orderId || 'N/A'}}</p></div>
+                        <div class="border-l border-gray-300"><p class="text-[9px] text-gray-400 font-bold">團體代號</p><p class="text-[12px] font-black font-mono">{{baseInfo.groupId || 'N/A'}}</p></div>
+                        <div class="border-l border-gray-300"><p class="text-[9px] text-gray-400 font-bold">訂票日期</p><p class="text-[12px] font-black font-mono">{{baseInfo.bookingDate.replace(/-/g, '/')}}</p></div>
+                        <div class="border-l border-gray-300"><p class="text-[9px] text-gray-400 font-bold">業務人員</p><p class="text-[12px] font-black">{{baseInfo.sales || 'N/A'}}</p></div>
+                        <div class="border-l border-gray-300"><p class="text-[9px] text-gray-400 font-bold">開票人員</p><p class="text-[12px] font-black">{{baseInfo.staff}}</p></div>
+                        <div class="border-l border-gray-300 text-red-600 font-bold"><p class="text-[9px] font-bold">開票期限 (DL)</p><p class="text-[12px] font-black font-mono">{{formattedDeadline}}</p></div>
                     </div>
+
+                    <!-- 完整 D/L 說明 -->
+                    <div class="bg-orange-50 border-l-4 border-orange-400 p-4 mb-6 rounded-r">
+                        <p class="text-xs font-black text-red-600 mb-1">★ 開票期限與規範：</p>
+                        <ul class="text-[10px] text-orange-800 font-bold space-y-1">
+                            <li>● 請於 D/L 前通知「可開票」與「取票方式」。</li>
+                            <li>● 逾期將自動取消需重新訂票。</li>
+                            <li>● 每筆訂位代碼，統一取票方式。</li>
+                        </ul>
+                    </div>
+
+                    <!-- 行程明細 -->
                     <div v-for="(trip, tIdx) in addedTrips" :key="tIdx" class="mb-8">
                         <div class="img-table-container">
                             <table class="img-table">
-                                <thead><tr><th>行程</th><th>高鐵訂位編號</th><th>PNR</th><th>搭乘日期</th><th>車次</th><th>起訖站點</th><th>時間</th></tr></thead>
+                                <thead><tr><th>行程</th><th>高鐵訂位編號</th><th>PNR</th><th>搭乘日期</th><th>車次</th><th>起訖站點</th><th>出發-到達</th></tr></thead>
                                 <tbody>
-                                    <tr style="background-color: #f1f4f6;"><td class="font-bold">去程</td><td class="font-black font-mono text-blue-800">{{ trip.outbound.hsrOrderId || 'N/A' }}</td><td class="font-black font-mono">{{ trip.outbound.pnr }}</td><td>{{ trip.outbound.date.replace(/-/g, '/') }}</td><td>{{ trip.outbound.trainNo }}</td><td>{{ trip.outbound.from }} ➔ {{ trip.outbound.to }}</td><td>{{ trip.outbound.depTime }} - {{ trip.outbound.arrTime }}</td></tr>
+                                    <tr style="background-color: #f1f4f6;">
+                                        <td class="font-bold">去程</td><td class="font-black font-mono text-blue-800">{{ trip.outbound.hsrOrderId || 'N/A' }}</td><td class="font-black font-mono">{{ trip.outbound.pnr }}</td><td>{{ trip.outbound.date.replace(/-/g, '/') }}</td><td>{{ trip.outbound.trainNo }}</td><td>{{ trip.outbound.from }} ➔ {{ trip.outbound.to }}</td><td>{{ trip.outbound.depTime }} - {{ trip.outbound.arrTime }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
-                            <div class="img-row-summary"><span>車廂艙等：{{ trip.outbound.carClass }}</span><span>票數：全{{ trip.ticketsOut.adult }} | 孩{{ trip.ticketsOut.child }} | 敬{{ trip.ticketsOut.senior }} | 愛{{ trip.ticketsOut.disability }}</span></div>
-                            <div class="img-row-breakdown"><span>票價：{{ trip.outBreakdown }}</span><span class="font-black">去程小計：NT$ {{ trip.outAmount.toLocaleString() }}</span></div>
+                            <div class="img-row-summary">
+                                <span>車廂艙等：{{ trip.outbound.carClass }}</span>
+                                <span>票數統計：全票 {{ trip.ticketsOut.adult }} 張 | 孩童 {{ trip.ticketsOut.child }} 張 | 敬老 {{ trip.ticketsOut.senior }} 張 | 愛心 {{ trip.ticketsOut.disability }} 張</span>
+                            </div>
+                            <div class="img-row-breakdown">
+                                <span>票價結構：{{ trip.outBreakdown }}</span>
+                                <span class="font-black text-[#4a4a46]">去程小計：NT$ {{ trip.outAmount.toLocaleString() }}</span>
+                            </div>
                             <table class="pax-table">
                                 <thead><tr><th>票種</th><th>旅客姓名</th><th>身分證/居留證</th><th>護照號碼</th></tr></thead>
                                 <tbody>
@@ -382,15 +404,24 @@
                                 </tbody>
                             </table>
                         </div>
+
                         <div v-if="trip.mode === 'round-trip'" class="img-table-container">
                             <table class="img-table">
-                                <thead><tr><th>行程</th><th>高鐵訂位編號</th><th>PNR</th><th>搭乘日期</th><th>車次</th><th>起訖站點</th><th>時間</th></tr></thead>
+                                <thead><tr><th>行程</th><th>高鐵訂位編號</th><th>PNR</th><th>搭乘日期</th><th>車次</th><th>起訖站點</th><th>出發-到達</th></tr></thead>
                                 <tbody>
-                                    <tr style="background-color: #f6f4f1;"><td class="font-bold">回程</td><td class="font-black font-mono text-blue-800">{{ trip.returnTrip.hsrOrderId || 'N/A' }}</td><td class="font-black font-mono">{{ trip.returnTrip.pnr }}</td><td>{{ trip.returnTrip.date.replace(/-/g, '/') }}</td><td>{{ trip.returnTrip.trainNo }}</td><td>{{ trip.returnTrip.from }} ➔ {{ trip.returnTrip.to }}</td><td>{{ trip.returnTrip.depTime }} - {{ trip.returnTrip.arrTime }}</td></tr>
+                                    <tr style="background-color: #f6f4f1;">
+                                        <td class="font-bold">回程</td><td class="font-black font-mono text-blue-800">{{ trip.returnTrip.hsrOrderId || 'N/A' }}</td><td class="font-black font-mono">{{ trip.returnTrip.pnr }}</td><td>{{ trip.returnTrip.date.replace(/-/g, '/') }}</td><td>{{ trip.returnTrip.trainNo }}</td><td>{{ trip.returnTrip.from }} ➔ {{ trip.returnTrip.to }}</td><td>{{ trip.returnTrip.depTime }} - {{ trip.returnTrip.arrTime }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
-                            <div class="img-row-summary"><span>車廂艙等：{{ trip.returnTrip.carClass }}</span><span>票數：全{{ trip.ticketsRet.adult }} | 孩{{ trip.ticketsRet.child }} | 敬{{ trip.ticketsRet.senior }} | 愛{{ trip.ticketsRet.disability }}</span></div>
-                            <div class="img-row-breakdown"><span>票價：{{ trip.retBreakdown }}</span><span class="font-black">回程小計：NT$ {{ trip.retAmount.toLocaleString() }}</span></div>
+                            <div class="img-row-summary">
+                                <span>車廂艙等：{{ trip.returnTrip.carClass }}</span>
+                                <span>票數統計：全票 {{ trip.ticketsRet.adult }} 張 | 孩童 {{ trip.ticketsRet.child }} 張 | 敬老 {{ trip.ticketsRet.senior }} 張 | 愛心 {{ trip.ticketsRet.disability }} 張</span>
+                            </div>
+                            <div class="img-row-breakdown">
+                                <span>票價結構：{{ trip.retBreakdown }}</span>
+                                <span class="font-black text-[#4a4a46]">回程小計：NT$ {{ trip.retAmount.toLocaleString() }}</span>
+                            </div>
                             <table class="pax-table">
                                 <thead><tr><th>票種</th><th>旅客姓名</th><th>身分證/居留證</th><th>護照號碼</th></tr></thead>
                                 <tbody>
@@ -399,8 +430,31 @@
                             </table>
                         </div>
                     </div>
-                    <div class="border-2 border-dashed border-[#a0aec0] p-4 text-center bg-gray-50 mb-6 rounded"><p class="text-[9px] text-red-600 font-black leading-relaxed">請業務務必核對票種與金額。掛帳全票以官方原價 85折(標準) 或 90折(商務) 計算，優待票均為 50折。開票後如有錯誤請自理。</p></div>
-                    <div class="flex justify-between items-end pt-6 border-t-2 border-[#4a4a46]"><div class="text-[9px] text-gray-400 leading-relaxed">● 系統自動劃位, 恕無法指定。 ● 退改票請於搭乘前4個工作日申請。 ● 超商取票每張 $10 手續費。</div><div class="text-right pl-8 border-l border-[#a0aec0]"><span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Grand Receivable</span><p class="text-4xl font-black tracking-tighter">NT$ {{ totalOrderAmount.toLocaleString() }}</p></div></div>
+
+                    <!-- 掛帳與注意事項 -->
+                    <div class="border-t-2 border-[#4a4a46] pt-6">
+                        <p class="text-[10px] font-black text-gray-700 mb-2">● 掛帳說明：掛帳全票會先掛85折的價格，優待票(孩童、敬老、愛心)都是半價。如果售價有調整需要更改再請通知唷 謝謝。</p>
+                        
+                        <div class="bg-gray-50 p-4 rounded border border-gray-200">
+                            <p class="text-[10px] font-black mb-2 tracking-widest text-[#4a4a46]">---注意事項與改/退票說明---</p>
+                            <ul class="text-[9px] text-gray-500 space-y-1 leading-relaxed font-medium">
+                                <li>1. 座位皆由電腦自動劃位,恕無法指定座位,亦無法保證同行者為相鄰座位。</li>
+                                <li>2. 若因逾時未能搭乘,請自行洽詢站務人員是否可改搭當日其他車次之自由座,恕無法辦理退票。</li>
+                                <li>3. 高鐵車票須於搭乘當日使用,逾期視同廢票,恕不受理退票。</li>
+                                <li>4. 如需辦理改票/退票,請於 4個工作日前 申請,並提供紙本票根或 APP 電子票截圖(天災導致高鐵停駛者不在此限)。</li>
+                                <li>5. 退票將酌收手續費 每張新台幣 50 元。</li>
+                                <li>6. 辦理改票/退票時,請務必提供 紙本票根或電子票(APP 截圖),未提供者將視同正常搭乘,相關費用須自行負擔。</li>
+                                <li>7. 因航班延誤或取消等非高鐵因素致無法搭乘者,車票 恕無法改期或退票,敬請見諒。</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-end mt-6">
+                        <p class="text-[8px] text-gray-300 font-bold uppercase">Grand Total Receivable</p>
+                        <div class="text-right">
+                            <p class="text-4xl font-black tracking-tighter">NT$ {{ totalOrderAmount.toLocaleString() }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -458,7 +512,7 @@
 
                 const showToast = (msg) => { toastMsg.value = msg; setTimeout(() => { toastMsg.value = ''; }, 3000); };
 
-                // 核心邏輯 1: 自動計算開票期限 (+2天 vs 週五)
+                // 自動期限規則
                 const calculateDeadline = () => {
                     if (!baseInfo.bookingDate) return;
                     const bDate = new Date(baseInfo.bookingDate);
@@ -472,25 +526,19 @@
                     baseInfo.deadlineDate = finalDeadline.toISOString().split('T')[0];
                 };
 
-                // 核心邏輯 2: 連動訂位編號
+                // ID 連動
                 const handleHsrIdInput = () => {
-                    if (tripMode.value === 'round-trip') {
-                        returnTrip.hsrOrderId = outbound.hsrOrderId;
-                    }
+                    if (tripMode.value === 'round-trip') returnTrip.hsrOrderId = outbound.hsrOrderId;
                 };
 
-                // 核心邏輯 3: 旅客資料連動同步
+                // 旅客連動同步核心邏輯
                 const syncPassengerData = (index, field) => {
                     if (paxTab.value === 'out' && tripMode.value === 'round-trip') {
-                        // 當去程資料變動時，若回程名單長度足夠，且回程該名單未被手動修改過(isDirty)，則同步
                         if (passengersRet.value[index] && !passengersRet.value[index].isDirty) {
                             passengersRet.value[index][field] = passengersOut.value[index][field];
                         }
                     } else if (paxTab.value === 'ret') {
-                        // 若在回程頁籤手動修改，標記為已手動編輯 (isDirty)
-                        if (passengersRet.value[index]) {
-                            passengersRet.value[index].isDirty = true;
-                        }
+                        if (passengersRet.value[index]) passengersRet.value[index].isDirty = true;
                     }
                 };
 
@@ -522,6 +570,12 @@
 
                 const maskId = (id) => id ? (id.length > 6 ? id.slice(0, 3) + '****' + id.slice(-3) : id) : '-';
 
+                const resetInputs = () => {
+                    outbound.hsrOrderId = ''; outbound.pnr = ''; ticketsOut.adult = 0; ticketsOut.child = 0; ticketsOut.senior = 0; ticketsOut.disability = 0;
+                    returnTrip.hsrOrderId = ''; returnTrip.pnr = ''; ticketsRet.adult = 0; ticketsRet.child = 0; ticketsRet.senior = 0; ticketsRet.disability = 0;
+                    passengersOut.value = []; passengersRet.value = [];
+                };
+
                 const addTripToList = () => {
                     const oAmt = calculateTotal(outbound, ticketsOut);
                     const rAmt = tripMode.value === 'round-trip' ? calculateTotal(returnTrip, ticketsRet) : 0;
@@ -541,18 +595,6 @@
                     showToast("已成功儲存行程紀錄");
                 };
 
-                const startEdit = (idx) => {
-                    editingIndex.value = idx;
-                    const t = addedTrips.value[idx];
-                    tripMode.value = t.mode;
-                    Object.assign(outbound, t.outbound);
-                    Object.assign(returnTrip, t.returnTrip);
-                    Object.assign(ticketsOut, t.ticketsOut);
-                    Object.assign(ticketsRet, t.ticketsRet);
-                    passengersOut.value = JSON.parse(JSON.stringify(t.passengersOut));
-                    passengersRet.value = JSON.parse(JSON.stringify(t.passengersRet));
-                };
-
                 const updateTripInList = () => {
                     const idx = editingIndex.value;
                     const oAmt = calculateTotal(outbound, ticketsOut);
@@ -569,10 +611,16 @@
                     editingIndex.value = null; resetInputs(); showToast("紀錄已儲存更新");
                 };
 
-                const resetInputs = () => {
-                    outbound.hsrOrderId = ''; outbound.pnr = ''; ticketsOut.adult = 0; ticketsOut.child = 0; ticketsOut.senior = 0; ticketsOut.disability = 0;
-                    returnTrip.hsrOrderId = ''; returnTrip.pnr = ''; ticketsRet.adult = 0; ticketsRet.child = 0; ticketsRet.senior = 0; ticketsRet.disability = 0;
-                    passengersOut.value = []; passengersRet.value = [];
+                const startEdit = (idx) => {
+                    editingIndex.value = idx;
+                    const t = addedTrips.value[idx];
+                    tripMode.value = t.mode;
+                    Object.assign(outbound, t.outbound);
+                    Object.assign(returnTrip, t.returnTrip);
+                    Object.assign(ticketsOut, t.ticketsOut);
+                    Object.assign(ticketsRet, t.ticketsRet);
+                    passengersOut.value = JSON.parse(JSON.stringify(t.passengersOut));
+                    passengersRet.value = JSON.parse(JSON.stringify(t.passengersRet));
                 };
 
                 const cancelEdit = () => { editingIndex.value = null; resetInputs(); };
@@ -584,16 +632,12 @@
                 const formattedDeadline = computed(() => baseInfo.deadlineDate ? `${baseInfo.deadlineDate.replace(/-/g, '/')} ${baseInfo.deadlineTime}` : '-');
 
                 watch(() => baseInfo.bookingDate, calculateDeadline);
-                
-                // 監聽票數變動以增減旅客名單列
                 watch(ticketsOut, (v) => syncPaxList(passengersOut, v, v.adult+v.child+v.senior+v.disability), { deep: true });
                 watch(ticketsRet, (v) => syncPaxList(passengersRet, v, v.adult+v.child+v.senior+v.disability), { deep: true });
 
                 const syncPaxList = (list, tks, count) => {
                     if (count > list.value.length) {
-                        for (let i = list.value.length; i < count; i++) {
-                            list.value.push({ type: '', name: '', idNumber: '', passportNo: '', birthday: '', isDirty: false });
-                        }
+                        for (let i = list.value.length; i < count; i++) list.value.push({ type: '', name: '', idNumber: '', passportNo: '', birthday: '', isDirty: false });
                     } else if (count < list.value.length) {
                         list.value.splice(count);
                     }
@@ -608,10 +652,47 @@
                     html2canvas(node, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
                         const a = document.createElement('a');
                         a.href = canvas.toDataURL("image/png");
-                        a.download = `HSR_Booking_${baseInfo.orderId || 'slip'}.png`;
+                        a.download = `高鐵確認單_${baseInfo.orderId || 'Booking'}.png`;
                         a.click();
-                        showToast("圖片下載中...");
+                        showToast("圖片已生成並下載");
                     });
+                };
+
+                const copySummaryText = () => {
+                    let txt = `【高鐵訂位確認單】\n`;
+                    txt += `業務姓名：${baseInfo.sales || 'N/A'}\n`;
+                    txt += `訂單編號：${baseInfo.orderId || 'N/A'}\n`;
+                    txt += `團體代號：${baseInfo.groupId || 'N/A'}\n`;
+                    txt += `開票人員：${baseInfo.staff}\n`;
+                    txt += `開票期限：${formattedDeadline.value}\n\n`;
+                    txt += `開票說明：\n請於D/L前通知 可開票 與 取票方式\n逾期將自動取消需重新訂票\n每筆訂位代碼,統一取票方式\n\n`;
+                    txt += `掛帳說明：掛帳全票會先掛85折的價格,優待票(孩童、敬老、愛心)都是半價。如果售價有調整需要更改再請通知唷 謝謝\n\n`;
+
+                    addedTrips.value.forEach((t, i) => {
+                        txt += `[行程紀錄 #${i+1}]\n`;
+                        txt += `去程：${t.outbound.from}-${t.outbound.to} ${t.outbound.date} 班次 ${t.outbound.trainNo}\n`;
+                        txt += `HSR ID: ${t.outbound.hsrOrderId} (PNR: ${t.outbound.pnr})\n`;
+                        txt += `票數：${t.outBreakdown}\n`;
+                        if(t.mode === 'round-trip') {
+                            txt += `回程：${t.returnTrip.from}-${t.returnTrip.to} ${t.returnTrip.date} 班次 ${t.returnTrip.trainNo}\n`;
+                            txt += `HSR ID: ${t.returnTrip.hsrOrderId} (PNR: ${t.returnTrip.pnr})\n`;
+                            txt += `票數：${t.retBreakdown}\n`;
+                        }
+                        txt += `應收：NT$ ${t.totalAmount.toLocaleString()}\n\n`;
+                    });
+
+                    txt += `總計應收金額：NT$ ${totalOrderAmount.value.toLocaleString()}\n\n`;
+                    txt += `---注意事項與改/退票說明---\n`;
+                    txt += `1. 座位皆由電腦自動劃位,恕無法指定座位,亦無法保證同行者為相鄰座位。\n`;
+                    txt += `2. 若因逾時未能搭乘,請自行洽詢站務人員是否可改搭當日其他車次之自由座,恕無法辦理退票。\n`;
+                    txt += `3. 高鐵車票須於搭乘當日使用,逾期視同廢票,恕不受理退票。\n`;
+                    txt += `4. 如需辦理改票/退票,請於 4個工作日前 申請,並提供紙本票根或 APP 電子票截圖(天災導致高鐵停駛者不在此限)。\n`;
+                    txt += `5. 退票將酌收手續費 每張新台幣 50 元。\n`;
+                    txt += `6. 辦理改票/退票時,請務必提供 紙本票根或電子票(APP 截圖),未提供者將視同正常搭乘,相關費用須自行負擔。\n`;
+                    txt += `7. 因航班延誤或取消等非高鐵因素致無法搭乘者,車票 恕無法改期或退票,敬請見諒。`;
+
+                    const el = document.createElement('textarea'); el.value = txt; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+                    showToast("文字範本已複製到剪貼簿");
                 };
 
                 onMounted(calculateDeadline);
@@ -623,7 +704,7 @@
                     addTripToList, updateTripInList, startEdit, cancelEdit, removeTrip: (i) => addedTrips.value.splice(i, 1),
                     openPassengerModal: () => showPassengerModal.value = true, 
                     copyOutboundTickets: () => Object.assign(ticketsRet, ticketsOut), 
-                    downloadImage, handleHsrIdInput, syncPassengerData
+                    downloadImage, handleHsrIdInput, syncPassengerData, copySummaryText
                 };
             }
         }).mount('#app');
