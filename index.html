@@ -269,7 +269,7 @@
 
                         <!-- 回程 -->
                         <div v-if="tripMode === 'round-trip'" class="pt-8 border-t border-[#a0aec0]/30">
-                            <span class="text-[10px] bg-gray-400 text-white px-2 py-0.5 rounded font-bold uppercase mb-4 inline-block tracking-widest">Return / 回程設定</span>
+                            <span class="text-[10px] bg-gray-400 text-white px-2 py-0.5 rounded font-bold uppercase mb-4 inline-block tracking-widest">回程設定</span>
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
                                 <div class="md:col-span-6"><label class="form-label">高鐵訂位編號 (ID)</label><input type="text" v-model="returnTrip.hsrOrderId" class="font-bold tracking-widest"></div>
                                 <div class="md:col-span-6"><label class="form-label">PNR 代碼</label><input type="text" v-model="returnTrip.pnr" class="uppercase font-bold tracking-widest"></div>
@@ -758,5 +758,6 @@
     </script>
 </body>
 </html>
+
 
 
