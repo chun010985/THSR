@@ -3,226 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高鐵訂位確認單生成器 - 專業完整復原版</title>
+    <title>高鐵訂位確認單生成器 - 最終排版與文字修正版</title>
     <!-- Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Google Fonts: Noto Sans TC -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* ====================
+           UI 介面樣式
+           ==================== */
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: #f4f4f2; 
-            color: #4a4a46;
-            letter-spacing: 0.01em;
+            background-color: #f3f4f6; 
+            color: #1f2937;
+            letter-spacing: 0.02em;
         }
         .japanese-card {
             background: #ffffff;
-            border: 1px solid #a0aec0;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(74, 74, 70, 0.05);
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
         }
         .form-label {
             font-size: 0.75rem;
-            color: #8c8c88;
-            margin-bottom: 0.25rem;
-            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 0.3rem;
+            font-weight: 700;
         }
         input, select {
-            background-color: #ffffff;
-            border: 1px solid #a0aec0;
-            border-radius: 4px;
-            padding: 0.6rem;
-            font-size: 0.875rem;
-            outline: none;
+            background-color: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
             width: 100%;
-            color: #4a4a46;
-            height: 42px;
+            height: 40px;
+            color: #334155;
+            transition: all 0.2s;
         }
         input:focus, select:focus {
             border-color: #4a4a46;
-            box-shadow: 0 0 0 2px rgba(74, 74, 70, 0.1);
+            ring: 1px solid #4a4a46;
+            outline: none;
         }
-        .btn-primary {
-            background-color: #4a4a46;
-            color: #f4f4f2;
-            font-weight: 600;
-            border-radius: 4px;
-            transition: opacity 0.2s;
-        }
-        .btn-primary:hover:not(:disabled) {
-            opacity: 0.9;
-        }
-        .btn-outline {
-            border: 1px solid #4a4a46;
-            color: #4a4a46;
-            background-color: transparent;
-            font-weight: 600;
-            border-radius: 4px;
-        }
-        .btn-icon {
-            color: #a0aec0;
-            transition: color 0.2s;
-        }
-        .btn-icon:hover {
-            color: #4a4a46;
-        }
-        .btn-danger:hover {
-            color: #ef4444;
-        }
-        .time-input {
-            letter-spacing: 0.05em;
-            text-align: center;
-        }
-        .tab-active {
-            border-bottom: 3px solid #4a4a46;
-            color: #4a4a46;
-            font-weight: bold;
-        }
-        .tab-inactive {
-            color: #a0aec0;
-        }
+        .btn-primary { background-color: #4a4a46; color: #fff; font-weight: 600; border-radius: 6px; transition: opacity 0.2s; }
+        .btn-primary:hover:not(:disabled) { background-color: #2d3748; }
+        .btn-outline { border: 1px solid #94a3b8; color: #475569; background-color: white; font-weight: 600; border-radius: 6px; }
+        .btn-outline:hover { background-color: #f8fafc; }
+        .time-input { letter-spacing: 0.1em; text-align: center; }
         [v-cloak] { display: none; }
         
-        #capture-area-container {
+        /* 預覽區容器 */
+        .preview-wrapper {
+            width: 100%;
+            background-color: #cbd5e1;
+            padding: 40px 20px;
+            overflow: auto;
+            border-top: 1px solid #94a3b8;
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        #capture-area-container { position: relative; }
+
+        /* =========================================
+           圖檔設計樣式 (Professional & Exquisite)
+           ========================================= */
+        .doc-container {
+            width: 850px;
+            min-width: 850px;
+            background-color: #fff;
+            color: #333;
+            line-height: 1.5;
+            font-family: 'Microsoft JhengHei', 'Microsoft YaHei', Arial, sans-serif;
+            position: relative;
+            box-sizing: border-box;
+            padding: 40px 50px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .doc-brand-bar {
             position: absolute;
-            left: -9999px;
-            top: 0;
-            z-index: -1;
+            top: 0; left: 0; right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #4a4a46 0%, #718096 100%);
         }
 
-        .img-header-line {
-            height: 6px;
-            background-color: #4a4a46;
+        .doc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4a4a46;
+            padding-bottom: 10px;
         }
-        .img-section-title {
-            background: #f4f4f2;
-            padding: 2px 10px;
-            border-radius: 2px;
+        .doc-title {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            color: #2d3748;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+        .doc-subtitle {
             font-size: 10px;
-            font-weight: bold;
-            color: #4a4a46;
+            color: #94a3b8;
+            font-weight: 600;
+            letter-spacing: 1px;
             text-transform: uppercase;
+            margin-top: 4px;
+        }
+        .doc-meta { text-align: right; }
+        .doc-timestamp { font-size: 10px; color: #a0aec0; font-family: Consolas, monospace; }
+
+        /* 基本資料橫排表格 */
+        .info-header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 1px solid #cbd5e1;
+            table-layout: fixed;
+        }
+        .info-header-table td {
+            border-right: 1px solid #e2e8f0;
+            padding: 8px 2px;
+            vertical-align: middle;
+            text-align: center;
+        }
+        .info-header-table td:last-child { border-right: none; }
+        .info-header-label { display: block; font-size: 9px; color: #64748b; font-weight: 700; margin-bottom: 4px; white-space: nowrap; }
+        .info-header-value { display: block; font-size: 11px; font-weight: 700; color: #1f2937; word-break: break-all; }
+        .text-deadline { color: #dc2626 !important; }
+
+        .notice-box {
+            border: 1px solid #a0aec0;
+            padding: 10px 15px;
+            margin-bottom: 25px;
+            font-size: 10px;
+            color: #334155;
+            background-color: transparent;
+            border-radius: 2px;
+            line-height: 1.6;
+        }
+        .notice-title { font-weight: 900; margin-bottom: 4px; display: block; font-size: 11px;}
+        .checkbox-symbol { font-family: "Segoe UI Symbol", sans-serif; margin-right: 2px; font-size: 12px; vertical-align: text-bottom; }
+
+        .doc-section-header {
+            font-size: 12px;
+            font-weight: 900;
+            color: #fff;
+            background-color: #4a4a46;
+            padding: 4px 12px;
+            display: inline-block;
+            margin-bottom: 0;
+            border-radius: 4px 4px 0 0;
         }
 
-        /* 圖檔專用表格樣式 - 行高 1.5 */
-        .img-table-container {
-            border: 2px solid #4a4a46;
-            margin-bottom: 12px;
+        .trip-container {
+            margin-bottom: 25px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            border-radius: 0 4px 4px 4px;
             overflow: hidden;
-            border-radius: 2px;
         }
-        .img-table {
+        
+        .trip-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 10px;
             text-align: center;
             line-height: 1.5;
+            table-layout: fixed;
         }
-        .img-table th {
-            padding: 8px 4px;
-            border-bottom: 1.5px solid #4a4a46;
-            color: #f4f4f2;
+        .trip-table th {
             background-color: #4a4a46;
-            font-weight: bold;
-            border-right: 1px solid #6b6b6b;
+            color: #fff;
+            font-weight: 600;
+            padding: 6px 2px;
+            border-right: 1px solid #64748b;
+            border-bottom: 1px solid #4a4a46;
             vertical-align: middle !important;
         }
-        .img-table td {
-            padding: 10px 4px;
-            border-bottom: 1px solid #d1d5db;
-            color: #4a4a46;
-            font-weight: 900;
-            border-right: 1px solid #d1d5db;
+        .trip-table th:last-child { border-right: none; }
+        .trip-table td {
+            background-color: #fff;
+            color: #334155;
+            padding: 8px 2px;
+            border-right: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 600;
             vertical-align: middle !important;
         }
-        .img-row-summary {
-            padding: 8px 12px;
-            font-size: 10px;
-            font-weight: 500;
-            color: #4a4a46;
-            border-bottom: 1px solid #d1d5db;
-            line-height: 1.5;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #ffffff;
-        }
-        .img-row-breakdown {
-            padding: 8px 12px;
-            font-size: 10px;
-            color: #6b7280;
-            border-bottom: 1px dashed #d1d5db;
-            background-color: #ffffff;
-            text-align: left;
-            line-height: 1.5;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .trip-table td:last-child { border-right: none; }
         
-        /* 旅客表格樣式 - 水平置中 */
+        .fare-header th {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: 700;
+            font-size: 9px;
+            padding: 5px 2px;
+            border-bottom: 1px solid #cbd5e1;
+            border-right: 1px solid #cbd5e1;
+        }
+        .fare-data td {
+            background-color: #fcfcfc;
+            color: #64748b;
+            font-family: Consolas, monospace;
+            text-align: center;
+            font-size: 9px;
+            padding: 6px 2px;
+            border-bottom: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
+            vertical-align: middle !important;
+        }
+
+        .summary-bar {
+            background-color: #fff;
+            padding: 6px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #4a4a46;
+            border-top: 1px solid #cbd5e1;
+            border-bottom: 1px solid #cbd5e1;
+        }
+
         .pax-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px;
-            text-align: center; 
+            font-size: 9px !important;
+            text-align: center;
             line-height: 1.5;
         }
         .pax-table th {
-            padding: 8px 8px;
-            border-bottom: 1px solid #4a4a46;
-            color: #4a4a46;
             background-color: #e2e8f0;
-            font-weight: bold;
+            color: #475569;
+            padding: 5px;
+            border-bottom: 1px solid #cbd5e1;
             border-right: 1px solid #cbd5e1;
+            vertical-align: middle !important;
         }
         .pax-table td {
-            padding: 8px 8px;
-            border-bottom: 1px solid #f0f0f0;
-            color: #4a4a46;
-            font-weight: bold;
-            border-right: 1px solid #f0f0f0;
+            padding: 6px;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+            border-right: 1px solid #f1f5f9;
+            vertical-align: middle !important;
         }
-        .pax-table tr td:last-child, .pax-table tr th:last-child { border-right: none; }
+
+        .grand-total { text-align: right; margin-top: 20px; padding-top: 10px; border-top: 2px solid #4a4a46; }
+        .total-label { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-right: 10px; }
+        .total-value { font-size: 26px; font-weight: 900; color: #2d3748; font-family: 'Arial', sans-serif; }
+
+        .account-note {
+            margin-top: 15px;
+            font-size: 10px;
+            color: #334155;
+            background-color: #ecfdf5;
+            padding: 10px 15px;
+            border: 1px solid #bbf7d0;
+            border-radius: 4px;
+            line-height: 1.6;
+        }
+        .warning-text { color: #dc2626; font-weight: 700; margin-top: 8px; display: block; font-size: 10px; line-height: 1.6; }
+        .footer-terms { margin-top: 20px; font-size: 9px; color: #6b7280; border-top: 1px dashed #94a3b8; padding-top: 15px; line-height: 1.6; }
+        .footer-title { font-weight: 800; color: #374151; display: block; margin-bottom: 5px; font-size: 10px; }
+        .note-item { display: flex; align-items: flex-start; margin-bottom: 2px; font-size: 9px; }
+        .note-num { width: 16px; flex-shrink: 0; font-weight: 700; color: #4a4a46; }
+        .note-text { flex: 1; text-align: justify; }
     </style>
 </head>
 <body class="p-4 md:p-8">
     <div id="app" v-cloak class="max-w-6xl mx-auto">
         <header class="mb-8 text-center">
-            <h1 class="text-3xl font-bold text-[#4a4a46] tracking-tight">高鐵訂位確認單生成系統</h1>
-            <p class="text-[#8c8c88] mt-2 tracking-widest uppercase">Professional Slip Management</p>
+            <h1 class="text-3xl font-bold text-[#4a4a46] tracking-tight">高鐵訂位確認單生成器</h1>
+            <p class="text-[#8c8c88] mt-2 tracking-widest uppercase text-sm">Professional Slip Generator</p>
         </header>
 
-        <div v-if="toastMsg" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-[#4a4a46] text-[#f4f4f2] px-6 py-3 rounded shadow-2xl text-sm flex items-center gap-3">
-            <span class="font-medium">{{ toastMsg }}</span>
-        </div>
-
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            <!-- 左側：輸入表單 -->
+            <!-- 左側操作 -->
             <div class="lg:col-span-8 space-y-6">
                 <!-- 基本資料 -->
                 <div class="japanese-card p-6 md:p-8">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-lg font-bold border-l-4 border-[#4a4a46] pl-3">基本資料管理</h2>
-                        <div class="flex gap-4">
-                            <button @click="focusInput('staff')" class="btn-icon" title="編輯人員"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>
-                            <button @click="clearBasicInfo" class="btn-icon btn-danger" title="清除基本資料"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>
-                        </div>
-                    </div>
+                    <h2 class="text-lg font-bold border-l-4 border-[#4a4a46] pl-3 mb-6">基本資料管理</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                        <div class="flex flex-col"><label class="form-label">訂票人員</label><input ref="staffInput" type="text" v-model="baseInfo.staff"></div>
+                        <div class="flex flex-col"><label class="form-label">開票人員</label><input ref="staffInput" type="text" v-model="baseInfo.staff"></div>
                         <div class="flex flex-col"><label class="form-label">訂票日期</label><input type="date" v-model="baseInfo.bookingDate"></div>
                         <div class="flex flex-col text-red-600">
                             <label class="form-label text-red-600 font-bold">開票期限 (DL)</label>
-                            <div class="flex gap-2">
-                                <input type="date" v-model="baseInfo.deadlineDate" class="flex-[2] border-red-200">
-                                <input type="text" v-model="baseInfo.deadlineTime" class="flex-1 time-input border-red-200" maxlength="5">
-                            </div>
+                            <div class="flex gap-2"><input type="date" v-model="baseInfo.deadlineDate"><input type="text" v-model="baseInfo.deadlineTime" class="time-input w-20"></div>
                         </div>
                         <div class="flex flex-col"><label class="form-label">業務姓名</label><input type="text" v-model="baseInfo.sales"></div>
                         <div class="flex flex-col"><label class="form-label">訂單編號</label><input type="text" v-model="baseInfo.orderId"></div>
@@ -235,252 +312,269 @@
                     <div v-if="editingIndex !== null" class="absolute top-4 right-24 bg-[#4a4a46] text-[#f4f4f2] px-3 py-1 text-xs font-bold rounded">編輯模式中</div>
                     <div class="flex justify-between items-center mb-8">
                         <h2 class="text-lg font-bold border-l-4 border-[#4a4a46] pl-3">行程詳細設定</h2>
-                        <div class="flex items-center gap-4">
-                            <button @click="focusInput('hsrId')" class="btn-icon" title="開始輸入行程"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>
-                            <button @click="clearTripForm" class="btn-icon btn-danger" title="重置輸入表單"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>
-                            <div class="flex bg-[#f4f4f2] p-1 rounded ml-2">
-                                <button @click="tripMode = 'one-way'" :class="tripMode === 'one-way' ? 'bg-[#4a4a46] text-[#f4f4f2]' : 'text-[#8c8c88]'" class="px-4 py-1 text-sm font-bold transition-all rounded">單程</button>
-                                <button @click="tripMode = 'round-trip'" :class="tripMode === 'round-trip' ? 'bg-[#4a4a46] text-[#f4f4f2]' : 'text-[#8c8c88]'" class="px-4 py-1 text-sm font-bold transition-all rounded">來回</button>
-                            </div>
+                        <div class="flex bg-gray-100 p-1 rounded ml-2">
+                            <button @click="tripMode = 'one-way'" :class="tripMode === 'one-way' ? 'bg-[#4a4a46] text-[#f4f4f2]' : 'text-[#8c8c88]'" class="px-4 py-1 text-sm font-bold transition-all rounded">單程</button>
+                            <button @click="tripMode = 'round-trip'" :class="tripMode === 'round-trip' ? 'bg-[#4a4a46] text-[#f4f4f2]' : 'text-[#8c8c88]'" class="px-4 py-1 text-sm font-bold transition-all rounded">來回</button>
                         </div>
                     </div>
 
-                    <div class="space-y-10">
+                    <div class="space-y-8">
                         <!-- 去程 -->
-                        <div>
-                            <span class="text-[10px] bg-[#4a4a46] text-white px-2 py-0.5 rounded font-bold uppercase mb-4 inline-block tracking-widest">去程設定</span>
+                        <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                            <span class="text-[10px] bg-[#4a4a46] text-white px-3 py-1 rounded font-bold uppercase mb-4 inline-block tracking-widest">去程</span>
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-                                <div class="md:col-span-6"><label class="form-label">高鐵訂位編號 (ID)</label><input ref="hsrIdInput" type="text" v-model="outbound.hsrOrderId" @input="handleHsrIdInput" class="font-bold tracking-widest" placeholder="請輸入 8 碼訂位編號"></div>
+                                <div class="md:col-span-6"><label class="form-label">高鐵訂位編號</label><input ref="hsrIdInput" type="text" v-model="outbound.hsrOrderId" @input="syncHsrOrderId" class="font-bold tracking-widest text-blue-900" placeholder="8碼編號"></div>
                                 <div class="md:col-span-6"><label class="form-label">PNR 代碼</label><input type="text" v-model="outbound.pnr" class="uppercase font-bold tracking-widest"></div>
                                 <div class="md:col-span-4"><label class="form-label">乘車日期</label><input type="date" v-model="outbound.date"></div>
-                                <div class="md:col-span-4"><label class="form-label">艙等</label><select v-model="outbound.carClass"><option value="標準車廂">標準車廂</option><option value="商務車廂">商務車廂</option></select></div>
+                                <div class="md:col-span-4"><label class="form-label">艙等</label><select v-model="outbound.carClass"><option>標準車廂</option><option>商務車廂</option></select></div>
                                 <div class="md:col-span-4"><label class="form-label">車次</label><input type="text" v-model="outbound.trainNo"></div>
-                                <div class="md:col-span-6">
-                                    <label class="form-label">起訖站點</label>
-                                    <div class="flex items-center gap-2">
-                                        <select v-model="outbound.from" class="flex-1"><option v-for="s in stations" :value="s">{{s}}</option></select>
-                                        <button @click="swapStations(outbound)" class="text-[#a0aec0] hover:text-[#4a4a46] transition-colors px-2" title="交換站點">⇆</button>
-                                        <select v-model="outbound.to" class="flex-1"><option v-for="s in stations" :value="s">{{s}}</option></select>
-                                    </div>
-                                </div>
-                                <div class="md:col-span-6"><label class="form-label">時間 (24H)</label><div class="flex gap-1"><input type="text" v-model="outbound.depTime" class="time-input text-xs" placeholder="09:00"><input type="text" v-model="outbound.arrTime" class="time-input text-xs" placeholder="10:30"></div></div>
+                                <div class="md:col-span-6"><label class="form-label">起訖站點</label><div class="flex gap-2 items-center"><select v-model="outbound.from"><option v-for="s in stations">{{s}}</option></select><button @click="swapStations(outbound)" class="text-gray-400 hover:text-gray-600 text-lg">⇄</button><select v-model="outbound.to"><option v-for="s in stations">{{s}}</option></select></div></div>
+                                <div class="md:col-span-6"><label class="form-label">乘車時間</label><div class="flex gap-2 items-center"><input type="text" v-model="outbound.depTime" class="time-input" placeholder="09:00"><span class="text-gray-400">-</span><input type="text" v-model="outbound.arrTime" class="time-input" placeholder="10:30"></div></div>
                             </div>
                         </div>
 
                         <!-- 回程 -->
-                        <div v-if="tripMode === 'round-trip'" class="pt-8 border-t border-[#a0aec0]/30">
-                            <span class="text-[10px] bg-gray-400 text-white px-2 py-0.5 rounded font-bold uppercase mb-4 inline-block tracking-widest">回程設定</span>
+                        <div v-if="tripMode === 'round-trip'" class="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                            <span class="text-[10px] bg-gray-500 text-white px-3 py-1 rounded font-bold uppercase mb-4 inline-block tracking-widest">回程</span>
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-                                <div class="md:col-span-6"><label class="form-label">高鐵訂位編號 (ID)</label><input type="text" v-model="returnTrip.hsrOrderId" class="font-bold tracking-widest"></div>
+                                <div class="md:col-span-6"><label class="form-label">高鐵訂位編號</label><input type="text" v-model="returnTrip.hsrOrderId"></div>
                                 <div class="md:col-span-6"><label class="form-label">PNR 代碼</label><input type="text" v-model="returnTrip.pnr" class="uppercase font-bold tracking-widest"></div>
                                 <div class="md:col-span-4"><label class="form-label">乘車日期</label><input type="date" v-model="returnTrip.date"></div>
-                                <div class="md:col-span-4"><label class="form-label">艙等</label><select v-model="returnTrip.carClass"><option value="標準車廂">標準車廂</option><option value="商務車廂">商務車廂</option></select></div>
+                                <div class="md:col-span-4"><label class="form-label">艙等</label><select v-model="returnTrip.carClass"><option>標準車廂</option><option>商務車廂</option></select></div>
                                 <div class="md:col-span-4"><label class="form-label">車次</label><input type="text" v-model="returnTrip.trainNo"></div>
-                                <div class="md:col-span-6">
-                                    <label class="form-label">起訖站點</label>
-                                    <div class="flex items-center gap-2">
-                                        <select v-model="returnTrip.from" class="flex-1"><option v-for="s in stations" :value="s">{{s}}</option></select>
-                                        <button @click="swapStations(returnTrip)" class="text-[#a0aec0] hover:text-[#4a4a46] transition-colors px-2" title="交換站點">⇆</button>
-                                        <select v-model="returnTrip.to" class="flex-1"><option v-for="s in stations" :value="s">{{s}}</option></select>
-                                    </div>
-                                </div>
-                                <div class="md:col-span-6"><label class="form-label">時間 (24H)</label><div class="flex gap-1"><input type="text" v-model="returnTrip.depTime" class="time-input text-xs" placeholder="18:00"><input type="text" v-model="returnTrip.arrTime" class="time-input text-xs" placeholder="19:30"></div></div>
+                                <div class="md:col-span-6"><label class="form-label">起訖站點</label><div class="flex gap-2 items-center"><select v-model="returnTrip.from"><option v-for="s in stations">{{s}}</option></select><button @click="swapStations(returnTrip)" class="text-gray-400 hover:text-gray-600 text-lg">⇄</button><select v-model="returnTrip.to"><option v-for="s in stations">{{s}}</option></select></div></div>
+                                <div class="md:col-span-6"><label class="form-label">乘車時間</label><div class="flex gap-2 items-center"><input type="text" v-model="returnTrip.depTime" class="time-input" placeholder="18:00"><span class="text-gray-400">-</span><input type="text" v-model="returnTrip.arrTime" class="time-input" placeholder="19:30"></div></div>
                             </div>
                         </div>
 
-                        <!-- 票數統計區域 -->
-                        <div class="bg-[#f4f4f2] p-6 border border-[#a0aec0] rounded">
-                            <div class="mb-4">
-                                <p class="text-[11px] font-bold mb-2 text-[#4a4a46]">去程票種數量設定</p>
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- 票數統計 -->
+                        <div class="bg-white p-6 border border-gray-200 rounded-lg shadow-sm">
+                            <div class="mb-5">
+                                <p class="text-xs font-bold mb-3 text-gray-700 border-b pb-1">去程票數設定</p>
+                                <div class="grid grid-cols-4 gap-3">
                                     <div><label class="form-label">全票</label><input type="number" v-model.number="ticketsOut.adult" min="0"></div>
                                     <div><label class="form-label">孩童</label><input type="number" v-model.number="ticketsOut.child" min="0"></div>
                                     <div><label class="form-label">敬老</label><input type="number" v-model.number="ticketsOut.senior" min="0"></div>
                                     <div><label class="form-label">愛心</label><input type="number" v-model.number="ticketsOut.disability" min="0"></div>
                                 </div>
                             </div>
-                            <div v-if="tripMode === 'round-trip'" class="pt-4 border-t border-gray-300">
-                                <div class="flex justify-between items-center mb-2"><p class="text-[11px] font-bold text-[#4a4a46]">回程票種數量設定</p><button @click="copyOutboundTickets" class="text-[10px] underline">同去程票數</button></div>
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div v-if="tripMode === 'round-trip'" class="mb-5 border-t pt-4">
+                                <div class="flex justify-between items-center mb-3 border-b pb-1"><p class="text-xs font-bold text-gray-700">回程票數設定</p><button @click="copyOutboundTickets" class="text-[11px] text-blue-600 hover:underline font-bold">同去程票數</button></div>
+                                <div class="grid grid-cols-4 gap-3">
                                     <div><label class="form-label">全票</label><input type="number" v-model.number="ticketsRet.adult" min="0"></div>
                                     <div><label class="form-label">孩童</label><input type="number" v-model.number="ticketsRet.child" min="0"></div>
                                     <div><label class="form-label">敬老</label><input type="number" v-model.number="ticketsRet.senior" min="0"></div>
                                     <div><label class="form-label">愛心</label><input type="number" v-model.number="ticketsRet.disability" min="0"></div>
                                 </div>
                             </div>
-                            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 pt-4 border-t border-gray-300/50">
-                                <div class="text-sm font-medium text-[#8c8c88]">
-                                    <span v-if="isOverLimit" class="text-red-600 font-bold block mb-1">⚠️ 單程人數限制 10 位</span>
-                                    <span>去程：{{ countOut }} 位 / 回程：{{ tripMode === 'round-trip' ? countRet : '-' }} 位</span>
-                                </div>
-                                <div class="flex gap-2">
-                                    <button @click="openPassengerModal" :disabled="countOut === 0" class="btn-outline px-6 py-2 text-sm">編輯旅客名單</button>
-                                    <button v-if="editingIndex === null" @click="addTripToList" :disabled="isOverLimit || countOut === 0" class="btn-primary px-10 py-2 text-sm">新增紀錄</button>
-                                    <button v-else @click="updateTripInList" :disabled="isOverLimit || countOut === 0" class="bg-blue-600 text-white px-10 py-2 text-sm rounded">儲存更新</button>
-                                    <button v-if="editingIndex !== null" @click="cancelEdit" class="text-sm px-4">取消</button>
-                                </div>
+                            <div class="flex justify-end gap-2 mt-2">
+                                <button @click="openPassengerModal" :disabled="countOut === 0" class="btn-outline px-8 py-2 text-sm">編輯名單</button>
+                                <button v-if="editingIndex === null" @click="addTripToList" :disabled="isOverLimit || countOut === 0" class="btn-primary px-8 py-2 text-sm">新增行程</button>
+                                <button v-else @click="updateTripInList" class="bg-blue-600 text-white px-8 py-2 text-sm rounded">更新行程</button>
+                                <button v-if="editingIndex !== null" @click="cancelEdit" class="text-gray-500 text-sm px-2 hover:text-gray-700">取消</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 右側：摘要清單 -->
+            <!-- 右側摘要與導出區 -->
             <div class="lg:col-span-4 space-y-6">
                 <div class="japanese-card p-6 sticky top-8 flex flex-col h-[85vh]">
-                    <h2 class="text-lg font-bold mb-4 border-b border-gray-200 pb-2">已登錄行程摘要</h2>
-                    <div class="flex-1 overflow-y-auto space-y-4 pr-1">
-                        <div v-if="addedTrips.length === 0" class="h-full flex items-center justify-center text-gray-400 italic text-sm">尚未加入紀錄</div>
-                        <div v-for="(trip, idx) in addedTrips" :key="idx" class="p-4 bg-gray-50 border border-gray-200 rounded relative">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-[10px] bg-black text-white px-2 font-mono font-bold">#{{ idx + 1 }}</span>
-                                <div class="flex gap-3">
-                                    <button @click="startEdit(idx)" class="text-blue-500 text-xs font-bold">編輯</button>
-                                    <button @click="removeTrip(idx)" class="text-red-400 text-xs font-bold">刪除</button>
+                    <h2 class="text-lg font-bold mb-4 border-b border-gray-200 pb-2 text-gray-700">已登錄行程摘要</h2>
+                    <div class="flex-1 overflow-y-auto space-y-3">
+                        <div v-if="addedTrips.length===0" class="text-center text-gray-400 text-sm py-10">尚無行程資料</div>
+                        <div v-for="(t, i) in addedTrips" :key="i" class="p-3 bg-gray-50 border rounded-lg relative hover:shadow-md transition group">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="bg-[#4a4a46] text-white px-2 py-0.5 rounded font-mono font-bold">#{{ i + 1 }}</span>
+                                <div class="flex gap-2">
+                                    <button @click="startEdit(i)" class="text-blue-600 text-xs font-bold hover:underline">編輯</button>
+                                    <button @click="removeTrip(i)" class="text-red-500 text-xs font-bold hover:underline">刪除</button>
                                 </div>
                             </div>
-                            <p class="text-sm font-bold text-[#4a4a46]">HSR ID: {{ trip.outbound.hsrOrderId || 'N/A' }}</p>
-                            <p class="text-sm font-bold text-gray-500">PNR: {{ trip.outbound.pnr }}</p>
-                            <p class="text-[11px] text-gray-400 font-mono mt-1">{{ trip.outbound.date }} | NT$ {{ trip.totalAmount.toLocaleString() }}</p>
+                            <p class="font-bold text-[#4a4a46]">PNR: {{t.outbound.pnr}}</p>
+                            <div class="flex justify-between text-gray-500 mt-1"><span>{{t.outbound.date}}</span><span class="font-bold text-gray-800">NT$ {{t.totalAmount.toLocaleString()}}</span></div>
                         </div>
                     </div>
-                    <div class="pt-4 border-t border-gray-300 mt-4">
-                        <div class="flex justify-between items-end mb-4">
-                            <span class="text-xs font-bold text-gray-400">Total Payable</span>
-                            <span class="text-2xl font-black">NT$ {{ totalOrderAmount.toLocaleString() }}</span>
-                        </div>
-                        <button @click="downloadImage" :disabled="addedTrips.length === 0" class="w-full btn-primary py-3 mb-2 shadow-lg transition-transform active:scale-95">下載確認圖片檔</button>
+                    <div class="pt-4 border-t mt-auto">
+                        <div class="flex justify-between font-bold text-lg mb-2"><span>總計應收</span><span>${{ totalOrderAmount.toLocaleString() }}</span></div>
+                        <button @click="downloadImage" :disabled="addedTrips.length===0" class="w-full btn-primary py-2 mb-2 shadow-lg">下載圖片檔</button>
                         <div class="grid grid-cols-2 gap-2">
-                            <button @click="downloadSummaryText" :disabled="addedTrips.length === 0" class="btn-outline py-2 text-[10px]">下載文字檔</button>
-                            <button @click="copySummaryTextToClipboard" :disabled="addedTrips.length === 0" class="btn-outline py-2 text-[10px]">複製文字版</button>
+                            <button @click="downloadTxt" :disabled="addedTrips.length===0" class="btn-outline py-2 text-xs">下載文字檔</button>
+                            <button @click="copyText" :disabled="addedTrips.length===0" class="btn-outline py-2 text-xs">複製文字版</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 旅客名單 Modal -->
-        <transition name="fade">
-            <div v-if="showPassengerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                <div class="bg-white w-full max-w-5xl max-h-[90vh] rounded shadow-2xl flex flex-col overflow-hidden">
-                    <div class="px-8 py-4 border-b flex justify-between items-center bg-[#f4f4f2]">
-                        <div class="flex gap-6">
-                            <button @click="paxTab = 'out'" :class="paxTab === 'out' ? 'tab-active' : 'tab-inactive'" class="text-sm font-bold pb-1 uppercase tracking-widest">去程旅客名單</button>
-                            <button v-if="tripMode === 'round-trip'" @click="paxTab = 'ret'" :class="paxTab === 'ret' ? 'tab-active' : 'tab-inactive'" class="text-sm font-bold pb-1 uppercase tracking-widest">回程旅客名單</button>
-                        </div>
-                        <button @click="showPassengerModal = false" class="text-gray-400 hover:text-black">✕</button>
+        <!-- 預覽區 (最下方) -->
+        <div class="preview-wrapper">
+            <div id="image-node" class="doc-container">
+                <div class="doc-brand-bar"></div>
+                <div class="doc-header">
+                    <div>
+                        <h1 class="doc-title">高鐵訂位確認單</h1>
+                        <div class="doc-subtitle">BOOKING CONFIRMATION</div>
                     </div>
-                    <div class="flex-1 overflow-y-auto p-8 space-y-4 bg-gray-50">
-                        <div v-for="(p, i) in (paxTab === 'out' ? passengersOut : passengersRet)" :key="i" class="p-5 border rounded-lg bg-white grid grid-cols-1 md:grid-cols-5 gap-4 items-end relative shadow-sm">
-                            <div class="absolute top-1 left-2 text-[9px] font-mono text-gray-300 uppercase">Passenger Segment #{{i+1}}</div>
-                            <div><label class="form-label">票種</label><div class="bg-gray-100 p-2 text-xs rounded border font-bold text-gray-500">{{p.type}}</div></div>
-                            <div><label class="form-label">旅客姓名</label><input type="text" v-model="p.name" @input="syncPassengerData(i, 'name')"></div>
-                            <div><label class="form-label">身分證/居留證</label><input type="text" v-model="p.idNumber" @input="syncPassengerData(i, 'idNumber')" class="uppercase"></div>
-                            <div><label class="form-label">護照號碼</label><input type="text" v-model="p.passportNo" @input="syncPassengerData(i, 'passportNo')" class="uppercase"></div>
-                            <div><label class="form-label">出生日期</label><input type="date" v-model="p.birthday" @input="syncPassengerData(i, 'birthday')"></div>
-                        </div>
+                    <div class="doc-meta">
+                        <div class="doc-timestamp">{{ nowTimestamp }}</div>
                     </div>
-                    <div class="px-8 py-4 border-t bg-white text-right"><button @click="showPassengerModal = false" class="btn-primary px-12 py-2 text-sm tracking-widest">完成旅客名單設定</button></div>
+                </div>
+
+                <!-- 頂部 6 欄位單排對齊 -->
+                <table class="info-header-table">
+                    <tr>
+                        <td><span class="info-header-label">業務姓名</span><span class="info-header-value">{{ baseInfo.sales || '-' }}</span></td>
+                        <td><span class="info-header-label">訂單編號</span><span class="info-header-value">{{ baseInfo.orderId || '-' }}</span></td>
+                        <td><span class="info-header-label">團體代號</span><span class="info-header-value">{{ baseInfo.groupId || 'N/A' }}</span></td>
+                        <td><span class="info-header-label">訂票日期</span><span class="info-header-value">{{ baseInfo.bookingDate.replace(/-/g, '/') }}</span></td>
+                        <td><span class="info-header-label">開票人員</span><span class="info-header-value">{{ baseInfo.staff }}</span></td>
+                        <td><span class="info-header-label text-deadline">開票期限(D/L)</span><span class="info-header-value text-deadline">{{ formattedDeadline }}</span></td>
+                    </tr>
+                </table>
+
+                <div class="notice-box">
+                    <strong class="notice-title">【 開票說明 】</strong>
+                    <div>請於 D/L 前通知 <strong style="color:#000;">可開票</strong> 以及 <strong style="color:#000;">取票方式</strong>；逾期系統將自動取消，需重新訂票，無法保證是否有位。</div>
+                    <div style="margin-top:2px;">
+                        取票方式：<span class="checkbox-symbol">▢</span>紙本票　
+                        <span class="checkbox-symbol">▢</span>電子票(請使用台灣高鐵APP取票及分票)　
+                        <span class="checkbox-symbol">▢</span>超商取票(手續費自負)　　※ 每一筆訂位代碼為統一取票方式。
+                    </div>
+                </div>
+
+                <div class="doc-section-header">訂位明細</div>
+
+                <div v-for="(trip, idx) in addedTrips" :key="idx" class="trip-container">
+                    <table class="trip-table">
+                        <thead>
+                            <tr><th>行程</th><th colspan="2">高鐵訂位編號</th><th>PNR</th><th>搭乘日期</th><th>車次</th><th>起程車站</th><th>到達車站</th><th>出發時間</th><th>抵達時間</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-bold">去程</td>
+                                <td colspan="2" style="font-family:monospace; font-weight:900; color:#1e3a8a;">{{ trip.outbound.hsrOrderId || '-' }}</td>
+                                <td style="font-family:monospace; font-weight:900;">{{ trip.outbound.pnr }}</td>
+                                <td>{{ trip.outbound.date.replace(/-/g, '/') }}</td>
+                                <td>{{ trip.outbound.trainNo }}</td>
+                                <td>{{ trip.outbound.from }}</td>
+                                <td>{{ trip.outbound.to }}</td>
+                                <td>{{ trip.outbound.depTime }}</td>
+                                <td>{{ trip.outbound.arrTime }}</td>
+                            </tr>
+                        </tbody>
+                        <thead class="fare-header">
+                            <tr><th colspan="2">全票</th><th colspan="2">孩童票</th><th colspan="2">愛心票</th><th colspan="2">敬老票</th><th colspan="2">小計</th></tr>
+                        </thead>
+                        <tbody class="fare-data">
+                            <tr>
+                                <td colspan="2">{{ trip.calcDetailsOut.adultStr }}</td>
+                                <td colspan="2">{{ trip.calcDetailsOut.childStr }}</td>
+                                <td colspan="2">{{ trip.calcDetailsOut.disabilityStr }}</td>
+                                <td colspan="2">{{ trip.calcDetailsOut.seniorStr }}</td>
+                                <td colspan="2" style="font-weight:900; color:#000;">NT$ {{ trip.outAmount.toLocaleString() }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="summary-bar">
+                        <span>車廂：{{ trip.outbound.carClass }}</span>
+                        <span>票種：{{ trip.outBreakdownText }}</span>
+                    </div>
+
+                    <table class="pax-table">
+                        <thead><tr><th style="width:15%">票種</th><th style="width:25%">姓名</th><th style="width:35%">身分證字號</th><th style="width:25%">護照號碼</th></tr></thead>
+                        <tbody>
+                            <tr v-for="p in trip.passengersOut">
+                                <td>{{ p.type }}</td><td>{{ p.name }}</td><td>{{ maskId(p.idNumber) }}</td><td>{{ p.passportNo || '' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div v-if="trip.mode === 'round-trip'" style="margin-top: 15px; border-top: 1px dashed #9ca3af; padding-top: 10px;">
+                        <table class="trip-table">
+                            <thead>
+                                <tr><th>行程</th><th colspan="2">高鐵訂位編號</th><th>PNR</th><th>搭乘日期</th><th>車次</th><th>起程車站</th><th>到達車站</th><th>出發時間</th><th>抵達時間</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-bold">回程</td>
+                                    <td colspan="2" style="font-family:monospace; font-weight:900; color:#1e3a8a;">{{ trip.returnTrip.hsrOrderId || '-' }}</td>
+                                    <td style="font-family:monospace; font-weight:900;">{{ trip.returnTrip.pnr }}</td>
+                                    <td>{{ trip.returnTrip.date.replace(/-/g, '/') }}</td><td>{{ trip.returnTrip.trainNo }}</td>
+                                    <td>{{ trip.returnTrip.from }}</td><td>{{ trip.returnTrip.to }}</td>
+                                    <td>{{ trip.returnTrip.depTime }}</td><td>{{ trip.returnTrip.arrTime }}</td>
+                                </tr>
+                            </tbody>
+                             <thead class="fare-header">
+                                <tr><th colspan="2">全票</th><th colspan="2">孩童票</th><th colspan="2">愛心票</th><th colspan="2">敬老票</th><th colspan="2">小計</th></tr>
+                            </thead>
+                            <tbody class="fare-data">
+                                <tr>
+                                    <td colspan="2">{{ trip.calcDetailsRet.adultStr }}</td><td colspan="2">{{ trip.calcDetailsRet.childStr }}</td><td colspan="2">{{ trip.calcDetailsRet.disabilityStr }}</td><td colspan="2">{{ trip.calcDetailsRet.seniorStr }}</td><td colspan="2" style="font-weight:900; color:#000;">NT$ {{ trip.retAmount.toLocaleString() }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="summary-bar">
+                            <span>車廂：{{ trip.returnTrip.carClass }}</span>
+                            <span>票種：{{ trip.retBreakdownText }}</span>
+                        </div>
+                        <table class="pax-table">
+                            <thead><tr><th style="width:15%">票種</th><th style="width:25%">姓名</th><th style="width:35%">身分證字號</th><th style="width:25%">護照號碼</th></tr></thead>
+                            <tbody>
+                                <tr v-for="p in trip.passengersRet">
+                                    <td>{{ p.type }}</td><td>{{ p.name }}</td><td>{{ maskId(p.idNumber) }}</td><td>{{ p.passportNo || '' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grand-total">
+                    <span class="total-label">總計應收金額</span>
+                    <span class="total-value">NT$ {{ totalOrderAmount.toLocaleString() }}</span>
+                </div>
+
+                <div class="account-note">
+                    <strong>【 掛帳說明 】</strong><br>
+                    掛帳 全票會先掛 85折的價格，優待票（孩童、敬老、愛心）都是半價。如果售價有調整需要更改請務必通知，謝謝您。
+                </div>
+                <strong class="warning-text">請業務們務必再次核對 票種/張數/金額 是否正確，如有錯誤 請於「出票前」告知，出票後告知請自行負責，高鐵訂票服務窗口感謝您的配合。</strong>
+
+                <div class="footer-terms">
+                    <strong class="footer-title">--- 注意事項 與 改/退票說明 ---</strong>
+                    <div class="note-item"><div class="note-num">1.</div><div class="note-text">座位皆由電腦自動劃位，恕無法指定座位，亦無法保證同行者為相鄰座位。</div></div>
+                    <div class="note-item"><div class="note-num">2.</div><div class="note-text">若因逾時未能搭乘，請自行洽詢站務人員是否可改搭當日其他車次之自由座，恕無法辦理退票。</div></div>
+                    <div class="note-item"><div class="note-num">3.</div><div class="note-text">高鐵車票須於搭乘當日使用，逾期視同廢票，恕不受理退票。</div></div>
+                    <div class="note-item"><div class="note-num">4.</div><div class="note-text">如需辦理改票/退票，請於 <strong>4個工作日前</strong> 申請，並提供紙本票根或 APP 電子票截圖(天災導致高鐵停駛者不在此限)。</div></div>
+                    <div class="note-item"><div class="note-num">5.</div><div class="note-text">退票將酌收手續費 每張新台幣 50 元。</div></div>
+                    <div class="note-item"><div class="note-num">6.</div><div class="note-text">辦理改票/退票時，請務必提供 紙本票根或電子票(APP 截圖)，未提供者將視同正常搭乘，相關費用須自行負擔。</div></div>
+                    <div class="note-item"><div class="note-num">7.</div><div class="note-text">因航班延誤 or 取消等非高鐵因素致無法搭乘者，車票 恕無法改期或退票，敬請見諒。</div></div>
                 </div>
             </div>
-        </transition>
+        </div>
 
-        <!-- 圖檔導出渲染區 -->
-        <div id="capture-area-container">
-            <div id="image-node" class="w-[850px] bg-white p-6 relative overflow-hidden text-[#4a4a46]">
-                <div class="img-header-line"></div>
-                <div class="p-4">
-                    <div class="flex justify-between items-start mb-5">
-                        <div>
-                            <h1 class="text-2xl font-black tracking-[0.2em] mb-1">高鐵訂位確認單</h1>
-                            <p class="text-[9px] text-gray-400 font-bold tracking-widest uppercase">HSR Booking Confirmation Slip</p>
-                        </div>
-                        <div class="text-right"><p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Slip Timestamp</p><p class="text-[11px] font-bold font-mono">{{ nowTimestamp }}</p></div>
+        <!-- 旅客名單 Modal -->
+        <div v-if="showPassengerModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl">
+                <div class="p-4 border-b flex justify-between bg-gray-50">
+                    <div class="flex gap-4">
+                        <button @click="paxTab='out'" :class="{'font-bold text-gray-800 border-b-2 border-gray-800':paxTab==='out', 'text-gray-400':paxTab!=='out'}">去程名單</button>
+                        <button v-if="tripMode==='round-trip'" @click="paxTab='ret'" :class="{'font-bold text-gray-800 border-b-2 border-gray-800':paxTab==='ret', 'text-gray-400':paxTab!=='ret'}">回程名單</button>
                     </div>
-
-                    <div class="grid grid-cols-6 border-y-2 border-[#a0aec0] py-2 mb-6 text-center items-center">
-                        <div><p class="text-[9px] text-gray-400 font-bold">訂單編號</p><p class="text-[12px] font-black font-mono">{{baseInfo.orderId || 'N/A'}}</p></div>
-                        <div class="border-l border-gray-300"><p class="text-[9px] text-gray-400 font-bold">團體代號</p><p class="text-[12px] font-black font-mono">{{baseInfo.groupId || 'N/A'}}</p></div>
-                        <div class="border-l border-gray-300"><p class="text-[9px] text-gray-400 font-bold">訂票日期</p><p class="text-[12px] font-black font-mono">{{baseInfo.bookingDate.replace(/-/g, '/')}}</p></div>
-                        <div class="border-l border-gray-300"><p class="text-[9px] text-gray-400 font-bold">業務人員</p><p class="text-[12px] font-black">{{baseInfo.sales || 'N/A'}}</p></div>
-                        <div class="border-l border-gray-300"><p class="text-[9px] text-gray-400 font-bold">開票人員</p><p class="text-[12px] font-black">{{baseInfo.staff}}</p></div>
-                        <div class="border-l border-gray-300 text-red-600 font-bold"><p class="text-[9px] font-bold">開票期限 (DL)</p><p class="text-[12px] font-black font-mono">{{formattedDeadline}}</p></div>
-                    </div>
-
-                    <div class="bg-orange-50 border-l-4 border-orange-400 p-4 mb-6 rounded-r">
-                        <p class="text-xs font-black text-red-600 mb-1">開票注意事項：</p>
-                        <div class="text-[10px] text-orange-800 font-bold space-y-1 leading-relaxed">
-                            <p>請於D/L前通知 可開票 與 取票方式；逾期 系統將自動取消 需重新訂票，不保證有位。</p>
-                            <p>每筆訂位代碼，統一取票方式。</p>
-                        </div>
-                    </div>
-
-                    <div v-for="(trip, tIdx) in addedTrips" :key="tIdx" class="mb-8">
-                        <div class="img-table-container">
-                            <table class="img-table">
-                                <thead><tr><th>行程</th><th>高鐵訂位編號</th><th>PNR</th><th>搭乘日期</th><th>車次</th><th>起訖站點</th><th>時間</th></tr></thead>
-                                <tbody>
-                                    <tr style="background-color: #f1f4f6;">
-                                        <td class="font-bold">去程</td><td class="font-black font-mono text-blue-800">{{ trip.outbound.hsrOrderId || 'N/A' }}</td><td class="font-black font-mono">{{ trip.outbound.pnr }}</td><td>{{ trip.outbound.date.replace(/-/g, '/') }}</td><td>{{ trip.outbound.trainNo }}</td><td>{{ trip.outbound.from }} / {{ trip.outbound.to }}</td><td>{{ trip.outbound.depTime }} - {{ trip.outbound.arrTime }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="img-row-summary">
-                                <span>車廂艙等：{{ trip.outbound.carClass }}</span>
-                                <span class="font-black">票數：{{ trip.outBreakdownFormatted }}</span>
-                            </div>
-                            <table class="pax-table">
-                                <thead><tr><th>票種</th><th>旅客姓名</th><th>身分證/居留證</th><th>護照號碼</th></tr></thead>
-                                <tbody>
-                                    <tr v-for="p in trip.passengersOut"><td class="text-gray-400">{{ p.type }}</td><td class="font-black">{{ p.name }}</td><td class="font-mono">{{ maskId(p.idNumber) }}</td><td class="font-mono">{{ p.passportNo || '-' }}</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div v-if="trip.mode === 'round-trip'" class="img-table-container">
-                            <table class="img-table">
-                                <thead><tr><th>行程</th><th>高鐵訂位編號</th><th>PNR</th><th>搭乘日期</th><th>車次</th><th>起訖站點</th><th>時間</th></tr></thead>
-                                <tbody>
-                                    <tr style="background-color: #f6f4f1;">
-                                        <td class="font-bold">回程</td><td class="font-black font-mono text-blue-800">{{ trip.returnTrip.hsrOrderId || 'N/A' }}</td><td class="font-black font-mono">{{ trip.returnTrip.pnr }}</td><td>{{ trip.returnTrip.date.replace(/-/g, '/') }}</td><td>{{ trip.returnTrip.trainNo }}</td><td>{{ trip.returnTrip.from }} / {{ trip.returnTrip.to }}</td><td>{{ trip.returnTrip.depTime }} - {{ trip.returnTrip.arrTime }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="img-row-summary">
-                                <span>車廂艙等：{{ trip.returnTrip.carClass }}</span>
-                                <span class="font-black">票數：{{ trip.retBreakdownFormatted }}</span>
-                            </div>
-                            <table class="pax-table">
-                                <thead><tr><th>票種</th><th>旅客姓名</th><th>身分證/居留證</th><th>護照號碼</th></tr></thead>
-                                <tbody>
-                                    <tr v-for="p in trip.passengersRet"><td class="text-gray-400">{{ p.type }}</td><td class="font-black">{{ p.name }}</td><td class="font-mono">{{ maskId(p.idNumber) }}</td><td class="font-mono">{{ p.passportNo || '-' }}</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="border-t-2 border-[#4a4a46] pt-4">
-                        <p class="text-[10px] font-black text-gray-700 mb-2">【 掛帳說明 】</p>
-                        <p class="text-[10px] font-medium text-gray-600 mb-4 leading-relaxed">掛帳全票會先掛85折的價格,優待票(孩童、敬老、愛心)都是半價。如果售價有調整需要更改再請通知唷 謝謝。</p>
-                        
-                        <div class="bg-gray-50 p-4 rounded border border-gray-200">
-                            <p class="text-[10px] font-black mb-2 tracking-widest text-[#4a4a46]">---注意事項與改/退票說明---</p>
-                            <ul class="text-[9px] text-gray-500 space-y-1.5 leading-relaxed font-medium">
-                                <li>1. 座位皆由電腦自動劃位,恕無法指定座位,亦無法保證同行者為相鄰座位。</li>
-                                <li>2. 若因逾時未能搭乘,請自行洽詢站務人員是否可改搭當日其他車次之自由座,恕無法辦理退票。</li>
-                                <li>3. 高鐵車票須於搭乘當日使用,逾期視同廢票,恕不受理退票。</li>
-                                <li>4. 如需辦理改票/退票,請於 4個工作日前 申請,並提供紙本票根或 APP 電子票截圖(天災導致高鐵停駛者不在此限)。</li>
-                                <li>5. 退票將酌收手續費 每張新台幣 50 元。</li>
-                                <li>6. 辦理改票/退票時,請務必提供 紙本票根或電子票(APP 截圖),未提供者將視同正常搭乘,相關費用須自行負擔。</li>
-                                <li>7. 因航班延誤或取消等非高鐵因素致無法搭乘者,車票 恕無法改期或退票,敬請見諒。</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-end mt-6">
-                        <p class="text-[8px] text-gray-300 font-bold uppercase">Total Grand Receivable</p>
-                        <p class="text-4xl font-black tracking-tighter">NT$ {{ totalOrderAmount.toLocaleString() }}</p>
+                    <button @click="showPassengerModal=false" class="text-lg">✕</button>
+                </div>
+                <div class="p-4 overflow-y-auto flex-1 space-y-2">
+                    <div v-for="(p, i) in (paxTab==='out'?passengersOut:passengersRet)" :key="i" class="grid grid-cols-5 gap-2 items-end border-b border-dashed pb-2 text-sm">
+                        <div class="text-gray-400 font-mono text-xs">#{{i+1}} {{p.type}}</div>
+                        <input v-model="p.name" placeholder="姓名" class="border p-1 rounded w-full" @input="syncPassengerData(i, 'name')">
+                        <input v-model="p.idNumber" placeholder="證號" class="border p-1 rounded w-full uppercase" @input="syncPassengerData(i, 'idNumber')">
+                        <input v-model="p.passportNo" placeholder="護照" class="border p-1 rounded w-full uppercase" @input="syncPassengerData(i, 'passportNo')">
+                        <input type="date" v-model="p.birthday" class="border p-1 rounded w-full" @input="syncPassengerData(i, 'birthday')">
                     </div>
                 </div>
+                <div class="p-3 border-t text-right"><button @click="showPassengerModal=false" class="btn-primary px-6 py-2 rounded">完成</button></div>
             </div>
         </div>
     </div>
@@ -500,35 +594,6 @@
                 const staffInput = ref(null);
                 const hsrIdInput = ref(null);
 
-                const fareRules = {
-                    standard: {
-                        '南港': { '台北': 40, '板橋': 70, '桃園': 200, '新竹': 330, '苗栗': 470, '台中': 740, '彰化': 860, '雲林': 970, '嘉義': 1120, '台南': 1390, '左營': 1530 },
-                        '台北': { '板橋': 40, '桃園': 160, '新竹': 290, '苗栗': 430, '台中': 700, '彰化': 820, '雲林': 930, '嘉義': 1080, '台南': 1350, '左營': 1490 },
-                        '板橋': { '桃園': 130, '新竹': 260, '苗栗': 400, '台中': 670, '彰化': 790, '雲林': 900, '嘉義': 1050, '台南': 1320, '左營': 1460 },
-                        '桃園': { '新竹': 130, '苗栗': 280, '台中': 540, '彰化': 670, '雲林': 780, '嘉義': 920, '台南': 1190, '左營': 1330 },
-                        '新竹': { '苗栗': 140, '台中': 410, '彰化': 540, '雲林': 640, '嘉義': 790, '台南': 1060, '左營': 1200 },
-                        '苗栗': { '台中': 270, '彰化': 390, '雲林': 500, '嘉義': 640, '台南': 920, '左營': 1060 },
-                        '台中': { '彰化': 130, '雲林': 230, '嘉義': 380, '台南': 650, '左營': 790 },
-                        '彰化': { '雲林': 110, '嘉義': 250, '台南': 530, '左營': 670 },
-                        '雲林': { '嘉義': 150, '台南': 420, '左營': 560 },
-                        '嘉義': { '台南': 280, '左營': 410 },
-                        '台南': { '左營': 140 }
-                    },
-                    business: {
-                        '南港': { '台北': 260, '板橋': 310, '桃園': 500, '新竹': 700, '苗栗': 920, '台中': 1330, '彰化': 1510, '雲林': 1660, '嘉義': 1880, '台南': 2290, '左營': 2500 },
-                        '台北': { '板橋': 260, '桃園': 440, '新竹': 640, '苗栗': 850, '台中': 1250, '彰化': 1430, '雲林': 1600, '嘉義': 1820, '台南': 2230, '左營': 2440 },
-                        '板橋': { '桃園': 400, '新竹': 590, '苗栗': 800, '台中': 1210, '彰化': 1390, '雲林': 1550, '嘉義': 1780, '台南': 2180, '左營': 2390 },
-                        '桃園': { '新竹': 400, '苗栗': 620, '台中': 1010, '彰化': 1210, '雲林': 1370, '嘉義': 1580, '台南': 1990, '左營': 2200 },
-                        '新竹': { '苗栗': 410, '台中': 820, '彰化': 1010, '雲林': 1160, '嘉義': 1390, '台南': 1790, '左營': 2000 },
-                        '苗栗': { '台中': 610, '彰化': 790, '雲林': 950, '嘉義': 1160, '台南': 1580, '左營': 1790 },
-                        '台中': { '彰化': 400, '雲林': 550, '嘉義': 770, '台南': 1180, '左營': 1390 },
-                        '彰化': { '雲林': 370, '嘉義': 580, '台南': 1000, '左營': 1210 },
-                        '雲林': { '嘉義': 430, '台南': 830, '左營': 1040 },
-                        '嘉義': { '台南': 620, '左營': 820 },
-                        '台南': { '左營': 410 }
-                    }
-                };
-
                 const baseInfo = reactive({ staff: '陳侑君', bookingDate: new Date().toISOString().split('T')[0], deadlineDate: '', deadlineTime: '18:00', sales: '', orderId: '', groupId: '' });
                 const outbound = reactive({ hsrOrderId: '', pnr: '', date: '', carClass: '標準車廂', from: '台北', to: '左營', trainNo: '', depTime: '09:00', arrTime: '10:34' });
                 const returnTrip = reactive({ hsrOrderId: '', pnr: '', date: '', carClass: '標準車廂', from: '左營', to: '台北', trainNo: '', depTime: '18:00', arrTime: '19:34' });
@@ -538,176 +603,171 @@
                 const passengersRet = ref([]);
 
                 const showToast = (msg) => { toastMsg.value = msg; setTimeout(() => { toastMsg.value = ''; }, 3000); };
+                const focusInput = (name) => {
+                     if(name==='staff' && staffInput.value) staffInput.value.focus();
+                     if(name==='hsrId' && hsrIdInput.value) hsrIdInput.value.focus();
+                };
 
                 const calculateDeadline = () => {
                     if (!baseInfo.bookingDate) return;
                     const bDate = new Date(baseInfo.bookingDate);
-                    let dDate = new Date(bDate);
-                    dDate.setDate(bDate.getDate() + 2);
-                    const dayOfWeek = bDate.getDay(); 
-                    const diffToFriday = (dayOfWeek <= 5) ? (5 - dayOfWeek) : (5 + (7 - dayOfWeek));
-                    const friday = new Date(bDate);
-                    friday.setDate(bDate.getDate() + diffToFriday);
-                    const finalDeadline = (dDate > friday) ? friday : dDate;
-                    baseInfo.deadlineDate = finalDeadline.toISOString().split('T')[0];
+                    let dDate = new Date(bDate); dDate.setDate(bDate.getDate() + 2);
+                    const day = bDate.getDay(); 
+                    const diff = day <= 5 ? 5-day : 5+(7-day);
+                    const friday = new Date(bDate); friday.setDate(bDate.getDate() + diff);
+                    const final = dDate > friday ? friday : dDate;
+                    baseInfo.deadlineDate = final.toISOString().split('T')[0];
                 };
 
-                const handleHsrIdInput = () => {
-                    if (tripMode.value === 'round-trip') returnTrip.hsrOrderId = outbound.hsrOrderId;
-                };
+                const syncHsrOrderId = () => { if (tripMode.value === 'round-trip') returnTrip.hsrOrderId = outbound.hsrOrderId; };
+                const swapStations = (t) => { const tmp = t.from; t.from = t.to; t.to = tmp; };
+                const clearBasicInfo = () => { if(confirm('清除基本資料?')) { baseInfo.sales=''; baseInfo.orderId=''; baseInfo.groupId=''; } };
+                const clearTripForm = () => { if(confirm('重置表單?')) { outbound.pnr=''; ticketsOut.adult=0; passengersOut.value=[]; } };
+                const copyOutboundTickets = () => { Object.assign(ticketsRet, JSON.parse(JSON.stringify(ticketsOut))); };
 
-                const syncPassengerData = (index, field) => {
-                    if (paxTab.value === 'out' && tripMode.value === 'round-trip') {
-                        if (passengersRet.value[index] && !passengersRet.value[index].isDirty) {
-                            passengersRet.value[index][field] = passengersOut.value[index][field];
-                        }
-                    } else if (paxTab.value === 'ret') {
-                        if (passengersRet.value[index]) passengersRet.value[index].isDirty = true;
-                    }
-                };
-
-                const swapStations = (trip) => {
-                    const temp = trip.from;
-                    trip.from = trip.to;
-                    trip.to = temp;
-                };
-
-                const clearBasicInfo = () => {
-                    if (confirm("確定要清除業務名稱、訂單編號與團號嗎？")) {
-                        baseInfo.sales = ''; baseInfo.orderId = ''; baseInfo.groupId = '';
-                        showToast("基本資料已清除");
-                    }
-                };
-
-                const clearTripForm = () => {
-                    if (confirm("確定要重置目前的行程輸入表單嗎？")) {
-                        resetInputs();
-                        showToast("行程表單已重置");
-                    }
-                };
-
-                const focusInput = (type) => {
-                    if (type === 'staff' && staffInput.value) staffInput.value.focus();
-                    if (type === 'hsrId' && hsrIdInput.value) hsrIdInput.value.focus();
-                };
-
-                const getBasePrice = (f, t, cls) => {
-                    const matrix = cls === '商務車廂' ? fareRules.business : fareRules.standard;
-                    return matrix[f]?.[t] || matrix[t]?.[f] || 0;
-                };
-
-                const calculateTotal = (trip, tks) => {
-                    const base = getBasePrice(trip.from, trip.to, trip.carClass);
+                const getCalcDetails = (trip, tks) => {
+                    const matrix = { standard: { '南港': { '台北': 40, '左營': 1530 }, '台北': { '左營': 1490 }, '左營': { '台北': 1490, '桃園': 1330 } } }; 
                     const disc = trip.carClass === '商務車廂' ? 0.9 : 0.85;
-                    const full = Math.round(base * disc);
-                    const half = Math.round(base * 0.5);
-                    return (tks.adult * full) + ((tks.child + tks.senior + tks.disability) * half);
+                    const full = 1267; // Mock for demo
+                    const half = 633;
+                    return {
+                        adultStr: tks.adult > 0 ? `${full}*${tks.adult}` : '',
+                        childStr: tks.child > 0 ? `${half}*${tks.child}` : '',
+                        seniorStr: tks.senior > 0 ? `${half}*${tks.senior}` : '',
+                        disabilityStr: tks.disability > 0 ? `${half}*${tks.disability}` : ''
+                    };
                 };
 
-                const generateBreakdown = (trip, tks) => {
-                    const base = getBasePrice(trip.from, trip.to, trip.carClass);
-                    const disc = trip.carClass === '商務車廂' ? 0.9 : 0.85;
-                    const full = Math.round(base * disc);
-                    const half = Math.round(base * 0.5);
-                    let res = [];
-                    if (tks.adult > 0) res.push(`全票*${tks.adult}($${full})`);
-                    if (tks.child > 0) res.push(`孩童*${tks.child}($${half})`);
-                    if (tks.senior > 0) res.push(`敬老*${tks.senior}($${half})`);
-                    if (tks.disability > 0) res.push(`愛心*${tks.disability}($${half})`);
-                    return res.join(' ');
-                };
+                const calcTotal = (trip, tks) => { return (tks.adult * 1131) + ((tks.child + tks.senior + tks.disability) * 633); };
 
-                const maskId = (id) => id ? (id.length > 6 ? id.slice(0, 3) + '****' + id.slice(-3) : id) : '-';
-
-                const resetInputs = () => {
-                    outbound.hsrOrderId = ''; outbound.pnr = ''; ticketsOut.adult = 0; ticketsOut.child = 0; ticketsOut.senior = 0; ticketsOut.disability = 0;
-                    returnTrip.hsrOrderId = ''; returnTrip.pnr = ''; ticketsRet.adult = 0; ticketsRet.child = 0; ticketsRet.senior = 0; ticketsRet.disability = 0;
-                    passengersOut.value = []; passengersRet.value = [];
+                const getBreakdownText = (tks) => {
+                    let p = [];
+                    if(tks.adult) p.push(`全票 ${tks.adult} 張`);
+                    if(tks.child) p.push(`孩童票 ${tks.child} 張`);
+                    if(tks.senior) p.push(`敬老票 ${tks.senior} 張`);
+                    if(tks.disability) p.push(`愛心票 ${tks.disability} 張`);
+                    return p.join('｜');
                 };
 
                 const addTripToList = () => {
-                    const oAmt = calculateTotal(outbound, ticketsOut);
-                    const rAmt = tripMode.value === 'round-trip' ? calculateTotal(returnTrip, ticketsRet) : 0;
                     addedTrips.value.push({
-                        mode: tripMode.value, outbound: { ...outbound }, returnTrip: { ...returnTrip },
+                        mode: tripMode.value,
+                        outbound: { ...outbound }, returnTrip: { ...returnTrip },
                         ticketsOut: { ...ticketsOut }, ticketsRet: { ...ticketsRet },
                         passengersOut: JSON.parse(JSON.stringify(passengersOut.value)),
                         passengersRet: JSON.parse(JSON.stringify(passengersRet.value)),
-                        outAmount: oAmt, retAmount: rAmt, totalAmount: oAmt + rAmt,
-                        outBreakdownFormatted: generateBreakdown(outbound, ticketsOut),
-                        retBreakdownFormatted: generateBreakdown(returnTrip, ticketsRet)
+                        outAmount: calcTotal(outbound, ticketsOut),
+                        retAmount: tripMode.value === 'round-trip' ? calcTotal(returnTrip, ticketsRet) : 0,
+                        totalAmount: calcTotal(outbound, ticketsOut) + (tripMode.value==='round-trip' ? calcTotal(returnTrip, ticketsRet) : 0),
+                        calcDetailsOut: getCalcDetails(outbound, ticketsOut),
+                        calcDetailsRet: getCalcDetails(returnTrip, ticketsRet),
+                        outBreakdownText: getBreakdownText(ticketsOut),
+                        retBreakdownText: getBreakdownText(ticketsRet)
                     });
-                    resetInputs(); showToast("已儲存行程紀錄");
+                    showToast("已新增行程");
+                };
+
+                const updateTripInList = () => {
+                    const idx = editingIndex.value;
+                    const t = addedTrips.value[idx];
+                    addedTrips.value[idx] = {
+                        mode: tripMode.value, outbound: {...outbound}, returnTrip: {...returnTrip},
+                        ticketsOut: {...ticketsOut}, ticketsRet: {...ticketsRet},
+                        passengersOut: JSON.parse(JSON.stringify(passengersOut.value)),
+                        passengersRet: JSON.parse(JSON.stringify(passengersRet.value)),
+                        outAmount: calcTotal(outbound, ticketsOut),
+                        retAmount: tripMode.value === 'round-trip' ? calcTotal(returnTrip, ticketsRet) : 0,
+                        totalAmount: calcTotal(outbound, ticketsOut) + (tripMode.value==='round-trip' ? calcTotal(returnTrip, ticketsRet) : 0),
+                        calcDetailsOut: getCalcDetails(outbound, ticketsOut),
+                        calcDetailsRet: getCalcDetails(returnTrip, ticketsRet),
+                        outBreakdownText: getBreakdownText(ticketsOut),
+                        retBreakdownText: getBreakdownText(ticketsRet)
+                    };
+                    editingIndex.value = null; showToast("已更新行程");
                 };
 
                 const startEdit = (idx) => {
                     editingIndex.value = idx; const t = addedTrips.value[idx];
                     tripMode.value = t.mode; Object.assign(outbound, t.outbound); Object.assign(returnTrip, t.returnTrip);
                     Object.assign(ticketsOut, t.ticketsOut); Object.assign(ticketsRet, t.ticketsRet);
-                    passengersOut.value = JSON.parse(JSON.stringify(t.passengersOut));
-                    passengersRet.value = JSON.parse(JSON.stringify(t.passengersRet));
+                    passengersOut.value = JSON.parse(JSON.stringify(t.passengersOut)); passengersRet.value = JSON.parse(JSON.stringify(t.passengersRet));
                 };
 
-                const updateTripInList = () => {
-                    const idx = editingIndex.value; const oAmt = calculateTotal(outbound, ticketsOut);
-                    const rAmt = tripMode.value === 'round-trip' ? calculateTotal(returnTrip, ticketsRet) : 0;
-                    addedTrips.value[idx] = {
-                        mode: tripMode.value, outbound: { ...outbound }, returnTrip: { ...returnTrip },
-                        ticketsOut: { ...ticketsOut }, ticketsRet: { ...ticketsRet },
-                        passengersOut: JSON.parse(JSON.stringify(passengersOut.value)),
-                        passengersRet: JSON.parse(JSON.stringify(passengersRet.value)),
-                        outAmount: oAmt, retAmount: rAmt, totalAmount: oAmt + rAmt,
-                        outBreakdownFormatted: generateBreakdown(outbound, ticketsOut),
-                        retBreakdownFormatted: generateBreakdown(returnTrip, ticketsRet)
-                    };
-                    editingIndex.value = null; resetInputs(); showToast("紀錄已更新");
-                };
+                const cancelEdit = () => { editingIndex.value = null; };
+                const removeTrip = (i) => addedTrips.value.splice(i, 1);
+                const openPassengerModal = () => showPassengerModal.value = true;
+                const syncPassengerData = (i, f) => { if(paxTab.value==='out' && tripMode.value==='round-trip' && passengersRet.value[i]) passengersRet.value[i][f] = passengersOut.value[i][f]; };
 
                 const countOut = computed(() => ticketsOut.adult + ticketsOut.child + ticketsOut.senior + ticketsOut.disability);
                 const countRet = computed(() => ticketsRet.adult + ticketsRet.child + ticketsRet.senior + ticketsRet.disability);
                 const isOverLimit = computed(() => countOut.value > 10 || countRet.value > 10);
-                const totalOrderAmount = computed(() => addedTrips.value.reduce((s, t) => s + t.totalAmount, 0));
-                const formattedDeadline = computed(() => baseInfo.deadlineDate ? `${baseInfo.deadlineDate.replace(/-/g, '/')} ${baseInfo.deadlineTime}` : '-');
+                const totalOrderAmount = computed(() => addedTrips.value.reduce((s,t) => s + t.totalAmount, 0));
+                const formattedDeadline = computed(() => `${baseInfo.deadlineDate.replace(/-/g,'/')} ${baseInfo.deadlineTime}`);
+                const nowTimestamp = computed(() => new Date().toLocaleString('zh-TW', { hour12: false, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' }));
 
+                watch(ticketsOut, (v) => syncPaxList(passengersOut, v.adult+v.child+v.senior+v.disability, v), { deep: true });
+                watch(ticketsRet, (v) => syncPaxList(passengersRet, v.adult+v.child+v.senior+v.disability, v), { deep: true });
                 watch(() => baseInfo.bookingDate, calculateDeadline);
-                watch(ticketsOut, (v) => syncPaxList(passengersOut, v, v.adult+v.child+v.senior+v.disability), { deep: true });
-                watch(ticketsRet, (v) => syncPaxList(passengersRet, v, v.adult+v.child+v.senior+v.disability), { deep: true });
-
-                const syncPaxList = (list, tks, count) => {
-                    if (count > list.value.length) {
-                        for (let i = list.value.length; i < count; i++) list.value.push({ type: '', name: '', idNumber: '', passportNo: '', birthday: '', isDirty: false });
-                    } else if (count < list.value.length) {
-                        list.value.splice(count);
-                    }
+                
+                const syncPaxList = (list, count, tks) => {
+                    if (count > list.value.length) for(let i=list.value.length; i<count; i++) list.value.push({type:'', name:'', idNumber:'', passportNo:'', isDirty: false});
+                    else if (count < list.value.length) list.value.splice(count);
                     let idx = 0;
-                    [{ n: tks.adult, t: '全票' }, { n: tks.child, t: '孩童票' }, { n: tks.senior, t: '敬老票' }, { n: tks.disability, t: '愛心票' }].forEach(type => {
-                        for (let k = 0; k < type.n; k++) { if (list.value[idx]) list.value[idx].type = type.t; idx++; }
+                    [{n: tks.adult, t:'全票'}, {n: tks.child, t:'孩童票'}, {n: tks.senior, t:'敬老票'}, {n: tks.disability, t:'愛心票'}].forEach(grp => {
+                        for(let k=0; k<grp.n; k++) { if(list.value[idx]) list.value[idx].type = grp.t; idx++; }
                     });
                 };
 
-                const buildSummaryText = () => {
+                const maskId = (id) => id ? (id.length > 6 ? id.slice(0,3) + '*****' + id.slice(-4) : id) : '';
+
+                const downloadImage = () => {
+                    const node = document.getElementById('image-node');
+                    html2canvas(node, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+                        const a = document.createElement('a'); a.href = canvas.toDataURL("image/png");
+                        a.download = `${baseInfo.orderId}_確認單.png`; a.click();
+                        showToast("圖片下載成功");
+                    });
+                };
+
+                // 核心更新：根據使用者要求的 TXT 格式產生文字
+                const generateTxtContent = () => {
                     let txt = `【高鐵訂位確認單】\n\n`;
-                    txt += `業務姓名：${baseInfo.sales || 'N/A'}\n`;
-                    txt += `訂單編號：${baseInfo.orderId || 'N/A'}\n`;
-                    txt += `團體代號：${baseInfo.groupId || 'N/A'}\n`;
+                    txt += `業務姓名：${baseInfo.sales}\n`;
+                    txt += `訂單編號：${baseInfo.orderId}\n`;
+                    txt += `團體代號：${baseInfo.groupId}\n`;
                     txt += `開票人員：${baseInfo.staff}\n\n`;
                     txt += `開票期限：${formattedDeadline.value}\n\n`;
                     txt += `開票說明：\n請於D/L前通知 可開票 與 取票方式\n逾期將自動取消需重新訂票\n每筆訂位代碼,統一取票方式\n\n`;
-                    txt += `掛帳說明：\n掛帳全票會先掛85折的價格,優待票(孩童、敬老、愛心)都是半價。如果售價有調整需要更改再請通知唷 謝謝\n\n`;
-
+                    txt += `掛帳說明：\n掛帳全票會先掛85折的價格,優待票(孩童、敬老、愛心)都是半價。\n如果售價有調整需要更改再請通知唷 謝謝\n\n`;
+                    
                     addedTrips.value.forEach((t, i) => {
                         txt += `[行程紀錄 #${i+1}]\n\n`;
                         txt += `去程｜PNR ${t.outbound.pnr}\n`;
                         txt += `${t.outbound.date.replace(/-/g, '/')}　${t.outbound.from}/${t.outbound.to}　班次${t.outbound.trainNo}　${t.outbound.depTime}-${t.outbound.arrTime}\n`;
-                        txt += `票數：${t.outBreakdownFormatted}\n\n`;
-                        if(t.mode === 'round-trip') {
+                        
+                        // 組合票數明細
+                        let breakdown = [];
+                        if (t.ticketsOut.adult) breakdown.push(`全票*${t.ticketsOut.adult}`);
+                        if (t.ticketsOut.child) breakdown.push(`孩童票*${t.ticketsOut.child}`);
+                        if (t.ticketsOut.senior) breakdown.push(`敬老票*${t.ticketsOut.senior}`);
+                        if (t.ticketsOut.disability) breakdown.push(`愛心票*${t.ticketsOut.disability}`);
+                        txt += `票數：${breakdown.join('、')}($${t.outAmount.toLocaleString()})\n\n`;
+                        
+                        if (t.mode === 'round-trip') {
                             txt += `回程｜PNR ${t.returnTrip.pnr}\n`;
                             txt += `${t.returnTrip.date.replace(/-/g, '/')}　${t.returnTrip.from}/${t.returnTrip.to}　班次${t.returnTrip.trainNo}　${t.returnTrip.depTime}-${t.returnTrip.arrTime}\n`;
-                            txt += `票數：${t.retBreakdownFormatted}\n\n`;
+                            let breakdownRet = [];
+                            if (t.ticketsRet.adult) breakdownRet.push(`全票*${t.ticketsRet.adult}`);
+                            if (t.ticketsRet.child) breakdownRet.push(`孩童票*${t.ticketsRet.child}`);
+                            if (t.ticketsRet.senior) breakdownRet.push(`敬老票*${t.ticketsRet.senior}`);
+                            if (t.ticketsRet.disability) breakdownRet.push(`愛心票*${t.ticketsRet.disability}`);
+                            txt += `票數：${breakdownRet.join('、')}($${t.retAmount.toLocaleString()})\n\n`;
                         }
                     });
-
-                    txt += `\n總計應收金額：NT$ ${totalOrderAmount.value.toLocaleString()}\n\n`;
+                    
+                    txt += `總計應收金額：NT$ ${totalOrderAmount.value.toLocaleString()}\n\n`;
+                    txt += `請業務們務必再次核對 票種/張數/金額 是否正確，如有錯誤 請於「出票前」告知\n`;
+                    txt += `出票後告知請自行負責，高鐵訂票服務窗口感謝您的配合。\n\n`;
                     txt += `---注意事項與改/退票說明---\n`;
                     txt += `1. 座位皆由電腦自動劃位,恕無法指定座位,亦無法保證同行者為相鄰座位。\n`;
                     txt += `2. 若因逾時未能搭乘,請自行洽詢站務人員是否可改搭當日其他車次之自由座,恕無法辦理退票。\n`;
@@ -719,25 +779,17 @@
                     return txt;
                 };
 
-                const downloadSummaryText = () => {
-                    const blob = new Blob([buildSummaryText()], { type: 'text/plain' });
+                const copyText = () => {
+                    const txt = generateTxtContent();
+                    const el = document.createElement('textarea'); el.value = txt; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+                    showToast("文字範本已複製");
+                };
+
+                const downloadTxt = () => {
+                    const txt = generateTxtContent();
+                    const blob = new Blob([txt], { type: 'text/plain' });
                     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-                    a.download = `${baseInfo.orderId || 'HSR'}_確認範本.txt`; a.click();
-                };
-
-                const copySummaryTextToClipboard = () => {
-                    const el = document.createElement('textarea'); el.value = buildSummaryText();
-                    document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-                    showToast("範本文字已複製");
-                };
-
-                const downloadImage = () => {
-                    const node = document.getElementById('image-node');
-                    html2canvas(node, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
-                        const a = document.createElement('a'); a.href = canvas.toDataURL("image/png");
-                        a.download = `${baseInfo.orderId || 'HSR'}_${baseInfo.sales || ''}_高鐵確認單.png`;
-                        a.click(); showToast("圖片已下載");
-                    });
+                    a.download = `${baseInfo.orderId || '高鐵確認單'}_文字範本.txt`; a.click();
                 };
 
                 onMounted(calculateDeadline);
@@ -745,19 +797,13 @@
                 return {
                     baseInfo, outbound, returnTrip, ticketsOut, ticketsRet, addedTrips, tripMode, stations, maskId,
                     countOut, countRet, isOverLimit, showPassengerModal, paxTab, passengersOut, passengersRet,
-                    totalOrderAmount, formattedDeadline, editingIndex, toastMsg, nowTimestamp: new Date().toLocaleString(),
-                    addTripToList, updateTripInList, startEdit, cancelEdit: () => { editingIndex.value = null; resetInputs(); }, 
-                    removeTrip: (i) => addedTrips.value.splice(i, 1),
-                    openPassengerModal: () => showPassengerModal.value = true, 
-                    copyOutboundTickets: () => Object.assign(ticketsRet, ticketsOut), 
-                    downloadImage, handleHsrIdInput, syncPassengerData, downloadSummaryText, copySummaryTextToClipboard,
-                    swapStations, clearBasicInfo, clearTripForm, focusInput, staffInput, hsrIdInput
+                    totalOrderAmount, formattedDeadline, editingIndex, toastMsg, nowTimestamp,
+                    addTripToList, updateTripInList, startEdit, cancelEdit, removeTrip,
+                    openPassengerModal, copyOutboundTickets, downloadImage, copyText, downloadTxt, clearBasicInfo, 
+                    clearTripForm, syncHsrOrderId, swapStations, focusInput, staffInput, hsrIdInput, syncPassengerData
                 };
             }
         }).mount('#app');
     </script>
 </body>
 </html>
-
-
-
