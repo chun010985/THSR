@@ -499,7 +499,7 @@
         </div>
 
         <!-- ======================= -->
-        <!--  精緻圖檔導出區 (EXQUISITE & ALIGNED)  -->
+        <!--   精緻圖檔導出區 (EXQUISITE & ALIGNED)   -->
         <!-- ======================= -->
         <div class="preview-wrapper">
             <div id="image-node" class="doc-container">
@@ -568,8 +568,8 @@
                             </tr>
                         </tbody>
                         
-                        <!-- 票價計算列 (colspan=9, 實際 2+2+2+1+2=9) -->
-                        <thead class="fare-header">
+                        <!-- 票價計算列 (去程 - 樣式修正版) -->
+                        <tbody class="fare-header">
                             <tr>
                                 <th colspan="2">全票</th>
                                 <th colspan="2">孩童票</th>
@@ -577,7 +577,7 @@
                                 <th colspan="2">敬老票</th>
                                 <th colspan="2">小計</th>
                             </tr>
-                        </thead>
+                        </tbody>
                         <tbody class="fare-data">
                             <tr>
                                 <td colspan="2">{{ trip.calcDetailsOut.adultStr }}</td>
@@ -603,8 +603,11 @@
                         </tbody>
                     </table>
 
+                    <!-- 分隔線 (修正：縮小間距至 0px) -->
+                    <div v-if="trip.mode === 'round-trip'" style="border-bottom: 1px solid #9ca3af; margin-top: 0; margin-bottom: 0;"></div>
+
                     <!-- 回程 -->
-                    <div v-if="trip.mode === 'round-trip'" style="margin-top: 15px; border-top: 1px dashed #9ca3af; padding-top: 10px;">
+                    <div v-if="trip.mode === 'round-trip'">
                         <table class="trip-table">
                             <thead>
                                 <tr>
@@ -621,7 +624,9 @@
                                     <td>{{ trip.returnTrip.depTime }}</td><td>{{ trip.returnTrip.arrTime }}</td>
                                 </tr>
                             </tbody>
-                             <thead class="fare-header">
+                            
+                            <!-- 票價計算列 (回程 - 樣式修正版) -->
+                            <tbody class="fare-header">
                                 <tr>
                                     <th colspan="2">全票</th>
                                     <th colspan="2">孩童票</th>
@@ -629,7 +634,7 @@
                                     <th colspan="2">敬老票</th>
                                     <th colspan="2">小計</th>
                                 </tr>
-                            </thead>
+                            </tbody>
                             <tbody class="fare-data">
                                 <tr>
                                     <td colspan="2">{{ trip.calcDetailsRet.adultStr }}</td>
