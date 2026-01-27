@@ -86,12 +86,9 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
         }
 
-        /* 頂部裝飾條 */
+        /* 頂部裝飾條 (已移除) */
         .doc-brand-bar {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 8px;
-            background: linear-gradient(90deg, #4a4a46 0%, #718096 100%);
+            display: none;
         }
 
         /* 標題區 */
@@ -305,12 +302,19 @@
             line-height: 1.6;
         }
         .warning-text {
-            color: #dc2626; /* 紅色 */
-            font-weight: 700;
-            margin-top: 8px;
+            color: #991b1b; /* 深紅色文字 */
+            background-color: #fef2f2; /* 淡紅色背景 */
+            border: 2px solid #fca5a5; /* 紅色邊框 */
+            font-weight: 800;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            padding: 12px 15px; /* 增加內距 */
             display: block;
-            font-size: 10px;
+            font-size: 11px; /* 稍微加大字體 */
             line-height: 1.6;
+            text-align: center; /* 文字置中 */
+            border-radius: 6px; /* 圓角 */
+            box-shadow: 0 2px 4px rgba(220, 38, 38, 0.1); /* 輕微陰影 */
         }
         
         /* 頁尾注意事項 (Flex 排版) */
@@ -503,7 +507,8 @@
         <!-- ======================= -->
         <div class="preview-wrapper">
             <div id="image-node" class="doc-container">
-                <div class="doc-brand-bar"></div>
+                <!-- 已移除頂部裝飾條 -->
+                
                 <div class="doc-header">
                     <div>
                         <h1 class="doc-title">高鐵訂位確認單</h1>
