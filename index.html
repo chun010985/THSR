@@ -3,29 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高鐵訂位確認單生成器 - 精緻版</title>
+    <title>高鐵訂位確認單生成器 - 大地石灰版</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         /* =========================================
-           【日系風格核心設定 - 全站共用】
+           【大地石灰風格 (Stone Theme) 設定】
            ========================================= */
         :root {
-            /* 主色調：勝色 (Kachi-iro) - 深沈有力的藏青 */
-            --j-theme-main: #2b4b6f; 
-            /* 副色調：藍鼠 (Ai-nezu) - 帶灰的藍 */
-            --j-theme-sub: #6c848d; 
-            /* 背景色：胡粉 (Gofun) - 溫潤的白 */
-            --j-bg-body: #f4f6f8; 
-            /* 強調色：茜色 (Akane) - 深紅 */
-            --j-accent-red: #b94047;
-            /* 邊框：銀鼠 */
-            --j-border: #d0d7de;
+            /* --- 核心色調 --- */
+            /* 主色調：按鈕深灰 - 用於標題、重要邊框、按鈕 */
+            --j-theme-main: #4a4a46; 
+            /* 副色調：次要文字、標籤文字 */
+            --j-theme-sub: #8c8c88; 
             
-            /* 圖檔專用背景：純白 */
-            --doc-bg: #ffffff;
+            /* --- 背景色 --- */
+            /* 頁面背景：米灰 */
+            --j-bg-body: #f4f4f2; 
+            /* 卡片/紙張白 */
+            --j-bg-card: #ffffff;
+            /* 輸入框背景 */
+            --j-bg-input: #fafaf9;
+            /* 表格標題背景 */
+            --j-bg-th: #f7fafc;
+            /* 標籤背景 */
+            --j-bg-tag: #f1f5f9;
+
+            /* --- 邊框 --- */
+            /* 標準邊框 (淺灰) */
+            --j-border: #e5e5e0;
+            /* 表格邊框 (冷灰) */
+            --j-border-table: #e2e8f0;
+
+            /* --- 文字顏色 --- */
+            /* 網頁一般文字 */
+            --j-text-body: #333333;
+            /* A4 內文 */
+            --j-text-doc: #1a202c;
+            /* 表格內容 */
+            --j-text-table: #2d3748;
+            /* 表格標題文字 */
+            --j-text-th: #4a5568;
+            /* 說明文字 */
+            --j-text-light: #a0aec0;
+
+            /* 強調色：維持深紅，用於期限/警語 */
+            --j-accent-red: #b94047;
         }
 
         /* ====================
@@ -34,22 +59,22 @@
         body {
             font-family: 'Noto Sans TC', "Yu Gothic", "游ゴシック", "Hiragino Kaku Gothic Pro", sans-serif;
             background-color: var(--j-bg-body); 
-            background-image: linear-gradient(0deg, #f4f6f8 0%, #fff 100%);
-            color: #2d3748;
+            color: var(--j-text-body);
             letter-spacing: 0.04em;
             min-height: 100vh;
         }
 
-        /* 日系卡片風格 */
+        /* 卡片風格 */
         .japanese-card {
-            background: #ffffff;
-            border: 1px solid #e0e6ed;
+            background: var(--j-bg-card);
+            border: 1px solid var(--j-border);
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(43, 75, 111, 0.06);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); /* Tailwind shadow-md feel */
             transition: all 0.3s ease;
         }
         .japanese-card:hover {
-            box-shadow: 0 5px 15px rgba(43, 75, 111, 0.1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: #d6d3d1; /* stone-300 */
         }
 
         /* 標題裝飾 */
@@ -62,18 +87,23 @@
             letter-spacing: 0.1em;
         }
 
-        .form-label { font-size: 0.75rem; color: #5a6a7e; margin-bottom: 0.4rem; font-weight: 700; }
+        .form-label { 
+            font-size: 0.75rem; 
+            color: var(--j-theme-sub); /* #8c8c88 */
+            margin-bottom: 0.4rem; 
+            font-weight: 700; 
+        }
         
         /* 輸入框優化 */
         input, select {
-            background-color: #fdfdfd; 
-            border: 1px solid #cbd5e1; 
+            background-color: var(--j-bg-input); /* #fafaf9 */
+            border: 1px solid var(--j-border); /* #e5e5e0 */
             border-radius: 4px;
             padding: 0.5rem 0.75rem; 
             font-size: 0.9rem; 
             width: 100%; 
             height: 40px; 
-            color: #334155;
+            color: var(--j-text-body);
             transition: all 0.2s;
         }
         input:focus, select:focus { 
@@ -85,15 +115,15 @@
         
         /* 按鈕風格重塑 */
         .btn-primary { 
-            background-color: var(--j-theme-main); 
+            background-color: var(--j-theme-main); /* #4a4a46 */
             color: #fff; 
             font-weight: 600; 
             border-radius: 4px;
             letter-spacing: 0.05em;
         }
         .btn-primary:hover:not(:disabled) { 
-            background-color: #1e3652; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: #292925; /* darker stone */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
         }
         .btn-outline { 
             border: 1px solid var(--j-theme-sub); 
@@ -103,7 +133,7 @@
             border-radius: 4px; 
         }
         .btn-outline:hover { 
-            background-color: #f0f4f6; 
+            background-color: var(--j-bg-input); 
             color: var(--j-theme-main);
             border-color: var(--j-theme-main);
         }
@@ -111,33 +141,33 @@
         .time-input { letter-spacing: 0.1em; text-align: center; }
         [v-cloak] { display: none; }
         
-        /* 預覽區容器背景 - 使用深色襯托白紙 */
+        /* 預覽區容器背景 - 使用深石灰襯托 */
         .preview-wrapper {
             width: 100%;
-            background-color: #6c757d; 
-            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+            background-color: #57534e; /* Stone-600 */
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23a8a29e' fill-opacity='0.15' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
             padding: 40px 20px;
             overflow: auto;
-            border-top: 1px solid #9ca3af;
+            border-top: 1px solid #a8a29e;
             display: flex;
             justify-content: center;
             margin-top: 40px;
         }
 
         /* =========================================
-           【圖檔文件本體樣式 - 已縮小文字】
+           【圖檔文件本體樣式】
            ========================================= */
         .doc-container {
             width: 850px;
             min-width: 850px;
-            background-color: var(--doc-bg); /* 純白背景 */
-            color: #2d3748;
+            background-color: var(--j-bg-card); /* 純白 */
+            color: var(--j-text-doc); /* #1a202c */
             line-height: 1.35;
             font-family: 'Yu Gothic', 'Microsoft JhengHei', 'Hiragino Sans', sans-serif; 
             position: relative;
             box-sizing: border-box;
             padding: 40px 45px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
         }
 
         /* 標題區 */
@@ -150,7 +180,7 @@
             padding-bottom: 10px;
         }
         .doc-title {
-            font-size: 27px; /* 原 28px -1 */
+            font-size: 27px;
             font-weight: 900;
             color: var(--j-theme-main); 
             letter-spacing: 0.2em;
@@ -159,27 +189,27 @@
             font-family: "MS Mincho", "Hiragino Mincho Pro", serif; 
         }
         .doc-subtitle {
-            font-size: 10px; /* 原 11px -1 */
-            color: #718096;
+            font-size: 10px;
+            color: var(--j-theme-sub); /* #718096ish but using stone sub */
             font-weight: 600;
             letter-spacing: 3px;
             text-transform: uppercase;
             margin-top: 6px;
         }
         .doc-meta { text-align: right; }
-        .doc-timestamp { font-size: 9px; color: #a0aec0; font-family: Consolas, monospace; } /* 原 10px -1 */
+        .doc-timestamp { font-size: 9px; color: var(--j-text-light); font-family: Consolas, monospace; }
 
         /* 資訊表頭 */
         .info-header-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-            border: 1px solid var(--j-border);
+            border: 1px solid var(--j-border-table);
             table-layout: fixed;
             background: #fff;
         }
         .info-header-table td {
-            border-right: 1px solid var(--j-border);
+            border-right: 1px solid var(--j-border-table);
             padding: 8px 6px;
             vertical-align: middle;
             text-align: center;
@@ -188,17 +218,17 @@
         
         .info-header-label {
             display: block;
-            font-size: 9px; /* 原 10px -1 */
-            color: #718096;
+            font-size: 9px;
+            color: var(--j-theme-sub); /* #8c8c88 */
             font-weight: 600;
             margin-bottom: 3px;
             letter-spacing: 0.05em;
         }
         .info-header-value {
             display: block;
-            font-size: 11px; /* 原 12px -1 */
+            font-size: 11px;
             font-weight: 800;
-            color: #2d3748;
+            color: var(--j-text-body);
             word-break: break-all;
         }
         .text-deadline { color: var(--j-accent-red) !important; }
@@ -206,11 +236,11 @@
         /* 開票說明 */
         .notice-box {
             border: 1px dashed var(--j-theme-main); 
-            background-color: #fafbfd; 
+            background-color: var(--j-bg-body); /* #f4f4f2 */
             padding: 12px 18px;
             margin-bottom: 25px;
-            font-size: 10px; /* 原 11px -1 */
-            color: #4a5568;
+            font-size: 10px;
+            color: var(--j-text-table);
             border-radius: 4px;
             line-height: 1.7;
         }
@@ -218,13 +248,13 @@
             font-weight: 900; 
             margin-bottom: 6px; 
             display: block; 
-            font-size: 11px; /* 原 12px -1 */
+            font-size: 11px;
             color: var(--j-theme-main);
         }
         .checkbox-symbol { 
             font-family: sans-serif; 
             margin-right: 4px; 
-            font-size: 13px; /* 原 14px -1 */
+            font-size: 13px;
             vertical-align: middle; 
             position: relative;
             top: -1px; 
@@ -233,7 +263,7 @@
 
         /* 區塊標題 */
         .doc-section-header {
-            font-size: 11px; /* 原 12px -1 */
+            font-size: 11px;
             font-weight: 900;
             color: #fff;
             background-color: var(--j-theme-main); 
@@ -256,19 +286,19 @@
         .trip-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px; /* 原 11px -1 */
+            font-size: 10px;
             text-align: center;
             line-height: 1.5;
             table-layout: fixed;
         }
-        /* 表頭 */
+        /* 表頭 - 改為淺底深字 */
         .trip-table th {
-            background-color: var(--j-theme-main); 
-            color: #fff;
-            font-weight: 600;
+            background-color: var(--j-bg-th); /* #f7fafc */
+            color: var(--j-text-th); /* #4a5568 */
+            font-weight: 700;
             padding: 8px 4px;
-            border-right: 1px solid rgba(255,255,255,0.3);
-            border-bottom: 1px solid var(--j-theme-main);
+            border-right: 1px solid var(--j-border-table);
+            border-bottom: 1px solid var(--j-border-table);
             vertical-align: middle !important;
             letter-spacing: 0.05em;
         }
@@ -276,10 +306,10 @@
         
         .trip-table td {
             background-color: #fff;
-            color: #2d3748;
+            color: var(--j-text-table); /* #2d3748 */
             padding: 8px 4px;
-            border-right: 1px solid #e2e8f0;
-            border-bottom: 1px solid #e2e8f0;
+            border-right: 1px solid var(--j-border-table); /* #e2e8f0 */
+            border-bottom: 1px solid var(--j-border-table);
             font-weight: 600;
             vertical-align: middle !important;
         }
@@ -289,45 +319,45 @@
             font-family: "Courier New", Consolas, monospace; 
             font-weight: 900; 
             color: var(--j-theme-main); 
-            font-size: 12px; /* 原 13px -1 */
+            font-size: 12px;
             letter-spacing: 0.05em;
         }
 
         /* 票價計算區 */
         .fare-row-header th {
-            background-color: #f7f9fa !important; 
-            color: #64748b !important;
+            background-color: #fafaf9 !important; /* Stone-50 */
+            color: var(--j-theme-sub) !important;
             font-weight: 700;
-            font-size: 9px; /* 原 10px -1 */
-            border-bottom: 1px dashed #cbd5e0 !important;
+            font-size: 9px;
+            border-bottom: 1px dashed var(--j-border) !important;
             padding: 4px;
         }
         .fare-row-data td {
-            background-color: #f7f9fa !important; 
-            color: #475569;
+            background-color: #fafaf9 !important; 
+            color: var(--j-text-table);
             font-family: Consolas, monospace;
-            font-size: 9px; /* 原 10px -1 */
+            font-size: 9px;
             padding: 4px;
             border-top: none !important;
         }
         .fare-total-price {
             font-weight: 900;
             color: var(--j-theme-main);
-            font-size: 10px; /* 原 11px -1 */
+            font-size: 10px;
         }
 
         /* 摘要條 */
         .summary-bar {
-            background-color: #f1f5f9;
+            background-color: var(--j-bg-tag); /* #f1f5f9 */
             padding: 6px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 10px; /* 原 11px -1 */
+            font-size: 10px;
             font-weight: 700;
-            color: var(--j-theme-main);
-            border-top: 1px solid #e2e8f0;
-            border-bottom: 1px solid #e2e8f0;
+            color: var(--j-text-th);
+            border-top: 1px solid var(--j-border-table);
+            border-bottom: 1px solid var(--j-border-table);
         }
 
         /* 旅客名單 */
@@ -338,29 +368,29 @@
             text-align: center;
         }
         .pax-table th {
-            background-color: #e2e8f0;
-            color: #475569;
+            background-color: var(--j-bg-th);
+            color: var(--j-text-th);
             padding: 5px;
             font-weight: 800;
-            border-bottom: 1px solid #cbd5e0;
-            border-right: 1px solid #cbd5e0;
-            font-size: 9px; /* 原 10px -1 */
+            border-bottom: 1px solid var(--j-border-table);
+            border-right: 1px solid var(--j-border-table);
+            font-size: 9px;
             text-align: center;
             vertical-align: middle;
         }
         .pax-table td {
             padding: 5px;
-            color: #2d3748;
-            border-bottom: 1px solid #e2e8f0;
-            border-right: 1px solid #e2e8f0;
-            font-size: 9px; /* 原 10px -1 */
+            color: var(--j-text-table);
+            border-bottom: 1px solid var(--j-border-table);
+            border-right: 1px solid var(--j-border-table);
+            font-size: 9px;
             text-align: center;
             vertical-align: middle;
         }
 
-        /* 分隔線 - 修改為 0px */
+        /* 分隔線 */
         .trip-divider {
-            border-bottom: 0px dashed #cbd5e0; /* 修改為 0px */
+            border-bottom: 0px dashed var(--j-border);
             margin: 0;
             height: 1px;
             background: none;
@@ -373,8 +403,8 @@
             padding-top: 15px;
             border-top: 2px solid var(--j-theme-main);
         }
-        .total-label { font-size: 11px; color: #64748b; font-weight: 700; margin-right: 12px; letter-spacing: 0.1em; } /* 原 12px -1 */
-        .total-value { font-size: 31px; font-weight: 900; color: var(--j-theme-main); font-family: 'Arial', sans-serif; letter-spacing: -0.02em; } /* 原 32px -1 */
+        .total-label { font-size: 11px; color: var(--j-theme-sub); font-weight: 700; margin-right: 12px; letter-spacing: 0.1em; }
+        .total-value { font-size: 31px; font-weight: 900; color: var(--j-theme-main); font-family: 'Arial', sans-serif; letter-spacing: -0.02em; }
 
         /* 警語 */
         .warning-text {
@@ -386,7 +416,7 @@
             margin-bottom: 15px;
             padding: 12px 18px;
             display: block;
-            font-size: 11px; /* 原 12px -1 */
+            font-size: 11px;
             line-height: 1.6;
             text-align: center;
             border-radius: 4px;
@@ -395,13 +425,13 @@
         /* 頁尾 */
         .footer-terms {
             margin-top: 30px;
-            font-size: 9px; /* 原 10px -1 */
-            color: #64748b;
-            border-top: 1px dashed #cbd5e0;
+            font-size: 9px;
+            color: var(--j-text-table); /* 修改處：文字顏色加深 */
+            border-top: 1px dashed var(--j-border);
             padding-top: 20px;
             line-height: 1.8;
         }
-        .footer-title { font-weight: 800; color: var(--j-theme-main); display: block; margin-bottom: 8px; font-size: 10px; letter-spacing: 0.1em; } /* 原 11px -1 */
+        .footer-title { font-weight: 800; color: var(--j-theme-main); display: block; margin-bottom: 8px; font-size: 10px; letter-spacing: 0.1em; }
         .note-item { display: flex; align-items: flex-start; margin-bottom: 3px; }
         .note-num { width: 18px; flex-shrink: 0; font-weight: 700; color: var(--j-theme-main); }
     </style>
@@ -409,15 +439,15 @@
 <body class="p-4 md:p-8">
     <div id="app" v-cloak class="max-w-6xl mx-auto">
         <header class="mb-10 text-center">
-            <h1 class="text-3xl font-bold text-slate-700 tracking-wider font-serif">高鐵訂位確認單生成器</h1>
+            <h1 class="text-3xl font-bold text-stone-700 tracking-wider font-serif">高鐵訂位確認單生成器</h1>
             <div class="flex items-center justify-center gap-2 mt-2">
-                <span class="h-[1px] w-8 bg-slate-300"></span>
-                <p class="text-slate-400 text-xs tracking-[0.2em] uppercase">Professional Slip Generator</p>
-                <span class="h-[1px] w-8 bg-slate-300"></span>
+                <span class="h-[1px] w-8 bg-stone-300"></span>
+                <p class="text-stone-400 text-xs tracking-[0.2em] uppercase">Professional Slip Generator</p>
+                <span class="h-[1px] w-8 bg-stone-300"></span>
             </div>
         </header>
 
-        <div v-if="toastMsg" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-slate-800 text-white px-6 py-3 rounded shadow-lg text-sm flex items-center gap-2 transition-all">
+        <div v-if="toastMsg" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-stone-800 text-white px-6 py-3 rounded shadow-lg text-sm flex items-center gap-2 transition-all">
             <span class="w-2 h-2 bg-emerald-400 rounded-full"></span>{{ toastMsg }}
         </div>
 
@@ -429,8 +459,8 @@
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="section-title">基本資料管理</h2>
                         <div class="flex gap-3">
-                            <button @click="focusInput('staff')" class="text-xs text-slate-500 hover:text-blue-700 hover:underline font-bold transition">✎ 編輯</button>
-                            <button @click="clearBasicInfo" class="text-xs text-slate-500 hover:text-red-700 hover:underline font-bold transition">🗑 清除</button>
+                            <button @click="focusInput('staff')" class="text-xs text-stone-500 hover:text-stone-700 hover:underline font-bold transition">✎ 編輯</button>
+                            <button @click="clearBasicInfo" class="text-xs text-stone-500 hover:text-red-700 hover:underline font-bold transition">🗑 清除</button>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -448,7 +478,7 @@
 
                 <!-- 行程設定卡片 -->
                 <div class="japanese-card p-6 md:p-8 relative">
-                    <div v-if="editingIndex !== null" class="absolute top-6 right-8 bg-[#2b4b6f] text-white px-4 py-1 text-xs font-bold rounded-full shadow-md animate-pulse">編輯模式中</div>
+                    <div v-if="editingIndex !== null" class="absolute top-6 right-8 bg-[#4a4a46] text-white px-4 py-1 text-xs font-bold rounded-full shadow-md animate-pulse">編輯模式中</div>
                     <div class="flex justify-between items-center mb-8">
                         <h2 class="section-title">行程詳細設定</h2>
                         <div class="flex items-center gap-4">
@@ -456,46 +486,46 @@
                             <button @click="clearTripForm" class="btn-outline px-3 py-1 text-xs border-none text-[#b94047] font-bold">🗑 重置表單</button>
                             
                             <!-- 單程/來回切換按鈕 -->
-                            <div class="flex bg-slate-100 p-1 rounded-md ml-2 border border-slate-200">
-                                <button @click="tripMode = 'one-way'" :class="tripMode === 'one-way' ? 'bg-white text-[#2b4b6f] shadow-sm' : 'text-slate-400 hover:text-slate-600'" class="px-4 py-1 text-sm font-bold transition-all rounded">單程</button>
-                                <button @click="tripMode = 'round-trip'" :class="tripMode === 'round-trip' ? 'bg-white text-[#2b4b6f] shadow-sm' : 'text-slate-400 hover:text-slate-600'" class="px-4 py-1 text-sm font-bold transition-all rounded">來回</button>
+                            <div class="flex bg-[#f1f5f9] p-1 rounded-md ml-2 border border-[#e5e5e0]">
+                                <button @click="tripMode = 'one-way'" :class="tripMode === 'one-way' ? 'bg-white text-[#4a4a46] shadow-sm' : 'text-stone-400 hover:text-stone-600'" class="px-4 py-1 text-sm font-bold transition-all rounded">單程</button>
+                                <button @click="tripMode = 'round-trip'" :class="tripMode === 'round-trip' ? 'bg-white text-[#4a4a46] shadow-sm' : 'text-stone-400 hover:text-stone-600'" class="px-4 py-1 text-sm font-bold transition-all rounded">來回</button>
                             </div>
                         </div>
                     </div>
 
                     <div class="space-y-8">
                         <!-- 去程區塊 -->
-                        <div class="p-5 bg-[#f8fafc] border border-slate-200 rounded-lg">
-                            <span class="text-[11px] bg-[#2b4b6f] text-white px-3 py-1 rounded-sm font-bold uppercase mb-4 inline-block tracking-widest">Outbound 去程</span>
+                        <div class="p-5 bg-[#fafaf9] border border-[#e5e5e0] rounded-lg">
+                            <span class="text-[11px] bg-[#4a4a46] text-white px-3 py-1 rounded-sm font-bold uppercase mb-4 inline-block tracking-widest">Outbound 去程</span>
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-                                <div class="md:col-span-6"><label class="form-label">高鐵訂位編號</label><input ref="hsrIdInput" type="text" v-model="outbound.hsrOrderId" @input="syncHsrOrderId" class="font-bold tracking-widest text-[#2b4b6f]" placeholder="8碼編號"></div>
+                                <div class="md:col-span-6"><label class="form-label">高鐵訂位編號</label><input ref="hsrIdInput" type="text" v-model="outbound.hsrOrderId" @input="syncHsrOrderId" class="font-bold tracking-widest text-[#4a4a46]" placeholder="8碼編號"></div>
                                 <div class="md:col-span-6"><label class="form-label">PNR 代碼</label><input type="text" v-model="outbound.pnr" class="uppercase font-bold tracking-widest"></div>
                                 <div class="md:col-span-4"><label class="form-label">日期</label><input type="date" v-model="outbound.date"></div>
                                 <div class="md:col-span-4"><label class="form-label">艙等</label><select v-model="outbound.carClass"><option>標準車廂</option><option>商務車廂</option></select></div>
                                 <div class="md:col-span-4"><label class="form-label">車次</label><input type="text" v-model="outbound.trainNo"></div>
-                                <div class="md:col-span-6"><label class="form-label">起訖站點</label><div class="flex gap-2 items-center"><select v-model="outbound.from"><option v-for="s in stations">{{s}}</option></select><button @click="swapStations(outbound)" class="text-slate-400 hover:text-[#2b4b6f] text-lg transition">⇄</button><select v-model="outbound.to"><option v-for="s in stations">{{s}}</option></select></div></div>
-                                <div class="md:col-span-6"><label class="form-label">時間 (24H)</label><div class="flex gap-2 items-center"><input type="text" v-model="outbound.depTime" class="time-input" placeholder="09:00"><span class="text-slate-400">-</span><input type="text" v-model="outbound.arrTime" class="time-input" placeholder="10:30"></div></div>
+                                <div class="md:col-span-6"><label class="form-label">起訖站點</label><div class="flex gap-2 items-center"><select v-model="outbound.from"><option v-for="s in stations">{{s}}</option></select><button @click="swapStations(outbound)" class="text-stone-400 hover:text-[#4a4a46] text-lg transition">⇄</button><select v-model="outbound.to"><option v-for="s in stations">{{s}}</option></select></div></div>
+                                <div class="md:col-span-6"><label class="form-label">時間 (24H)</label><div class="flex gap-2 items-center"><input type="text" v-model="outbound.depTime" class="time-input" placeholder="09:00"><span class="text-stone-400">-</span><input type="text" v-model="outbound.arrTime" class="time-input" placeholder="10:30"></div></div>
                             </div>
                         </div>
 
                         <!-- 回程區塊 -->
-                        <div v-if="tripMode === 'round-trip'" class="p-5 bg-[#f8fafc] border border-slate-200 rounded-lg">
-                            <span class="text-[11px] bg-[#6c848d] text-white px-3 py-1 rounded-sm font-bold uppercase mb-4 inline-block tracking-widest">Return 回程</span>
+                        <div v-if="tripMode === 'round-trip'" class="p-5 bg-[#fafaf9] border border-[#e5e5e0] rounded-lg">
+                            <span class="text-[11px] bg-[#8c8c88] text-white px-3 py-1 rounded-sm font-bold uppercase mb-4 inline-block tracking-widest">Return 回程</span>
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-                                <div class="md:col-span-6"><label class="form-label">高鐵訂位編號</label><input type="text" v-model="returnTrip.hsrOrderId" class="text-[#2b4b6f] font-bold"></div>
+                                <div class="md:col-span-6"><label class="form-label">高鐵訂位編號</label><input type="text" v-model="returnTrip.hsrOrderId" class="text-[#4a4a46] font-bold"></div>
                                 <div class="md:col-span-6"><label class="form-label">PNR 代碼</label><input type="text" v-model="returnTrip.pnr" class="uppercase font-bold tracking-widest"></div>
                                 <div class="md:col-span-4"><label class="form-label">日期</label><input type="date" v-model="returnTrip.date"></div>
                                 <div class="md:col-span-4"><label class="form-label">艙等</label><select v-model="returnTrip.carClass"><option>標準車廂</option><option>商務車廂</option></select></div>
                                 <div class="md:col-span-4"><label class="form-label">車次</label><input type="text" v-model="returnTrip.trainNo"></div>
-                                <div class="md:col-span-6"><label class="form-label">起訖站點</label><div class="flex gap-2 items-center"><select v-model="returnTrip.from"><option v-for="s in stations">{{s}}</option></select><button @click="swapStations(returnTrip)" class="text-slate-400 hover:text-[#2b4b6f] text-lg transition">⇄</button><select v-model="returnTrip.to"><option v-for="s in stations">{{s}}</option></select></div></div>
-                                <div class="md:col-span-6"><label class="form-label">時間 (24H)</label><div class="flex gap-2 items-center"><input type="text" v-model="returnTrip.depTime" class="time-input" placeholder="18:00"><span class="text-slate-400">-</span><input type="text" v-model="returnTrip.arrTime" class="time-input" placeholder="19:30"></div></div>
+                                <div class="md:col-span-6"><label class="form-label">起訖站點</label><div class="flex gap-2 items-center"><select v-model="returnTrip.from"><option v-for="s in stations">{{s}}</option></select><button @click="swapStations(returnTrip)" class="text-stone-400 hover:text-[#4a4a46] text-lg transition">⇄</button><select v-model="returnTrip.to"><option v-for="s in stations">{{s}}</option></select></div></div>
+                                <div class="md:col-span-6"><label class="form-label">時間 (24H)</label><div class="flex gap-2 items-center"><input type="text" v-model="returnTrip.depTime" class="time-input" placeholder="18:00"><span class="text-stone-400">-</span><input type="text" v-model="returnTrip.arrTime" class="time-input" placeholder="19:30"></div></div>
                             </div>
                         </div>
 
                         <!-- 票數設定區 -->
-                        <div class="bg-white p-6 border border-slate-200 rounded-lg">
+                        <div class="bg-white p-6 border border-[#e5e5e0] rounded-lg">
                             <div class="mb-5">
-                                <p class="text-xs font-bold mb-3 text-slate-600 border-b border-slate-100 pb-2">去程票數設定</p>
+                                <p class="text-xs font-bold mb-3 text-stone-600 border-b border-[#e5e5e0] pb-2">去程票數設定</p>
                                 <div class="grid grid-cols-4 gap-3">
                                     <div><label class="form-label">全票</label><input type="number" v-model.number="ticketsOut.adult" min="0"></div>
                                     <div><label class="form-label">孩童</label><input type="number" v-model.number="ticketsOut.child" min="0"></div>
@@ -503,8 +533,8 @@
                                     <div><label class="form-label">愛心</label><input type="number" v-model.number="ticketsOut.disability" min="0"></div>
                                 </div>
                             </div>
-                            <div v-if="tripMode === 'round-trip'" class="mb-5 border-t border-slate-100 pt-4">
-                                <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2"><p class="text-xs font-bold text-slate-600">回程票數設定</p><button @click="copyOutboundTickets" class="text-[11px] text-[#2b4b6f] hover:underline font-bold">同去程票數</button></div>
+                            <div v-if="tripMode === 'round-trip'" class="mb-5 border-t border-[#e5e5e0] pt-4">
+                                <div class="flex justify-between items-center mb-3 border-b border-[#e5e5e0] pb-2"><p class="text-xs font-bold text-stone-600">回程票數設定</p><button @click="copyOutboundTickets" class="text-[11px] text-[#4a4a46] hover:underline font-bold">同去程票數</button></div>
                                 <div class="grid grid-cols-4 gap-3">
                                     <div><label class="form-label">全票</label><input type="number" v-model.number="ticketsRet.adult" min="0"></div>
                                     <div><label class="form-label">孩童</label><input type="number" v-model.number="ticketsRet.child" min="0"></div>
@@ -512,11 +542,11 @@
                                     <div><label class="form-label">愛心</label><input type="number" v-model.number="ticketsRet.disability" min="0"></div>
                                 </div>
                             </div>
-                            <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
+                            <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-[#e5e5e0]">
                                 <button @click="openPassengerModal" :disabled="countOut === 0" class="btn-outline px-5 py-2 text-sm">編輯名單</button>
                                 <button v-if="editingIndex === null" @click="addTripToList" :disabled="isOverLimit || countOut === 0" class="btn-primary px-8 py-2 text-sm shadow-md hover:shadow-lg transition">新增行程</button>
-                                <button v-else @click="updateTripInList" class="bg-[#2b4b6f] text-white px-8 py-2 text-sm rounded shadow-md">更新行程</button>
-                                <button v-if="editingIndex !== null" @click="cancelEdit" class="text-slate-400 text-sm px-2 hover:text-slate-600">取消</button>
+                                <button v-else @click="updateTripInList" class="bg-[#4a4a46] text-white px-8 py-2 text-sm rounded shadow-md">更新行程</button>
+                                <button v-if="editingIndex !== null" @click="cancelEdit" class="text-stone-400 text-sm px-2 hover:text-stone-600">取消</button>
                             </div>
                         </div>
                     </div>
@@ -525,31 +555,31 @@
 
             <div class="lg:col-span-4 space-y-6">
                 <div class="japanese-card p-6 sticky top-8 flex flex-col h-[85vh]">
-                    <h2 class="section-title mb-4 border-b border-slate-100 pb-3">已登錄行程摘要</h2>
+                    <h2 class="section-title mb-4 border-b border-[#e5e5e0] pb-3">已登錄行程摘要</h2>
                     <div class="flex-1 overflow-y-auto space-y-3 pr-1">
-                        <div v-if="addedTrips.length===0" class="flex flex-col items-center justify-center h-40 text-slate-300">
+                        <div v-if="addedTrips.length===0" class="flex flex-col items-center justify-center h-40 text-stone-300">
                             <span class="text-4xl mb-2">📭</span>
                             <span class="text-sm">尚未新增任何行程</span>
                         </div>
-                        <div v-for="(t, i) in addedTrips" :key="i" class="p-4 bg-white border border-slate-200 rounded-lg relative hover:border-[#2b4b6f] transition group shadow-sm">
+                        <div v-for="(t, i) in addedTrips" :key="i" class="p-4 bg-white border border-[#e5e5e0] rounded-lg relative hover:border-[#4a4a46] transition group shadow-sm">
                             <div class="flex justify-between items-start mb-2">
-                                <span class="text-[10px] bg-[#2b4b6f] text-white px-2 py-0.5 rounded font-mono font-bold">#{{ i + 1 }}</span>
+                                <span class="text-[10px] bg-[#4a4a46] text-white px-2 py-0.5 rounded font-mono font-bold">#{{ i + 1 }}</span>
                                 <div class="flex gap-3 opacity-60 group-hover:opacity-100 transition">
-                                    <button @click="startEdit(i)" class="text-[#2b4b6f] text-xs font-bold hover:underline">編輯</button>
+                                    <button @click="startEdit(i)" class="text-[#4a4a46] text-xs font-bold hover:underline">編輯</button>
                                     <button @click="removeTrip(i)" class="text-[#b94047] text-xs font-bold hover:underline">刪除</button>
                                 </div>
                             </div>
-                            <p class="font-bold text-slate-700 mb-1 font-mono">ID: {{t.outbound.hsrOrderId}}</p>
-                            <div class="flex justify-between text-xs text-slate-500 font-mono">
+                            <p class="font-bold text-stone-700 mb-1 font-mono">ID: {{t.outbound.hsrOrderId}}</p>
+                            <div class="flex justify-between text-xs text-stone-500 font-mono">
                                 <span>{{t.outbound.date}}</span>
-                                <span class="font-bold text-[#2b4b6f]">NT$ {{t.totalAmount.toLocaleString()}}</span>
+                                <span class="font-bold text-[#4a4a46]">NT$ {{t.totalAmount.toLocaleString()}}</span>
                             </div>
                         </div>
                     </div>
-                    <div class="pt-5 border-t border-slate-200 mt-auto bg-white">
+                    <div class="pt-5 border-t border-[#e5e5e0] mt-auto bg-white">
                         <div class="flex justify-between items-baseline mb-4">
-                            <span class="text-slate-500 font-bold text-sm">總金額</span>
-                            <span class="text-2xl font-bold text-[#2b4b6f] font-sans">${{ totalOrderAmount.toLocaleString() }}</span>
+                            <span class="text-stone-500 font-bold text-sm">總金額</span>
+                            <span class="text-2xl font-bold text-[#4a4a46] font-sans">${{ totalOrderAmount.toLocaleString() }}</span>
                         </div>
                         <button @click="downloadImage" :disabled="addedTrips.length===0" class="w-full btn-primary py-3 mb-3 shadow-md font-bold text-sm flex items-center justify-center gap-2">
                              下載圖片
@@ -564,30 +594,30 @@
         </div>
 
         <!-- 旅客名單 Modal -->
-        <div v-if="showPassengerModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-lg w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl border border-slate-200">
-                <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-[#f8fafc] rounded-t-lg">
-                    <h3 class="font-bold text-slate-700 flex items-center gap-2">
-                        <span class="w-1 h-4 bg-[#2b4b6f] rounded-full"></span>
+        <div v-if="showPassengerModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl border border-[#e5e5e0]">
+                <div class="p-5 border-b border-[#e5e5e0] flex justify-between items-center bg-[#f7fafc] rounded-t-lg">
+                    <h3 class="font-bold text-stone-700 flex items-center gap-2">
+                        <span class="w-1 h-4 bg-[#4a4a46] rounded-full"></span>
                         編輯旅客資料
                     </h3>
-                    <div class="flex bg-white border border-slate-200 rounded-md p-1">
-                        <button @click="paxTab='out'" :class="{'bg-[#2b4b6f] text-white shadow-sm':paxTab==='out', 'text-slate-500 hover:bg-slate-50':paxTab!=='out'}" class="px-4 py-1 text-xs rounded transition-all font-bold">去程名單</button>
-                        <button v-if="tripMode==='round-trip'" @click="paxTab='ret'" :class="{'bg-[#2b4b6f] text-white shadow-sm':paxTab==='ret', 'text-slate-500 hover:bg-slate-50':paxTab!=='ret'}" class="px-4 py-1 text-xs rounded transition-all font-bold">回程名單</button>
+                    <div class="flex bg-white border border-[#e5e5e0] rounded-md p-1">
+                        <button @click="paxTab='out'" :class="{'bg-[#4a4a46] text-white shadow-sm':paxTab==='out', 'text-stone-500 hover:bg-stone-50':paxTab!=='out'}" class="px-4 py-1 text-xs rounded transition-all font-bold">去程名單</button>
+                        <button v-if="tripMode==='round-trip'" @click="paxTab='ret'" :class="{'bg-[#4a4a46] text-white shadow-sm':paxTab==='ret', 'text-stone-500 hover:bg-stone-50':paxTab!=='ret'}" class="px-4 py-1 text-xs rounded transition-all font-bold">回程名單</button>
                     </div>
-                    <button @click="showPassengerModal=false" class="text-slate-400 hover:text-slate-600 px-2 text-lg">✕</button>
+                    <button @click="showPassengerModal=false" class="text-stone-400 hover:text-stone-600 px-2 text-lg">✕</button>
                 </div>
                 <div class="p-6 overflow-y-auto flex-1 space-y-3 bg-white">
-                    <div v-for="(p, i) in (paxTab==='out'?passengersOut:passengersRet)" :key="i" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end border-b border-slate-100 pb-3 text-sm">
-                        <div class="md:col-span-1 text-slate-400 font-mono text-xs font-bold pt-2">#{{i+1}}</div>
-                        <div class="md:col-span-2 text-[#2b4b6f] font-bold text-xs bg-slate-50 p-1 rounded text-center">{{p.type}}</div>
+                    <div v-for="(p, i) in (paxTab==='out'?passengersOut:passengersRet)" :key="i" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end border-b border-[#e5e5e0] pb-3 text-sm">
+                        <div class="md:col-span-1 text-stone-400 font-mono text-xs font-bold pt-2">#{{i+1}}</div>
+                        <div class="md:col-span-2 text-[#4a4a46] font-bold text-xs bg-[#f1f5f9] p-1 rounded text-center">{{p.type}}</div>
                         <div class="md:col-span-2"><input v-model="p.name" placeholder="姓名" class="text-sm h-8" @input="syncPassengerData(i, 'name')"></div>
                         <div class="md:col-span-3"><input v-model="p.idNumber" placeholder="身分證字號" class="text-sm h-8 uppercase font-mono" @input="syncPassengerData(i, 'idNumber')"></div>
                         <div class="md:col-span-2"><input v-model="p.passportNo" placeholder="護照號碼" class="text-sm h-8 uppercase font-mono" @input="syncPassengerData(i, 'passportNo')"></div>
                         <div class="md:col-span-2"><input type="date" v-model="p.birthday" class="text-sm h-8" @input="syncPassengerData(i, 'birthday')"></div>
                     </div>
                 </div>
-                <div class="p-4 border-t border-slate-100 text-right bg-[#f8fafc] rounded-b-lg">
+                <div class="p-4 border-t border-[#e5e5e0] text-right bg-[#f7fafc] rounded-b-lg">
                     <button @click="showPassengerModal=false" class="btn-primary px-8 py-2 rounded shadow-md">完成編輯</button>
                 </div>
             </div>
@@ -627,7 +657,7 @@
                     </div>
 
                     <!-- 新增：掛帳說明移至此處 -->
-                    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px dashed #cbd5e0; color: #2b6cb0;">
+                    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px dashed #cbd5e0; color: #4a5568;">
                         <strong>【 掛帳說明 】</strong>
                         <span>掛帳 全票會先掛 85折的價格，優待票（孩童、敬老、愛心）都是半價。如果售價有調整需要更改請務必通知，謝謝您。</span>
                     </div>
