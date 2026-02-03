@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高鐵訂位確認單生成器 - 純正日系版</title>
+    <title>高鐵訂位確認單生成器 - 精緻版</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -34,9 +34,9 @@
         body {
             font-family: 'Noto Sans TC', "Yu Gothic", "游ゴシック", "Hiragino Kaku Gothic Pro", sans-serif;
             background-color: var(--j-bg-body); 
-            background-image: linear-gradient(0deg, #f4f6f8 0%, #fff 100%); /* 微微的漸層增加質感 */
+            background-image: linear-gradient(0deg, #f4f6f8 0%, #fff 100%);
             color: #2d3748;
-            letter-spacing: 0.04em; /* 增加一點字距 */
+            letter-spacing: 0.04em;
             min-height: 100vh;
         }
 
@@ -44,8 +44,8 @@
         .japanese-card {
             background: #ffffff;
             border: 1px solid #e0e6ed;
-            border-radius: 8px; /* 圓角稍微收斂，更俐落 */
-            box-shadow: 0 2px 10px rgba(43, 75, 111, 0.06); /* 使用主色調的淡陰影 */
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(43, 75, 111, 0.06);
             transition: all 0.3s ease;
         }
         .japanese-card:hover {
@@ -125,7 +125,7 @@
         }
 
         /* =========================================
-           【圖檔文件本體樣式】
+           【圖檔文件本體樣式 - 已縮小文字】
            ========================================= */
         .doc-container {
             width: 850px;
@@ -136,7 +136,7 @@
             font-family: 'Yu Gothic', 'Microsoft JhengHei', 'Hiragino Sans', sans-serif; 
             position: relative;
             box-sizing: border-box;
-            padding: 40px 45px; /* 增加內邊距讓版面更像正式文件 */
+            padding: 40px 45px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
 
@@ -146,21 +146,20 @@
             justify-content: space-between;
             align-items: flex-end;
             margin-bottom: 20px;
-            /* 改用更優雅的雙線 */
             border-bottom: 3px double var(--j-theme-main);
             padding-bottom: 10px;
         }
         .doc-title {
-            font-size: 28px;
+            font-size: 27px; /* 原 28px -1 */
             font-weight: 900;
             color: var(--j-theme-main); 
             letter-spacing: 0.2em;
             margin: 0;
             line-height: 1;
-            font-family: "MS Mincho", "Hiragino Mincho Pro", serif; /* 標題用襯線體更有質感 */
+            font-family: "MS Mincho", "Hiragino Mincho Pro", serif; 
         }
         .doc-subtitle {
-            font-size: 11px;
+            font-size: 10px; /* 原 11px -1 */
             color: #718096;
             font-weight: 600;
             letter-spacing: 3px;
@@ -168,7 +167,7 @@
             margin-top: 6px;
         }
         .doc-meta { text-align: right; }
-        .doc-timestamp { font-size: 10px; color: #a0aec0; font-family: Consolas, monospace; }
+        .doc-timestamp { font-size: 9px; color: #a0aec0; font-family: Consolas, monospace; } /* 原 10px -1 */
 
         /* 資訊表頭 */
         .info-header-table {
@@ -189,7 +188,7 @@
         
         .info-header-label {
             display: block;
-            font-size: 10px;
+            font-size: 9px; /* 原 10px -1 */
             color: #718096;
             font-weight: 600;
             margin-bottom: 3px;
@@ -197,7 +196,7 @@
         }
         .info-header-value {
             display: block;
-            font-size: 12px;
+            font-size: 11px; /* 原 12px -1 */
             font-weight: 800;
             color: #2d3748;
             word-break: break-all;
@@ -207,10 +206,10 @@
         /* 開票說明 */
         .notice-box {
             border: 1px dashed var(--j-theme-main); 
-            background-color: #fafbfd; /* 極淡的藍色背景 */
+            background-color: #fafbfd; 
             padding: 12px 18px;
             margin-bottom: 25px;
-            font-size: 11px;
+            font-size: 10px; /* 原 11px -1 */
             color: #4a5568;
             border-radius: 4px;
             line-height: 1.7;
@@ -219,23 +218,22 @@
             font-weight: 900; 
             margin-bottom: 6px; 
             display: block; 
-            font-size: 12px;
+            font-size: 11px; /* 原 12px -1 */
             color: var(--j-theme-main);
         }
         .checkbox-symbol { 
             font-family: sans-serif; 
             margin-right: 4px; 
-            font-size: 14px; 
-            /* 修改對齊方式 */
+            font-size: 13px; /* 原 14px -1 */
             vertical-align: middle; 
             position: relative;
-            top: -1px; /* 稍微向上微調 */
+            top: -1px; 
             color: var(--j-theme-main);
         }
 
         /* 區塊標題 */
         .doc-section-header {
-            font-size: 12px;
+            font-size: 11px; /* 原 12px -1 */
             font-weight: 900;
             color: #fff;
             background-color: var(--j-theme-main); 
@@ -250,7 +248,6 @@
         .trip-container {
             margin-bottom: 25px;
             border: 2px solid var(--j-theme-main); 
-            /* 移除陰影，改用純粹的線條風格 */
             border-radius: 0 4px 4px 4px;
             overflow: hidden;
             background: #fff;
@@ -259,7 +256,7 @@
         .trip-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 11px;
+            font-size: 10px; /* 原 11px -1 */
             text-align: center;
             line-height: 1.5;
             table-layout: fixed;
@@ -292,16 +289,16 @@
             font-family: "Courier New", Consolas, monospace; 
             font-weight: 900; 
             color: var(--j-theme-main); 
-            font-size: 13px;
+            font-size: 12px; /* 原 13px -1 */
             letter-spacing: 0.05em;
         }
 
         /* 票價計算區 */
         .fare-row-header th {
-            background-color: #f7f9fa !important; /* 極淡灰 */
+            background-color: #f7f9fa !important; 
             color: #64748b !important;
             font-weight: 700;
-            font-size: 10px;
+            font-size: 9px; /* 原 10px -1 */
             border-bottom: 1px dashed #cbd5e0 !important;
             padding: 4px;
         }
@@ -309,14 +306,14 @@
             background-color: #f7f9fa !important; 
             color: #475569;
             font-family: Consolas, monospace;
-            font-size: 10px;
+            font-size: 9px; /* 原 10px -1 */
             padding: 4px;
             border-top: none !important;
         }
         .fare-total-price {
             font-weight: 900;
             color: var(--j-theme-main);
-            font-size: 11px;
+            font-size: 10px; /* 原 11px -1 */
         }
 
         /* 摘要條 */
@@ -326,19 +323,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 11px;
+            font-size: 10px; /* 原 11px -1 */
             font-weight: 700;
             color: var(--j-theme-main);
             border-top: 1px solid #e2e8f0;
             border-bottom: 1px solid #e2e8f0;
         }
 
-        /* 旅客名單 - 修正樣式 */
+        /* 旅客名單 */
         .pax-table {
-            width: 100%; /* 強制填滿容器寬度 */
+            width: 100%;
             border-collapse: collapse;
-            table-layout: fixed; /* 固定列寬，避免因內容長短不一而歪斜 */
-            text-align: center; /* 文字置中 */
+            table-layout: fixed;
+            text-align: center;
         }
         .pax-table th {
             background-color: #e2e8f0;
@@ -347,8 +344,8 @@
             font-weight: 800;
             border-bottom: 1px solid #cbd5e0;
             border-right: 1px solid #cbd5e0;
-            font-size: 10px;
-            text-align: center; /* 標題置中 */
+            font-size: 9px; /* 原 10px -1 */
+            text-align: center;
             vertical-align: middle;
         }
         .pax-table td {
@@ -356,14 +353,14 @@
             color: #2d3748;
             border-bottom: 1px solid #e2e8f0;
             border-right: 1px solid #e2e8f0;
-            font-size: 10px;
-            text-align: center; /* 內容置中 */
+            font-size: 9px; /* 原 10px -1 */
+            text-align: center;
             vertical-align: middle;
         }
 
-        /* 分隔線 */
+        /* 分隔線 - 修改為 0px */
         .trip-divider {
-            border-bottom: 1px dashed #cbd5e0;
+            border-bottom: 0px dashed #cbd5e0; /* 修改為 0px */
             margin: 0;
             height: 1px;
             background: none;
@@ -376,14 +373,8 @@
             padding-top: 15px;
             border-top: 2px solid var(--j-theme-main);
         }
-        .total-label { font-size: 12px; color: #64748b; font-weight: 700; margin-right: 12px; letter-spacing: 0.1em; }
-        .total-value { font-size: 32px; font-weight: 900; color: var(--j-theme-main); font-family: 'Arial', sans-serif; letter-spacing: -0.02em; }
-
-        /* 掛帳 */
-        .account-note {
-            /* 舊樣式移除或保留備用皆可，這裡為保持代碼整潔，我將不再使用此 class */
-            display: none; 
-        }
+        .total-label { font-size: 11px; color: #64748b; font-weight: 700; margin-right: 12px; letter-spacing: 0.1em; } /* 原 12px -1 */
+        .total-value { font-size: 31px; font-weight: 900; color: var(--j-theme-main); font-family: 'Arial', sans-serif; letter-spacing: -0.02em; } /* 原 32px -1 */
 
         /* 警語 */
         .warning-text {
@@ -395,7 +386,7 @@
             margin-bottom: 15px;
             padding: 12px 18px;
             display: block;
-            font-size: 12px;
+            font-size: 11px; /* 原 12px -1 */
             line-height: 1.6;
             text-align: center;
             border-radius: 4px;
@@ -404,13 +395,13 @@
         /* 頁尾 */
         .footer-terms {
             margin-top: 30px;
-            font-size: 10px;
+            font-size: 9px; /* 原 10px -1 */
             color: #64748b;
             border-top: 1px dashed #cbd5e0;
             padding-top: 20px;
             line-height: 1.8;
         }
-        .footer-title { font-weight: 800; color: var(--j-theme-main); display: block; margin-bottom: 8px; font-size: 11px; letter-spacing: 0.1em; }
+        .footer-title { font-weight: 800; color: var(--j-theme-main); display: block; margin-bottom: 8px; font-size: 10px; letter-spacing: 0.1em; } /* 原 11px -1 */
         .note-item { display: flex; align-items: flex-start; margin-bottom: 3px; }
         .note-num { width: 18px; flex-shrink: 0; font-weight: 700; color: var(--j-theme-main); }
     </style>
@@ -431,7 +422,7 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-             
+              
             <div class="lg:col-span-8 space-y-6">
                 <!-- 基本資料卡片 -->
                 <div class="japanese-card p-6 md:p-8">
@@ -641,8 +632,6 @@
                         <span>掛帳 全票會先掛 85折的價格，優待票（孩童、敬老、愛心）都是半價。如果售價有調整需要更改請務必通知，謝謝您。</span>
                     </div>
                 </div>
-
-                <!-- 舊的位置已移除 -->
 
                 <div class="doc-section-header">訂位明細</div>
 
