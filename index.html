@@ -753,8 +753,17 @@
                 };
 
                 const swapStations = () => { const tmp = tripForm.from; tripForm.from = tripForm.to; tripForm.to = tmp; };
-                const clearBasicInfo = () => { if(confirm('清除基本資料?')) { baseInfo.sales=''; baseInfo.orderId=''; baseInfo.groupId=''; } };
-                const clearTripForm = () => { if(confirm('重置行程表單?')) { tripForm.pnr=''; ticketForm.adult=0; passengerList.value=[]; } };
+                
+                // Canvas 環境調整：移除 confirm 彈窗，改為直接執行並提示
+                const clearBasicInfo = () => { 
+                    baseInfo.sales=''; baseInfo.orderId=''; baseInfo.groupId=''; 
+                    showToast('基本資料已清除');
+                };
+                
+                const clearTripForm = () => { 
+                    tripForm.pnr=''; ticketForm.adult=0; passengerList.value=[]; 
+                    showToast('行程表單已重置');
+                };
 
                 // 票價計算 (顯示算式)
                 const getCalcDetails = (trip, tks) => {
@@ -856,9 +865,44 @@
 
                 const maskId = (id) => id ? (id.length > 6 ? id.slice(0,3) + '*****' + id.slice(-4) : id) : '';
 
+                // 修改後的下載圖片函式 (修復文字下沉問題)
                 const downloadImage = () => {
                     const node = document.getElementById('image-node');
-                    html2canvas(node, { scale: 3, backgroundColor: '#ffffff' }).then(canvas => {
+                    
+                    // 使用 html2canvas
+                    html2canvas(node, { 
+                        scale: 3, // 保持高解析度
+                        backgroundColor: '#ffffff',
+                        
+                        // 【關鍵修復】：onclone 允許我們在截圖"前"修改複製出來的 DOM
+                        onclone: (clonedDoc) => {
+                            const style = clonedDoc.createElement('style');
+                            // 在這裡寫入 CSS，強制把文字往上提，抵銷 html2canvas 的下沉誤差
+                            style.innerHTML = `
+                                /* 針對表格內的文字進行垂直校正 */
+                                .trip-table td, .trip-table th, .pax-table td, .pax-table th {
+                                    padding-top: 5px !important;    /* 原本是 8px，減少 3px */
+                                    padding-bottom: 11px !important; /* 原本是 8px，增加 3px (保持總高度不變，但內容上移) */
+                                }
+                                
+                                /* 針對上方資訊欄位的校正 */
+                                .info-header-value {
+                                    transform: translateY(-3px); /* 直接使用 transform 上移 */
+                                }
+                                
+                                /* 針對總金額與標題 */
+                                .total-value, .doc-title, .doc-subtitle {
+                                    transform: translateY(-4px);
+                                }
+                                
+                                /* 針對 checkbox 符號特別修正 */
+                                .checkbox-symbol {
+                                    top: -4px !important;
+                                }
+                            `;
+                            clonedDoc.body.appendChild(style);
+                        }
+                    }).then(canvas => {
                         const a = document.createElement('a'); a.href = canvas.toDataURL("image/png");
                         a.download = `${baseInfo.orderId}_${baseInfo.sales}_高鐵確認單.png`; a.click();
                         showToast("圖檔下載成功");
@@ -885,8 +929,10 @@
                     a.download = `${baseInfo.orderId}_確認範本.txt`; a.click();
                 };
                 
+                // Canvas 環境調整：移除 confirm 彈窗，改為直接執行並提示
                 const resetCurrentTripForm = () => {
-                    if(confirm('重置行程表單?')) { tripForm.pnr=''; ticketForm.adult=0; passengerList.value=[]; }
+                    tripForm.pnr=''; ticketForm.adult=0; passengerList.value=[];
+                    showToast('行程表單已重置');
                 };
 
                 onMounted(calculateDeadline);
