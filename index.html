@@ -937,6 +937,12 @@
                         retBreakdownText: getBreakdownText(ticketsRet)
                     });
                     showToast("已新增");
+
+                    // 自動清空票數與名單，避免下一筆行程帶入舊資料
+                    Object.assign(ticketsOut, { adult: 0, child: 0, senior: 0, disability: 0 });
+                    Object.assign(ticketsRet, { adult: 0, child: 0, senior: 0, disability: 0 });
+                    passengersOut.value = [];
+                    passengersRet.value = [];
                 };
 
                 const updateTripInList = () => {
@@ -1011,15 +1017,19 @@
                 };
 
                 const copyText = () => {
-                    let txt = `【高鐵訂位確認單】\n\n業務姓名：${baseInfo.sales}\n訂單編號：${baseInfo.orderId}　\n團體代號：${baseInfo.groupId}\t\n開票人員：${baseInfo.staff}\n\n開票期限：${formattedDeadline.value}\n\n開票說明：\n請於D/L前通知 可開票 與 取票方式\n逾期將自動取消需重新訂票\n每筆訂位代碼,統一取票方式\n\n掛帳說明：\n掛帳全票會先掛85折的價格,優待票(孩童、敬老、愛心)都是半價。如果售價有調整需要更改再請通知唷 謝謝\n\n請業務們務必再次核對 票種/張數/金額 是否正確，如有錯誤 請於「出票前」告知，出票後告知請自行負責。\n高鐵訂票服務窗口感謝您的配合。\n\n`;
+                    // 更新為新的文字範本格式
+                    let txt = `【高鐵訂位確認單】\n\n開票期限：${formattedDeadline.value}\n\n開票說明：\n請於D/L前通知 可開票 與 取票方式\n逾期將自動取消需重新訂票\n每筆訂位代碼,統一取票方式\n\n請業務們務必再次核對 票種/張數/金額 是否正確\n如有錯誤 請於「出票前」告知，出票後告知請自行負責。\n高鐵訂票服務窗口感謝您的配合。\n\n------------------\n\n`;
+                    
                     addedTrips.value.forEach((t, i) => {
                         txt += `[行程紀錄 #${i+1}]\n\n`;
-                        txt += `去程｜PNR ${t.outbound.pnr}\n${t.outbound.date}　${t.outbound.from}/${t.outbound.to}  班次${t.outbound.trainNo}　${t.outbound.depTime}-${t.outbound.arrTime}\n票數：${t.outBreakdownText} ($${t.outAmount.toLocaleString()})\n\n`;
+                        txt += `去程｜PNR ${t.outbound.pnr}\n${t.outbound.date}　${t.outbound.from}/${t.outbound.to}  班次 ${t.outbound.trainNo}　${t.outbound.depTime}-${t.outbound.arrTime}\n票數：${t.outBreakdownText} ($${t.outAmount.toLocaleString()})\n\n`;
                         if (t.mode === 'round-trip') {
-                            txt += `回程｜PNR ${t.returnTrip.pnr}\n${t.returnTrip.date}　${t.returnTrip.from}/${t.returnTrip.to}  班次${t.returnTrip.trainNo}　${t.returnTrip.depTime}-${t.returnTrip.arrTime}\n票數：${t.retBreakdownText} ($${t.retAmount.toLocaleString()})\n\n`;
+                            txt += `回程｜PNR ${t.returnTrip.pnr}\n${t.returnTrip.date}　${t.returnTrip.from}/${t.returnTrip.to}  班次 ${t.returnTrip.trainNo}　${t.returnTrip.depTime}-${t.returnTrip.arrTime}\n票數：${t.retBreakdownText} ($${t.retAmount.toLocaleString()})\n\n`;
                         }
                     });
+                    
                     txt += `總計應收金額：NT$ ${totalOrderAmount.value.toLocaleString()}\n\n---注意事項與改/退票說明---\n1. 座位皆由電腦自動劃位,恕無法指定座位,亦無法保證同行者為相鄰座位。\n2. 若因逾時未能搭乘,請自行洽詢站務人員是否可改搭當日其他車次之自由座,恕無法辦理退票。\n3. 高鐵車票須於搭乘當日使用,逾期視同廢票,恕不受理退票。\n4. 如需辦理改票/退票,請於 4個工作日前 申請,並提供紙本票根或 APP 電子票截圖(天災導致高鐵停駛者不在此限)。\n5. 退票將酌收手續費 每張新台幣 50 元。\n6. 辦理改票/退票時,請務必提供 紙本票根或電子票(APP 截圖),未提供者將視同正常搭乘,相關費用須自行負擔。\n7. 因航班延誤或取消等非高鐵因素致無法搭乘者,車票 恕無法改期或退票,敬請見諒。`;
+                    
                     const el = document.createElement('textarea'); el.value = txt; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
                     showToast("文字範本已複製");
                 };
