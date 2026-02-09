@@ -938,11 +938,24 @@
                 };
 
                 const copyText = () => {
-                    let txt = `【高鐵訂位確認單】\n\n開票期限：${formattedDeadline.value}\n\n開票說明：\n請於D/L前通知 可開票 與 取票方式\n逾期將自動取消需重新訂票\n每筆訂位代碼,統一取票方式\n\n請業務們務必再次核對 票種/張數/金額 是否正確\n如有錯誤 請於「出票前」告知，出票後告知請自行負責。\n高鐵訂票服務窗口感謝您的配合。\n\n------------------\n\n`;
+                    let txt = `【高鐵訂位確認單】\n\n開票期限：${formattedDeadline.value}\n\n開票說明：\n請於D/L前通知 可開票 與 取票方式\n逾期將自動取消需重新訂票\n每筆訂位代碼，統一取票方式\n\n請業務們務必再次核對 票種/張數/金額 是否正確\n如有錯誤 請於「出票前」告知，出票後告知請自行負責。\n高鐵訂票服務窗口感謝您的配合。\n\n------------------\n\n`;
                     
                     addedTrips.value.forEach((t, i) => {
+                        // 重新計算單價以便在文字模式顯示詳細算式
+                        const matrix = t.carClass === '商務車廂' ? fareRules.business : fareRules.standard;
+                        const base = matrix[t.from]?.[t.to] || matrix[t.to]?.[t.from] || 0;
+                        const disc = t.carClass === '商務車廂' ? 0.9 : 0.85;
+                        const fullPrice = Math.round(base * disc);
+                        const halfPrice = Math.round(base * 0.5);
+
+                        let details = [];
+                        if(t.tickets.adult > 0) details.push(`全票 ${t.tickets.adult} 張 ($${fullPrice}*${t.tickets.adult}=$${(fullPrice * t.tickets.adult).toLocaleString()})`);
+                        if(t.tickets.child > 0) details.push(`孩童 ${t.tickets.child} 張 ($${halfPrice}*${t.tickets.child}=$${(halfPrice * t.tickets.child).toLocaleString()})`);
+                        if(t.tickets.senior > 0) details.push(`敬老 ${t.tickets.senior} 張 ($${halfPrice}*${t.tickets.senior}=$${(halfPrice * t.tickets.senior).toLocaleString()})`);
+                        if(t.tickets.disability > 0) details.push(`愛心 ${t.tickets.disability} 張 ($${halfPrice}*${t.tickets.disability}=$${(halfPrice * t.tickets.disability).toLocaleString()})`);
+
                         txt += `[行程紀錄 #${i+1}]\n\n`;
-                        txt += `${t.type}｜PNR ${t.pnr}\n${t.date}　${t.from}/${t.to}  班次 ${t.trainNo}　${t.depTime}-${t.arrTime}\n票數：${t.breakdownText} ($${t.totalAmount.toLocaleString()})\n\n`;
+                        txt += `${t.type}｜PNR ${t.pnr}\n${t.date.replace(/-/g, '/')}　${t.from}/${t.to}  班次 ${t.trainNo}　${t.depTime}-${t.arrTime}\n票數：${details.join('｜')}\n\n`;
                     });
                     
                     txt += `總計應收金額：NT$ ${totalOrderAmount.value.toLocaleString()}\n\n---注意事項與改/退票說明---\n1. 座位皆由電腦自動劃位,恕無法指定座位,亦無法保證同行者為相鄰座位。\n2. 若因逾時未能搭乘,請自行洽詢站務人員是否可改搭當日其他車次之自由座,恕無法辦理退票。\n3. 高鐵車票須於搭乘當日使用,逾期視同廢票,恕不受理退票。\n4. 如需辦理改票/退票,請於 4個工作日前 申請,並提供紙本票根或 APP 電子票截圖(天災導致高鐵停駛者不在此限)。\n5. 退票將酌收手續費 每張新台幣 50 元。\n6. 辦理改票/退票時,請務必提供 紙本票根或電子票(APP 截圖),未提供者將視同正常搭乘,相關費用須自行負擔。\n7. 因航班延誤或取消等非高鐵因素致無法搭乘者,車票 恕無法改期或退票,敬請見諒。`;
