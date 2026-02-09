@@ -467,7 +467,14 @@
                             </div>
                             
                             <div class="flex justify-between items-center gap-3 mt-4 pt-4 border-t border-[#e5e5e0]">
-                                <button @click="openPassengerModal" :disabled="totalTickets === 0" class="btn-outline px-5 py-2 text-sm">編輯名單</button>
+                                <div class="flex gap-2">
+                                    <button @click="openPassengerModal" :disabled="totalTickets === 0" class="btn-outline px-5 py-2 text-sm">編輯名單</button>
+                                    
+                                    <!-- 新增：帶入去程按鈕 (僅在有去程資料且不在編輯模式時顯示) -->
+                                    <button v-if="hasDeparture && editingIndex === null" @click="importDepartureInfo" class="bg-stone-100 text-stone-600 border border-stone-300 px-3 py-2 text-xs rounded hover:bg-stone-200 transition font-bold flex items-center gap-1">
+                                        <span>📋</span> 帶入去程旅客
+                                    </button>
+                                </div>
                                 
                                 <div v-if="editingIndex === null" class="flex gap-2">
                                     <button @click="addTripToList('去程')" :disabled="totalTickets === 0" class="btn-primary px-5 py-2 text-sm shadow-md hover:shadow-lg transition flex items-center gap-1">
@@ -677,7 +684,7 @@
                     <div class="note-item"><div class="note-num">2.</div><div class="note-text">若因逾時未能搭乘，請自行洽詢站務人員是否可改搭當日其他車次之自由座，恕無法辦理退票。</div></div>
                     <div class="note-item"><div class="note-num">3.</div><div class="note-text">高鐵車票須於搭乘當日使用，逾期視同廢票，恕不受理退票。</div></div>
                     <div class="note-item"><div class="note-num">4.</div><div class="note-text">如需辦理改票/退票，請於 <strong>4個工作日前</strong> 申請，並提供紙本票根或 APP 電子票截圖(天災導致高鐵停駛者不在此限)。</div></div>
-                    <div class="note-item"><div class="note-num">5.</div><div class="note-text">退票將酌收手續費 每張新台幣 50 元。</div></div>
+                    <div class="note-item"><div class="note-num">5.</div><div class="note-text" style="color: #b94047; font-weight: 800;">退票將酌收手續費 每張新台幣 50 元。</div></div>
                     <div class="note-item"><div class="note-num">6.</div><div class="note-text">辦理改票/退票時，請務必提供 紙本票根或電子票(APP 截圖)，未提供者將視同正常搭乘，相關費用須自行負擔。</div></div>
                     <div class="note-item"><div class="note-num">7.</div><div class="note-text">因航班延誤或取消等非高鐵因素致無法搭乘者，車票 恕無法改期或退票，敬請見諒。</div></div>
                 </div>
@@ -831,6 +838,21 @@
                     };
                     editingIndex.value = null; showToast("已更新");
                 };
+                
+                // 新增功能：從已加入的「去程」中複製票數與旅客資料
+                const importDepartureInfo = () => {
+                    const depTrip = [...addedTrips.value].reverse().find(t => t.type === '去程');
+                    if (!depTrip) { showToast('找不到去程資料'); return; }
+                    
+                    // 1. 複製票數 (這會觸發 watcher 自動調整 passengerList 長度與類型)
+                    Object.assign(ticketForm, depTrip.tickets);
+                    
+                    // 2. 複製旅客詳細資料 (覆蓋 watcher 產生的空資料)
+                    // 使用 JSON parse/stringify 深拷貝，避免參照問題
+                    passengerList.value = JSON.parse(JSON.stringify(depTrip.passengers));
+                    
+                    showToast('已帶入去程旅客資料');
+                };
 
                 const startEdit = (idx) => {
                     editingIndex.value = idx; const t = addedTrips.value[idx];
@@ -845,6 +867,9 @@
                 const cancelEdit = () => { editingIndex.value = null; };
                 const removeTrip = (i) => addedTrips.value.splice(i, 1);
                 const openPassengerModal = () => showPassengerModal.value = true;
+                
+                // Computed property to check if there is any "Departure" trip
+                const hasDeparture = computed(() => addedTrips.value.some(t => t.type === '去程'));
 
                 const totalTickets = computed(() => ticketForm.adult + ticketForm.child + ticketForm.senior + ticketForm.disability);
                 const totalOrderAmount = computed(() => addedTrips.value.reduce((s,t) => s + t.totalAmount, 0));
@@ -941,7 +966,7 @@
                     baseInfo, tripForm, ticketForm, passengerList, addedTrips, stations, maskId,
                     totalTickets, showPassengerModal,
                     totalOrderAmount, formattedDeadline, editingIndex, toastMsg, nowTimestamp: new Date().toLocaleString(),
-                    addTripToList, updateTripInList, startEdit, cancelEdit, removeTrip,
+                    addTripToList, updateTripInList, startEdit, cancelEdit, removeTrip, hasDeparture, importDepartureInfo,
                     openPassengerModal, downloadImage, copyText, downloadTxt, clearBasicInfo, 
                     clearTripForm: resetCurrentTripForm, swapStations, focusInput, staffInput, hsrIdInput
                 };
