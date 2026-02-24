@@ -127,26 +127,28 @@
         }
 
         /* =========================================
-           【圖檔文件本體樣式】
+           【圖檔文件本體樣式 - 安全的 A4 尺寸設定】
            ========================================= */
         .doc-container {
-            width: 850px;
-            min-width: 850px;
+            width: 794px;
+            min-height: 1123px; /* 改回 min-height 避免溢出截斷 */
             background-color: var(--j-bg-card);
             color: var(--j-text-doc);
             line-height: 1.35;
             font-family: 'Yu Gothic', 'Microsoft JhengHei', 'Hiragino Sans', sans-serif; 
             position: relative;
             box-sizing: border-box;
-            padding: 40px 45px; 
+            padding: 35px 45px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
         }
 
         .doc-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             border-bottom: 3px double var(--j-theme-main);
             padding-bottom: 10px;
         }
@@ -173,14 +175,14 @@
         .info-header-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             border: 1px solid var(--j-border-table);
             table-layout: fixed;
             background: #fff;
         }
         .info-header-table td {
             border-right: 1px solid var(--j-border-table);
-            padding: 8px 6px;
+            padding: 6px 4px;
             vertical-align: middle;
             text-align: center;
         }
@@ -206,16 +208,16 @@
         .notice-box {
             border: 1px dashed var(--j-theme-main); 
             background-color: var(--j-bg-body);
-            padding: 12px 18px;
-            margin-bottom: 25px;
+            padding: 10px 15px; 
+            margin-bottom: 16px; 
             font-size: 10px;
             color: var(--j-text-table);
             border-radius: 4px;
-            line-height: 1.7;
+            line-height: 1.6; 
         }
         .notice-title { 
             font-weight: 900; 
-            margin-bottom: 6px; 
+            margin-bottom: 4px; 
             display: block; 
             font-size: 11px;
             color: var(--j-theme-main);
@@ -235,7 +237,7 @@
             font-weight: 900;
             color: #fff;
             background-color: var(--j-theme-main); 
-            padding: 5px 20px;
+            padding: 5px 15px;
             display: inline-block;
             margin-bottom: 0;
             border-radius: 4px 4px 0 0;
@@ -243,37 +245,38 @@
         }
 
         .trip-container {
-            margin-bottom: 5px; /* 修改：間距調整為 5px */
+            margin-bottom: 8px; /* 縮減區塊間距 */
             border: 2px solid var(--j-theme-main); 
             border-radius: 0 4px 4px 4px;
             overflow: hidden;
             background: #fff;
         }
         
+        /* 恢復正常字體，利用 Padding 來節省高度 */
         .trip-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px;
+            font-size: 10px; /* 安全的 10px 字體 */
             text-align: center;
-            line-height: 1.5; /* 修改：行高改為 1.5 */
+            line-height: 1.3; 
             table-layout: fixed;
         }
         .trip-table th {
             background-color: var(--j-bg-th);
             color: var(--j-text-th);
             font-weight: 700;
-            padding: 8px 4px; /* 修改：恢復上下對稱 padding */
+            padding: 4px 2px; /* 合理的壓縮 */
             border-right: 1px solid var(--j-border-table);
             border-bottom: 1px solid var(--j-border-table);
             vertical-align: middle !important;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.02em;
         }
         .trip-table th:last-child { border-right: none; }
         
         .trip-table td {
             background-color: #fff;
             color: var(--j-text-table);
-            padding: 8px 4px; /* 修改：恢復上下對稱 padding */
+            padding: 4px 2px; /* 合理的壓縮 */
             border-right: 1px solid var(--j-border-table);
             border-bottom: 1px solid var(--j-border-table);
             font-weight: 600;
@@ -284,7 +287,7 @@
             font-family: "Courier New", Consolas, monospace; 
             font-weight: 900; 
             color: var(--j-theme-main); 
-            font-size: 12px;
+            font-size: 11px; 
             letter-spacing: 0.05em;
         }
 
@@ -294,14 +297,14 @@
             font-weight: 700;
             font-size: 9px;
             border-bottom: 1px dashed var(--j-border) !important;
-            padding: 4px;
+            padding: 3px;
         }
         .fare-row-data td {
             background-color: #fafaf9 !important; 
             color: var(--j-text-table);
             font-family: Consolas, monospace;
-            font-size: 9px;
-            padding: 4px;
+            font-size: 9px; 
+            padding: 3px;
             border-top: none !important;
         }
         .fare-total-price {
@@ -312,11 +315,11 @@
 
         .summary-bar {
             background-color: var(--j-bg-tag);
-            padding: 6px 15px;
+            padding: 4px 15px; 
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 10px;
+            font-size: 10px; 
             font-weight: 700;
             color: var(--j-text-th);
             border-top: 1px solid var(--j-border-table);
@@ -328,64 +331,64 @@
             border-collapse: collapse;
             table-layout: fixed;
             text-align: center;
-            line-height: 1.5; /* 修改：行高改為 1.5 */
+            line-height: 1.3; 
         }
         .pax-table th {
             background-color: var(--j-bg-th);
             color: var(--j-text-th);
-            padding: 6px 5px; /* 修改：恢復上下對稱 padding */
+            padding: 4px 2px; /* 安全的 Padding */
             font-weight: 800;
             border-bottom: 1px solid var(--j-border-table);
             border-right: 1px solid var(--j-border-table);
-            font-size: 9px;
+            font-size: 9px; /* 安全字體 */
             text-align: center;
             vertical-align: middle !important;
         }
         .pax-table td {
-            padding: 6px 5px; /* 修改：恢復上下對稱 padding */
+            padding: 4px 2px; /* 安全的 Padding */
             color: var(--j-text-table);
             border-bottom: 1px solid var(--j-border-table);
             border-right: 1px solid var(--j-border-table);
-            font-size: 9px;
+            font-size: 10px; /* 安全字體 */
             text-align: center;
             vertical-align: middle !important;
         }
 
         .grand-total {
             text-align: right;
-            margin-top: 30px;
-            padding-top: 15px;
+            margin-top: 12px;
+            padding-top: 10px;
             border-top: 2px solid var(--j-theme-main);
         }
         .total-label { font-size: 11px; color: var(--j-theme-sub); font-weight: 700; margin-right: 12px; letter-spacing: 0.1em; }
-        .total-value { font-size: 31px; font-weight: 900; color: var(--j-theme-main); font-family: 'Arial', sans-serif; letter-spacing: -0.02em; }
+        .total-value { font-size: 28px; font-weight: 900; color: var(--j-theme-main); font-family: 'Arial', sans-serif; letter-spacing: -0.02em; }
 
         .warning-text {
             color: #9b2c2c;
             background-color: #fff5f5;
             border: 1px solid #fc8181;
             font-weight: 800;
-            margin-top: 20px;
-            margin-bottom: 15px;
-            padding: 12px 18px;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            padding: 10px 14px;
             display: block;
-            font-size: 11px;
-            line-height: 1.6;
+            font-size: 10px;
+            line-height: 1.5;
             text-align: center;
             border-radius: 4px;
         }
 
         .footer-terms {
-            margin-top: 30px;
+            margin-top: 12px;
             font-size: 9px;
             color: var(--j-text-table);
             border-top: 1px dashed var(--j-border);
-            padding-top: 20px;
-            line-height: 1.8;
+            padding-top: 12px;
+            line-height: 1.6;
         }
-        .footer-title { font-weight: 800; color: var(--j-theme-main); display: block; margin-bottom: 8px; font-size: 10px; letter-spacing: 0.1em; }
-        .note-item { display: flex; align-items: flex-start; margin-bottom: 3px; }
-        .note-num { width: 18px; flex-shrink: 0; font-weight: 700; color: var(--j-theme-main); }
+        .footer-title { font-weight: 800; color: var(--j-theme-main); display: block; margin-bottom: 6px; font-size: 10px; letter-spacing: 0.1em; }
+        .note-item { display: flex; align-items: flex-start; margin-bottom: 2px; }
+        .note-num { width: 14px; flex-shrink: 0; font-weight: 700; color: var(--j-theme-main); }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -563,6 +566,7 @@
 
         <!-- 預覽區 -->
         <div class="preview-wrapper">
+            <!-- 恢復為安全的最小高度 min-height A4 佈局 -->
             <div id="image-node" class="doc-container">
                 <div class="doc-header">
                     <div>
@@ -673,23 +677,26 @@
                     <span class="total-value">NT$ {{ totalOrderAmount.toLocaleString() }}</span>
                 </div>
                 
-                <strong class="warning-text">
-                    請業務們務必再次核對 票種/張數/金額 是否正確，如有錯誤 請於「出票前」告知，出票後告知請自行負責。<br>
-                    高鐵訂票服務窗口感謝您的配合。<br>
-                    <span style="display: block; margin-top: 8px; border-top: 1px dashed #fc8181; padding-top: 8px;">
-                        業務人員專用，除注意事項可截圖給客人，其他內容請勿提供給客人唷
-                    </span>
-                </strong>
+                <!-- 加入 mt-auto 的容器，將警告與 footer 推至紙張最底部 -->
+                <div class="mt-auto">
+                    <strong class="warning-text">
+                        請業務們務必再次核對 票種/張數/金額 是否正確，如有錯誤 請於「出票前」告知，出票後告知請自行負責。<br>
+                        高鐵訂票服務窗口感謝您的配合。<br>
+                        <span style="display: block; margin-top: 6px; border-top: 1px dashed #fc8181; padding-top: 6px;">
+                            業務人員專用，除注意事項可截圖給客人，其他內容請勿提供給客人唷
+                        </span>
+                    </strong>
 
-                <div class="footer-terms">
-                    <strong class="footer-title">--- 注意事項 與 改/退票說明 ---</strong>
-                    <div class="note-item"><div class="note-num">1.</div><div class="note-text">座位皆由電腦自動劃位，恕無法指定座位，亦無法保證同行者為相鄰座位。</div></div>
-                    <div class="note-item"><div class="note-num">2.</div><div class="note-text">若因逾時未能搭乘，請自行洽詢站務人員是否可改搭當日其他車次之自由座，恕無法辦理退票。</div></div>
-                    <div class="note-item"><div class="note-num">3.</div><div class="note-text">高鐵車票須於搭乘當日使用，逾期視同廢票，恕不受理退票。</div></div>
-                    <div class="note-item"><div class="note-num">4.</div><div class="note-text">如需辦理改票/退票，請於 <strong>4個工作日前</strong> 申請，並提供紙本票根或 APP 電子票截圖(天災導致高鐵停駛者不在此限)。</div></div>
-                    <div class="note-item"><div class="note-num">5.</div><div class="note-text" style="color: #b94047; font-weight: 800;">退票將酌收手續費 每張新台幣 50 元。</div></div>
-                    <div class="note-item"><div class="note-num">6.</div><div class="note-text">辦理改票/退票時，請務必提供 紙本票根或電子票(APP 截圖)，未提供者將視同正常搭乘，相關費用須自行負擔。</div></div>
-                    <div class="note-item"><div class="note-num">7.</div><div class="note-text">因航班延誤或取消等非高鐵因素致無法搭乘者，車票 恕無法改期或退票，敬請見諒。</div></div>
+                    <div class="footer-terms">
+                        <strong class="footer-title">--- 注意事項 與 改/退票說明 ---</strong>
+                        <div class="note-item"><div class="note-num">1.</div><div class="note-text">座位皆由電腦自動劃位，恕無法指定座位，亦無法保證同行者為相鄰座位。</div></div>
+                        <div class="note-item"><div class="note-num">2.</div><div class="note-text">若因逾時未能搭乘，請自行洽詢站務人員是否可改搭當日其他車次之自由座，恕無法辦理退票。</div></div>
+                        <div class="note-item"><div class="note-num">3.</div><div class="note-text">高鐵車票須於搭乘當日使用，逾期視同廢票，恕不受理退票。</div></div>
+                        <div class="note-item"><div class="note-num">4.</div><div class="note-text">如需辦理改票/退票，請於 <strong>4個工作日前</strong> 申請，並提供紙本票根或 APP 電子票截圖(天災導致高鐵停駛者不在此限)。</div></div>
+                        <div class="note-item"><div class="note-num">5.</div><div class="note-text" style="color: #b94047; font-weight: 800;">退票將酌收手續費 每張新台幣 50 元。</div></div>
+                        <div class="note-item"><div class="note-num">6.</div><div class="note-text">辦理改票/退票時，請務必提供 紙本票根或電子票(APP 截圖)，未提供者將視同正常搭乘，相關費用須自行負擔。</div></div>
+                        <div class="note-item"><div class="note-num">7.</div><div class="note-text">因航班延誤或取消等非高鐵因素致無法搭乘者，車票 恕無法改期或退票，敬請見諒。</div></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -764,7 +771,6 @@
 
                 const swapStations = () => { const tmp = tripForm.from; tripForm.from = tripForm.to; tripForm.to = tmp; };
                 
-                // Canvas 環境調整：移除 confirm 彈窗，改為直接執行並提示
                 const clearBasicInfo = () => { 
                     baseInfo.sales=''; baseInfo.orderId=''; baseInfo.groupId=''; 
                     showToast('基本資料已清除');
@@ -775,7 +781,6 @@
                     showToast('行程表單已重置');
                 };
 
-                // 票價計算 (顯示算式)
                 const getCalcDetails = (trip, tks) => {
                     const matrix = trip.carClass === '商務車廂' ? fareRules.business : fareRules.standard;
                     const base = matrix[trip.from]?.[trip.to] || matrix[trip.to]?.[trip.from] || 0;
@@ -812,8 +817,8 @@
 
                 const addTripToList = (type) => {
                     addedTrips.value.push({
-                        type: type, // '去程' or '回程'
-                        ...JSON.parse(JSON.stringify(tripForm)), // Clone form data
+                        type: type,
+                        ...JSON.parse(JSON.stringify(tripForm)),
                         tickets: { ...ticketForm },
                         passengers: JSON.parse(JSON.stringify(passengerList.value)),
                         totalAmount: calcTotal(tripForm, ticketForm),
@@ -822,14 +827,13 @@
                     });
                     showToast(`已新增${type}`);
 
-                    // 自動清空票數與名單
                     Object.assign(ticketForm, { adult: 0, child: 0, senior: 0, disability: 0 });
                     passengerList.value = [];
                 };
 
                 const updateTripInList = () => {
                     const idx = editingIndex.value;
-                    const type = addedTrips.value[idx].type; // Keep original type
+                    const type = addedTrips.value[idx].type;
                     addedTrips.value[idx] = {
                         type: type,
                         ...JSON.parse(JSON.stringify(tripForm)),
@@ -842,18 +846,11 @@
                     editingIndex.value = null; showToast("已更新");
                 };
                 
-                // 新增功能：從已加入的「去程」中複製票數與旅客資料
                 const importDepartureInfo = () => {
                     const depTrip = [...addedTrips.value].reverse().find(t => t.type === '去程');
                     if (!depTrip) { showToast('找不到去程資料'); return; }
-                    
-                    // 1. 複製票數 (這會觸發 watcher 自動調整 passengerList 長度與類型)
                     Object.assign(ticketForm, depTrip.tickets);
-                    
-                    // 2. 複製旅客詳細資料 (覆蓋 watcher 產生的空資料)
-                    // 使用 JSON parse/stringify 深拷貝，避免參照問題
                     passengerList.value = JSON.parse(JSON.stringify(depTrip.passengers));
-                    
                     showToast('已帶入去程旅客資料');
                 };
 
@@ -871,9 +868,7 @@
                 const removeTrip = (i) => addedTrips.value.splice(i, 1);
                 const openPassengerModal = () => showPassengerModal.value = true;
                 
-                // Computed property to check if there is any "Departure" trip
                 const hasDeparture = computed(() => addedTrips.value.some(t => t.type === '去程'));
-
                 const totalTickets = computed(() => ticketForm.adult + ticketForm.child + ticketForm.senior + ticketForm.disability);
                 const totalOrderAmount = computed(() => addedTrips.value.reduce((s,t) => s + t.totalAmount, 0));
                 const formattedDeadline = computed(() => `${baseInfo.deadlineDate.replace(/-/g,'/')} ${baseInfo.deadlineTime}`);
@@ -893,46 +888,74 @@
 
                 const maskId = (id) => id ? (id.length > 6 ? id.slice(0,3) + '*****' + id.slice(-4) : id) : '';
 
-                // 修改後的下載圖片函式 (修復文字下沉問題)
+                // 產生自動檔名 (包含日期、高鐵訂位編號、訂單號、業務)
+                const generateFileName = (suffix) => {
+                    const d = new Date();
+                    const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+                    // 取得所有不重複的高鐵訂位編號 (如果去回程代碼不同，會用底線連接)
+                    const hsrIds = [...new Set(addedTrips.value.map(t => t.hsrOrderId).filter(Boolean))].join('_');
+                    const hsrStr = hsrIds ? hsrIds : '無高鐵編號';
+                    const orderStr = baseInfo.orderId ? `_${baseInfo.orderId}` : '';
+                    const salesStr = baseInfo.sales ? `_${baseInfo.sales}` : '';
+                    return `${dateStr}_${hsrStr}${orderStr}${salesStr}_${suffix}`;
+                };
+
+                // 下載圖片 
                 const downloadImage = () => {
                     const node = document.getElementById('image-node');
                     
-                    // 使用 html2canvas
                     html2canvas(node, { 
-                        scale: 3, // 保持高解析度
+                        scale: 3, 
+                        width: 794,
+                        // 確保即使內容很少，也至少擷取 1123px 的標準 A4 長度；如果塞好塞滿，它會自動抓取完整 A4。
+                        windowHeight: 1123, 
                         backgroundColor: '#ffffff',
-                        
-                        // 【關鍵修復】：onclone 允許我們在截圖"前"修改複製出來的 DOM
                         onclone: (clonedDoc) => {
                             const style = clonedDoc.createElement('style');
-                            // 在這裡寫入 CSS，強制把文字往上提，抵銷 html2canvas 的下沉誤差
                             style.innerHTML = `
-                                /* 針對表格內的文字進行垂直校正 */
+                                /* --- 解決 html2canvas 中文字型垂直偏下(下沉)的問題 --- */
+                                
+                                /* 1. 訂位明細與旅客表 (修正 Padding 以推高文字) */
                                 .trip-table td, .trip-table th, .pax-table td, .pax-table th {
-                                    padding-top: 5px !important;    /* 原本是 8px，減少 3px */
-                                    padding-bottom: 11px !important; /* 原本是 8px，增加 3px (保持總高度不變，但內容上移) */
+                                    padding-top: 1px !important;
+                                    padding-bottom: 7px !important;
                                 }
                                 
-                                /* 針對上方資訊欄位的校正 */
-                                .info-header-value {
-                                    transform: translateY(-3px); /* 直接使用 transform 上移 */
+                                /* 2. 票價小計表 */
+                                .fare-row-header th, .fare-row-data td {
+                                    padding-top: 0px !important;
+                                    padding-bottom: 6px !important;
                                 }
                                 
-                                /* 針對總金額與標題 */
-                                .total-value, .doc-title, .doc-subtitle {
-                                    transform: translateY(-4px);
+                                /* 3. 頂部基本資料表 */
+                                .info-header-table td {
+                                    padding-top: 3px !important;
+                                    padding-bottom: 9px !important;
                                 }
                                 
-                                /* 針對 checkbox 符號特別修正 */
+                                /* 4. 灰色資訊條 */
+                                .summary-bar {
+                                    padding-top: 1px !important;
+                                    padding-bottom: 7px !important;
+                                }
+                                
+                                /* 5. 純文字/無框線區塊 (使用 transform 直接上提) */
+                                .info-header-value, .info-header-label, 
+                                .total-value, .doc-title, .doc-subtitle, 
+                                .doc-section-header, .warning-text {
+                                    transform: translateY(-2px);
+                                }
+                                
+                                /* 6. Checkbox 符號特別微調 */
                                 .checkbox-symbol {
-                                    top: -4px !important;
+                                    top: -3px !important;
                                 }
                             `;
                             clonedDoc.body.appendChild(style);
                         }
                     }).then(canvas => {
                         const a = document.createElement('a'); a.href = canvas.toDataURL("image/png");
-                        a.download = `${baseInfo.orderId}_${baseInfo.sales}_高鐵確認單.png`; a.click();
+                        a.download = generateFileName('高鐵確認單.png'); a.click();
                         showToast("圖檔下載成功");
                     });
                 };
@@ -941,7 +964,6 @@
                     let txt = `【高鐵訂位確認單】\n\n開票期限：${formattedDeadline.value}\n\n開票說明：\n請於D/L前通知 可開票 與 取票方式\n逾期將自動取消需重新訂票\n每筆訂位代碼，統一取票方式\n\n請業務們務必再次核對 票種/張數/金額 是否正確\n如有錯誤 請於「出票前」告知，出票後告知請自行負責。\n高鐵訂票服務窗口感謝您的配合。\n\n------------------\n\n`;
                     
                     addedTrips.value.forEach((t, i) => {
-                        // 重新計算單價以便在文字模式顯示詳細算式
                         const matrix = t.carClass === '商務車廂' ? fareRules.business : fareRules.standard;
                         const base = matrix[t.from]?.[t.to] || matrix[t.to]?.[t.from] || 0;
                         const disc = t.carClass === '商務車廂' ? 0.9 : 0.85;
@@ -967,20 +989,21 @@
                 const downloadTxt = () => {
                     const blob = new Blob([document.querySelector('textarea')?.value || '請先點選複製文字'], { type: 'text/plain' });
                     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-                    a.download = `${baseInfo.orderId}_確認範本.txt`; a.click();
+                    a.download = generateFileName('確認範本.txt'); a.click();
                 };
                 
-                // Canvas 環境調整：移除 confirm 彈窗，改為直接執行並提示
                 const resetCurrentTripForm = () => {
                     tripForm.pnr=''; ticketForm.adult=0; passengerList.value=[];
                     showToast('行程表單已重置');
                 };
 
-                onMounted(calculateDeadline);
+                onMounted(() => {
+                    calculateDeadline();
+                });
 
                 return {
                     baseInfo, tripForm, ticketForm, passengerList, addedTrips, stations, maskId,
-                    totalTickets, showPassengerModal,
+                    totalTickets, showPassengerModal, 
                     totalOrderAmount, formattedDeadline, editingIndex, toastMsg, nowTimestamp: new Date().toLocaleString(),
                     addTripToList, updateTripInList, startEdit, cancelEdit, removeTrip, hasDeparture, importDepartureInfo,
                     openPassengerModal, downloadImage, copyText, downloadTxt, clearBasicInfo, 
