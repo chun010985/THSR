@@ -131,7 +131,7 @@
            ========================================= */
         .doc-container {
             width: 794px;
-            min-height: 1123px; /* 改回 min-height 避免溢出截斷 */
+            min-height: 1123px;
             background-color: var(--j-bg-card);
             color: var(--j-text-doc);
             line-height: 1.35;
@@ -245,18 +245,17 @@
         }
 
         .trip-container {
-            margin-bottom: 8px; /* 縮減區塊間距 */
+            margin-bottom: 8px; 
             border: 2px solid var(--j-theme-main); 
             border-radius: 0 4px 4px 4px;
             overflow: hidden;
             background: #fff;
         }
         
-        /* 恢復正常字體，利用 Padding 來節省高度 */
         .trip-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px; /* 安全的 10px 字體 */
+            font-size: 10px;
             text-align: center;
             line-height: 1.3; 
             table-layout: fixed;
@@ -265,7 +264,7 @@
             background-color: var(--j-bg-th);
             color: var(--j-text-th);
             font-weight: 700;
-            padding: 4px 2px; /* 合理的壓縮 */
+            padding: 4px 2px; 
             border-right: 1px solid var(--j-border-table);
             border-bottom: 1px solid var(--j-border-table);
             vertical-align: middle !important;
@@ -276,7 +275,7 @@
         .trip-table td {
             background-color: #fff;
             color: var(--j-text-table);
-            padding: 4px 2px; /* 合理的壓縮 */
+            padding: 4px 2px; 
             border-right: 1px solid var(--j-border-table);
             border-bottom: 1px solid var(--j-border-table);
             font-weight: 600;
@@ -289,28 +288,6 @@
             color: var(--j-theme-main); 
             font-size: 11px; 
             letter-spacing: 0.05em;
-        }
-
-        .fare-row-header th {
-            background-color: #fafaf9 !important;
-            color: var(--j-theme-sub) !important;
-            font-weight: 700;
-            font-size: 9px;
-            border-bottom: 1px dashed var(--j-border) !important;
-            padding: 3px;
-        }
-        .fare-row-data td {
-            background-color: #fafaf9 !important; 
-            color: var(--j-text-table);
-            font-family: Consolas, monospace;
-            font-size: 9px; 
-            padding: 3px;
-            border-top: none !important;
-        }
-        .fare-total-price {
-            font-weight: 900;
-            color: var(--j-theme-main);
-            font-size: 10px;
         }
 
         .summary-bar {
@@ -336,20 +313,20 @@
         .pax-table th {
             background-color: var(--j-bg-th);
             color: var(--j-text-th);
-            padding: 4px 2px; /* 安全的 Padding */
+            padding: 4px 2px;
             font-weight: 800;
             border-bottom: 1px solid var(--j-border-table);
             border-right: 1px solid var(--j-border-table);
-            font-size: 9px; /* 安全字體 */
+            font-size: 9px;
             text-align: center;
             vertical-align: middle !important;
         }
         .pax-table td {
-            padding: 4px 2px; /* 安全的 Padding */
+            padding: 4px 2px;
             color: var(--j-text-table);
             border-bottom: 1px solid var(--j-border-table);
             border-right: 1px solid var(--j-border-table);
-            font-size: 10px; /* 安全字體 */
+            font-size: 10px;
             text-align: center;
             vertical-align: middle !important;
         }
@@ -377,18 +354,6 @@
             text-align: center;
             border-radius: 4px;
         }
-
-        .footer-terms {
-            margin-top: 12px;
-            font-size: 9px;
-            color: var(--j-text-table);
-            border-top: 1px dashed var(--j-border);
-            padding-top: 12px;
-            line-height: 1.6;
-        }
-        .footer-title { font-weight: 800; color: var(--j-theme-main); display: block; margin-bottom: 6px; font-size: 10px; letter-spacing: 0.1em; }
-        .note-item { display: flex; align-items: flex-start; margin-bottom: 2px; }
-        .note-num { width: 14px; flex-shrink: 0; font-weight: 700; color: var(--j-theme-main); }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -423,7 +388,7 @@
                         <div class="flex flex-col"><label class="form-label">訂票日期</label><input type="date" v-model="baseInfo.bookingDate"></div>
                         <div class="flex flex-col">
                             <label class="form-label text-[#b94047] font-bold">開票期限 (DL)</label>
-                            <div class="flex gap-2"><input type="date" v-model="baseInfo.deadlineDate"><input type="text" v-model="baseInfo.deadlineTime" class="time-input w-24"></div>
+                            <div class="flex gap-2"><input type="date" v-model="baseInfo.deadlineDate"><input type="text" v-model="baseInfo.deadlineTime" class="time-input w-24" placeholder="18:00"></div>
                         </div>
                         <div class="flex flex-col"><label class="form-label">業務姓名</label><input type="text" v-model="baseInfo.sales"></div>
                         <div class="flex flex-col"><label class="form-label">訂單編號</label><input type="text" v-model="baseInfo.orderId"></div>
@@ -471,19 +436,18 @@
                             
                             <div class="flex justify-between items-center gap-3 mt-4 pt-4 border-t border-[#e5e5e0]">
                                 <div class="flex gap-2">
-                                    <button @click="openPassengerModal" :disabled="totalTickets === 0" class="btn-outline px-5 py-2 text-sm">編輯名單</button>
+                                    <button @click="openPassengerModal" :disabled="totalTickets === 0" class="btn-outline px-5 py-2 text-sm disabled:opacity-50">編輯名單</button>
                                     
-                                    <!-- 新增：帶入去程按鈕 (僅在有去程資料且不在編輯模式時顯示) -->
                                     <button v-if="hasDeparture && editingIndex === null" @click="importDepartureInfo" class="bg-stone-100 text-stone-600 border border-stone-300 px-3 py-2 text-xs rounded hover:bg-stone-200 transition font-bold flex items-center gap-1">
                                         <span>📋</span> 帶入去程旅客
                                     </button>
                                 </div>
                                 
                                 <div v-if="editingIndex === null" class="flex gap-2">
-                                    <button @click="addTripToList('去程')" :disabled="totalTickets === 0" class="btn-primary px-5 py-2 text-sm shadow-md hover:shadow-lg transition flex items-center gap-1">
+                                    <button @click="addTripToList('去程')" :disabled="totalTickets === 0" class="btn-primary px-5 py-2 text-sm shadow-md hover:shadow-lg transition flex items-center gap-1 disabled:opacity-50">
                                         <span class="text-lg leading-none">+</span> 新增去程
                                     </button>
-                                    <button @click="addTripToList('回程')" :disabled="totalTickets === 0" class="bg-white text-[#4a4a46] border border-[#4a4a46] px-5 py-2 text-sm rounded font-bold hover:bg-[#fafaf9] transition flex items-center gap-1">
+                                    <button @click="addTripToList('回程')" :disabled="totalTickets === 0" class="bg-white text-[#4a4a46] border border-[#4a4a46] px-5 py-2 text-sm rounded font-bold hover:bg-[#fafaf9] transition flex items-center gap-1 disabled:opacity-50">
                                         <span class="text-lg leading-none">+</span> 新增回程
                                     </button>
                                 </div>
@@ -526,12 +490,12 @@
                             <span class="text-stone-500 font-bold text-sm">總金額</span>
                             <span class="text-2xl font-bold text-[#4a4a46] font-sans">${{ totalOrderAmount.toLocaleString() }}</span>
                         </div>
-                        <button @click="downloadImage" :disabled="addedTrips.length===0" class="w-full btn-primary py-3 mb-3 shadow-md font-bold text-sm flex items-center justify-center gap-2">
+                        <button @click="downloadImage" :disabled="addedTrips.length===0" class="w-full btn-primary py-3 mb-3 shadow-md font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50">
                              下載圖片
                         </button>
                         <div class="grid grid-cols-2 gap-3">
-                            <button @click="downloadTxt" :disabled="addedTrips.length===0" class="btn-outline py-2 text-xs">下載文字</button>
-                            <button @click="copyText" :disabled="addedTrips.length===0" class="btn-outline py-2 text-xs">複製文字</button>
+                            <button @click="downloadTxt" :disabled="addedTrips.length===0" class="btn-outline py-2 text-xs disabled:opacity-50">下載文字</button>
+                            <button @click="copyText" :disabled="addedTrips.length===0" class="btn-outline py-2 text-xs disabled:opacity-50">複製文字</button>
                         </div>
                     </div>
                 </div>
@@ -615,6 +579,7 @@
                                 <th colspan="2" style="width:20%;">高鐵訂位編號</th>
                                 <th style="width:10%;">PNR</th>
                                 <th style="width:12%;">搭乘日期</th>
+                                <th style="width:10%;">車廂</th>
                                 <th style="width:10%;">車次</th>
                                 <th style="width:10%;">起程車站</th>
                                 <th style="width:10%;">到達車站</th>
@@ -623,392 +588,358 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <!-- HTML 補全部分開始 -->
                             <tr>
                                 <td class="font-bold">{{ trip.type }}</td>
                                 <td colspan="2" class="hsr-code">{{ trip.hsrOrderId || '-' }}</td>
-                                <td style="font-family:Consolas, monospace; font-weight:700;">{{ trip.pnr }}</td>
+                                <td style="font-family:Consolas, monospace; font-weight:700;">{{ trip.pnr || '-' }}</td>
                                 <td>{{ trip.date.replace(/-/g, '/') }}</td>
+                                <td>{{ trip.carClass }}</td>
                                 <td>{{ trip.trainNo }}</td>
                                 <td>{{ trip.from }}</td>
                                 <td>{{ trip.to }}</td>
                                 <td>{{ trip.depTime }}</td>
                                 <td>{{ trip.arrTime }}</td>
                             </tr>
-                        </tbody>
-                        
-                        <tbody class="fare-row-header">
-                            <tr>
-                                <th colspan="2">全票</th>
-                                <th colspan="2">孩童票</th>
-                                <th colspan="2">愛心票</th>
-                                <th colspan="2">敬老票</th>
-                                <th colspan="2">小計</th>
-                            </tr>
-                        </tbody>
-                        <tbody class="fare-row-data">
-                            <tr>
-                                <td colspan="2">{{ trip.calcDetails.adultStr }}</td>
-                                <td colspan="2">{{ trip.calcDetails.childStr }}</td>
-                                <td colspan="2">{{ trip.calcDetails.disabilityStr }}</td>
-                                <td colspan="2">{{ trip.calcDetails.seniorStr }}</td>
-                                <td colspan="2" class="fare-total-price">NT${{ trip.totalAmount.toLocaleString() }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="summary-bar">
-                        <span>車廂：{{ trip.carClass }}</span>
-                        <span>票種：{{ trip.breakdownText }}</span>
-                    </div>
-
-                    <table class="pax-table">
-                        <thead><tr><th style="width:15%">票種</th><th style="width:25%">姓名</th><th style="width:35%">身分證字號</th><th style="width:25%">護照號碼</th></tr></thead>
-                        <tbody>
-                            <tr v-for="p in trip.passengers">
-                                <td>{{ p.type }}</td><td>{{ p.name }}</td><td>{{ maskId(p.idNumber) }}</td><td>{{ p.passportNo || '' }}</td>
+                            <!-- 旅客資訊列 (合併儲存格) -->
+                            <tr v-if="trip.passengers && trip.passengers.length > 0">
+                                <td colspan="11" style="padding: 0; border: none;">
+                                    <table class="pax-table" style="width: 100%; border-top: 1px solid var(--j-border-table);">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 10%;">票種</th>
+                                                <th style="width: 20%;">姓名</th>
+                                                <th style="width: 25%;">身分證字號</th>
+                                                <th style="width: 25%;">護照號碼</th>
+                                                <th style="width: 20%;">生日</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(pax, pIdx) in trip.passengers" :key="pIdx">
+                                                <td style="font-weight: bold;">{{ pax.type }}</td>
+                                                <td>{{ pax.name || '-' }}</td>
+                                                <td style="font-family: Consolas, monospace;">{{ pax.idNumber || '-' }}</td>
+                                                <td style="font-family: Consolas, monospace;">{{ pax.passportNo || '-' }}</td>
+                                                <td>{{ pax.birthday ? pax.birthday.replace(/-/g, '/') : '-' }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
-                </div>
-                <!-- 迴圈結束 -->
-
-                <div class="grand-total">
-                    <span class="total-label">總計應收金額</span>
-                    <span class="total-value">NT$ {{ totalOrderAmount.toLocaleString() }}</span>
                 </div>
                 
-                <!-- 加入 mt-auto 的容器，將警告與 footer 推至紙張最底部 -->
-                <div class="mt-auto">
-                    <strong class="warning-text">
-                        請業務們務必再次核對 票種/張數/金額 是否正確，如有錯誤 請於「出票前」告知，出票後告知請自行負責。<br>
-                        高鐵訂票服務窗口感謝您的配合。<br>
-                        <span style="display: block; margin-top: 6px; border-top: 1px dashed #fc8181; padding-top: 6px;">
-                            業務人員專用，除注意事項可截圖給客人，其他內容請勿提供給客人唷
-                        </span>
-                    </strong>
-
-                    <div class="footer-terms">
-                        <strong class="footer-title">--- 注意事項 與 改/退票說明 ---</strong>
-                        <div class="note-item"><div class="note-num">1.</div><div class="note-text">座位皆由電腦自動劃位，恕無法指定座位，亦無法保證同行者為相鄰座位。</div></div>
-                        <div class="note-item"><div class="note-num">2.</div><div class="note-text">若因逾時未能搭乘，請自行洽詢站務人員是否可改搭當日其他車次之自由座，恕無法辦理退票。</div></div>
-                        <div class="note-item"><div class="note-num">3.</div><div class="note-text">高鐵車票須於搭乘當日使用，逾期視同廢票，恕不受理退票。</div></div>
-                        <div class="note-item"><div class="note-num">4.</div><div class="note-text">如需辦理改票/退票，請於 <strong>4個工作日前</strong> 申請，並提供紙本票根或 APP 電子票截圖(天災導致高鐵停駛者不在此限)。</div></div>
-                        <div class="note-item"><div class="note-num">5.</div><div class="note-text" style="color: #b94047; font-weight: 800;">退票將酌收手續費 每張新台幣 50 元。</div></div>
-                        <div class="note-item"><div class="note-num">6.</div><div class="note-text">辦理改票/退票時，請務必提供 紙本票根或電子票(APP 截圖)，未提供者將視同正常搭乘，相關費用須自行負擔。</div></div>
-                        <div class="note-item"><div class="note-num">7.</div><div class="note-text">因航班延誤或取消等非高鐵因素致無法搭乘者，車票 恕無法改期或退票，敬請見諒。</div></div>
-                    </div>
+                <div v-if="addedTrips.length > 0" class="grand-total">
+                    <span class="total-label">總票價金額 (TWD)</span>
+                    <span class="total-value">{{ totalOrderAmount.toLocaleString() }}</span>
                 </div>
+
+                <div v-if="addedTrips.length > 0" class="warning-text">
+                    ★ 提醒您：請務必核對乘車日期、時間、起訖站及旅客身分資料是否正確。<br>
+                    若因資料提供錯誤導致無法取票或乘車，本公司恕不負責。
+                </div>
+                <!-- HTML 補全部分結束 -->
             </div>
         </div>
-
     </div>
 
     <script>
-        const { createApp, ref, reactive, computed, watch, onMounted } = Vue;
+        const { createApp } = Vue;
 
         createApp({
-            setup() {
-                const stations = ['南港', '台北', '板橋', '桃園', '新竹', '苗栗', '台中', '彰化', '雲林', '嘉義', '台南', '左營'];
-                const showPassengerModal = ref(false);
-                const toastMsg = ref('');
-                const addedTrips = ref([]);
-                const editingIndex = ref(null);
-                
-                const staffInput = ref(null);
-                const hsrIdInput = ref(null);
-
-                // 2026 完整官方票價 (含商務)
-                const fareRules = {
-                    standard: {
-                        '南港': { '台北': 40, '板橋': 70, '桃園': 200, '新竹': 330, '苗栗': 470, '台中': 740, '彰化': 860, '雲林': 970, '嘉義': 1120, '台南': 1390, '左營': 1530 },
-                        '台北': { '板橋': 40, '桃園': 160, '新竹': 290, '苗栗': 430, '台中': 700, '彰化': 820, '雲林': 930, '嘉義': 1080, '台南': 1350, '左營': 1490 },
-                        '板橋': { '桃園': 130, '新竹': 260, '苗栗': 400, '台中': 670, '彰化': 790, '雲林': 900, '嘉義': 1050, '台南': 1320, '左營': 1460 },
-                        '桃園': { '新竹': 130, '苗栗': 280, '台中': 540, '彰化': 670, '雲林': 780, '嘉義': 920, '台南': 1190, '左營': 1330 },
-                        '新竹': { '苗栗': 140, '台中': 410, '彰化': 540, '雲林': 640, '嘉義': 790, '台南': 1060, '左營': 1200 },
-                        '苗栗': { '台中': 270, '彰化': 390, '雲林': 500, '嘉義': 640, '台南': 920, '左營': 1060 },
-                        '台中': { '彰化': 130, '雲林': 230, '嘉義': 380, '台南': 650, '左營': 790 },
-                        '彰化': { '雲林': 110, '嘉義': 250, '台南': 530, '左營': 670 },
-                        '雲林': { '嘉義': 150, '台南': 420, '左營': 560 },
-                        '嘉義': { '台南': 280, '左營': 410 },
-                        '台南': { '左營': 140 }
-                    },
-                    business: {
-                        '南港': { '台北': 260, '板橋': 310, '桃園': 500, '新竹': 700, '苗栗': 920, '台中': 1330, '彰化': 1510, '雲林': 1660, '嘉義': 1880, '台南': 2290, '左營': 2500 },
-                        '台北': { '板橋': 260, '桃園': 440, '新竹': 640, '苗栗': 850, '台中': 1250, '彰化': 1430, '雲林': 1600, '嘉義': 1820, '台南': 2230, '左營': 2440 },
-                        '板橋': { '桃園': 400, '新竹': 590, '苗栗': 800, '台中': 1210, '彰化': 1390, '雲林': 1550, '嘉義': 1780, '台南': 2180, '左營': 2390 },
-                        '桃園': { '新竹': 400, '苗栗': 620, '台中': 1010, '彰化': 1210, '雲林': 1370, '嘉義': 1580, '台南': 1990, '左營': 2200 },
-                        '新竹': { '苗栗': 410, '台中': 820, '彰化': 1010, '雲林': 1160, '嘉義': 1390, '台南': 1790, '左營': 2000 },
-                        '苗栗': { '台中': 610, '彰化': 790, '雲林': 950, '嘉義': 1160, '台南': 1580, '左營': 1790 },
-                        '台中': { '彰化': 400, '雲林': 550, '嘉義': 770, '台南': 1180, '左營': 1390 },
-                        '彰化': { '雲林': 370, '嘉義': 580, '台南': 1000, '左營': 1210 },
-                        '雲林': { '嘉義': 430, '台南': 830, '左營': 1040 },
-                        '嘉義': { '台南': 620, '左營': 820 },
-                        '台南': { '左營': 410 }
-                    }
-                };
-
-                const baseInfo = reactive({ staff: '陳侑君', bookingDate: new Date().toISOString().split('T')[0], deadlineDate: '', deadlineTime: '18:00', sales: '', orderId: '', groupId: '' });
-                const tripForm = reactive({ hsrOrderId: '', pnr: '', date: '', carClass: '標準車廂', from: '台北', to: '左營', trainNo: '', depTime: '09:00', arrTime: '10:34' });
-                const ticketForm = reactive({ adult: 0, child: 0, senior: 0, disability: 0 });
-                const passengerList = ref([]);
-
-                const showToast = (msg) => { toastMsg.value = msg; setTimeout(() => { toastMsg.value = ''; }, 3000); };
-                const focusInput = (name) => {
-                      if(name==='staff' && staffInput.value) staffInput.value.focus();
-                      if(name==='hsrId' && hsrIdInput.value) hsrIdInput.value.focus();
-                };
-
-                const calculateDeadline = () => {
-                    if (!baseInfo.bookingDate) return;
-                    const bDate = new Date(baseInfo.bookingDate);
-                    let dDate = new Date(bDate); dDate.setDate(bDate.getDate() + 2);
-                    const day = bDate.getDay(); 
-                    const diff = day <= 5 ? 5-day : 5+(7-day);
-                    const friday = new Date(bDate); friday.setDate(bDate.getDate() + diff);
-                    const final = dDate > friday ? friday : dDate;
-                    baseInfo.deadlineDate = final.toISOString().split('T')[0];
-                };
-
-                const swapStations = () => { const tmp = tripForm.from; tripForm.from = tripForm.to; tripForm.to = tmp; };
-                
-                const clearBasicInfo = () => { 
-                    baseInfo.sales=''; baseInfo.orderId=''; baseInfo.groupId=''; 
-                    showToast('基本資料已清除');
-                };
-                
-                const clearTripForm = () => { 
-                    tripForm.pnr=''; ticketForm.adult=0; passengerList.value=[]; 
-                    showToast('行程表單已重置');
-                };
-
-                const getCalcDetails = (trip, tks) => {
-                    const matrix = trip.carClass === '商務車廂' ? fareRules.business : fareRules.standard;
-                    const base = matrix[trip.from]?.[trip.to] || matrix[trip.to]?.[trip.from] || 0;
-                    const disc = trip.carClass === '商務車廂' ? 0.9 : 0.85;
-                    const full = Math.round(base * disc);
-                    const half = Math.round(base * 0.5);
-                    return {
-                        adultStr: tks.adult > 0 ? `${full}*${tks.adult}` : '',
-                        childStr: tks.child > 0 ? `${half}*${tks.child}` : '',
-                        seniorStr: tks.senior > 0 ? `${half}*${tks.senior}` : '',
-                        disabilityStr: tks.disability > 0 ? `${half}*${tks.disability}` : ''
-                    };
-                };
-
-                const getFare = (trip) => {
-                    const matrix = trip.carClass === '商務車廂' ? fareRules.business : fareRules.standard;
-                    return matrix[trip.from]?.[trip.to] || matrix[trip.to]?.[trip.from] || 0;
-                };
-
-                const calcTotal = (trip, tks) => {
-                    const base = getFare(trip);
-                    const disc = trip.carClass === '商務車廂' ? 0.9 : 0.85;
-                    return (tks.adult * Math.round(base*disc)) + ((tks.child + tks.senior + tks.disability) * Math.round(base*0.5));
-                };
-
-                const getBreakdownText = (tks) => {
-                    let p = [];
-                    if(tks.adult) p.push(`全票 ${tks.adult} 張`);
-                    if(tks.child) p.push(`孩童票 ${tks.child} 張`);
-                    if(tks.senior) p.push(`敬老票 ${tks.senior} 張`);
-                    if(tks.disability) p.push(`愛心票 ${tks.disability} 張`);
-                    return p.join('｜');
-                };
-
-                const addTripToList = (type) => {
-                    addedTrips.value.push({
-                        type: type,
-                        ...JSON.parse(JSON.stringify(tripForm)),
-                        tickets: { ...ticketForm },
-                        passengers: JSON.parse(JSON.stringify(passengerList.value)),
-                        totalAmount: calcTotal(tripForm, ticketForm),
-                        calcDetails: getCalcDetails(tripForm, ticketForm),
-                        breakdownText: getBreakdownText(ticketForm)
-                    });
-                    showToast(`已新增${type}`);
-
-                    Object.assign(ticketForm, { adult: 0, child: 0, senior: 0, disability: 0 });
-                    passengerList.value = [];
-                };
-
-                const updateTripInList = () => {
-                    const idx = editingIndex.value;
-                    const type = addedTrips.value[idx].type;
-                    addedTrips.value[idx] = {
-                        type: type,
-                        ...JSON.parse(JSON.stringify(tripForm)),
-                        tickets: { ...ticketForm },
-                        passengers: JSON.parse(JSON.stringify(passengerList.value)),
-                        totalAmount: calcTotal(tripForm, ticketForm),
-                        calcDetails: getCalcDetails(tripForm, ticketForm),
-                        breakdownText: getBreakdownText(ticketForm)
-                    };
-                    editingIndex.value = null; showToast("已更新");
-                };
-                
-                const importDepartureInfo = () => {
-                    const depTrip = [...addedTrips.value].reverse().find(t => t.type === '去程');
-                    if (!depTrip) { showToast('找不到去程資料'); return; }
-                    Object.assign(ticketForm, depTrip.tickets);
-                    passengerList.value = JSON.parse(JSON.stringify(depTrip.passengers));
-                    showToast('已帶入去程旅客資料');
-                };
-
-                const startEdit = (idx) => {
-                    editingIndex.value = idx; const t = addedTrips.value[idx];
-                    Object.assign(tripForm, {
-                        hsrOrderId: t.hsrOrderId, pnr: t.pnr, date: t.date, carClass: t.carClass,
-                        from: t.from, to: t.to, trainNo: t.trainNo, depTime: t.depTime, arrTime: t.arrTime
-                    });
-                    Object.assign(ticketForm, t.tickets);
-                    passengerList.value = JSON.parse(JSON.stringify(t.passengers));
-                };
-
-                const cancelEdit = () => { editingIndex.value = null; };
-                const removeTrip = (i) => addedTrips.value.splice(i, 1);
-                const openPassengerModal = () => showPassengerModal.value = true;
-                
-                const hasDeparture = computed(() => addedTrips.value.some(t => t.type === '去程'));
-                const totalTickets = computed(() => ticketForm.adult + ticketForm.child + ticketForm.senior + ticketForm.disability);
-                const totalOrderAmount = computed(() => addedTrips.value.reduce((s,t) => s + t.totalAmount, 0));
-                const formattedDeadline = computed(() => `${baseInfo.deadlineDate.replace(/-/g,'/')} ${baseInfo.deadlineTime}`);
-                const nowTimestamp = computed(() => new Date().toLocaleString('zh-TW', { hour12: false }));
-
-                watch(ticketForm, (v) => syncPaxList(passengerList, v.adult+v.child+v.senior+v.disability, v), { deep: true });
-                watch(() => baseInfo.bookingDate, calculateDeadline);
-
-                const syncPaxList = (list, count, tks) => {
-                    if (count > list.value.length) for(let i=list.value.length; i<count; i++) list.value.push({type:'', name:'', idNumber:'', passportNo:'', isDirty: false});
-                    else if (count < list.value.length) list.value.splice(count);
-                    let idx = 0;
-                    [{n: tks.adult, t:'全票'}, {n: tks.child, t:'孩童票'}, {n: tks.senior, t:'敬老票'}, {n: tks.disability, t:'愛心票'}].forEach(grp => {
-                        for(let k=0; k<grp.n; k++) { if(list.value[idx]) list.value[idx].type = grp.t; idx++; }
-                    });
-                };
-
-                const maskId = (id) => id ? (id.length > 6 ? id.slice(0,3) + '*****' + id.slice(-4) : id) : '';
-
-                // 產生自動檔名 (包含日期、高鐵訂位編號、訂單號、業務)
-                const generateFileName = (suffix) => {
+            data() {
+                // 取得今天日期的函數 (格式 YYYY-MM-DD)
+                const getTodayString = () => {
                     const d = new Date();
-                    const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-                    // 取得所有不重複的高鐵訂位編號 (如果去回程代碼不同，會用底線連接)
-                    const hsrIds = [...new Set(addedTrips.value.map(t => t.hsrOrderId).filter(Boolean))].join('_');
-                    const hsrStr = hsrIds ? hsrIds : '無高鐵編號';
-                    const orderStr = baseInfo.orderId ? `_${baseInfo.orderId}` : '';
-                    const salesStr = baseInfo.sales ? `_${baseInfo.sales}` : '';
-                    return `${dateStr}_${hsrStr}${orderStr}${salesStr}_${suffix}`;
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
                 };
 
-                // 下載圖片 
-                const downloadImage = () => {
-                    const node = document.getElementById('image-node');
-                    
-                    html2canvas(node, { 
-                        scale: 3, 
-                        width: 794,
-                        // 確保即使內容很少，也至少擷取 1123px 的標準 A4 長度；如果塞好塞滿，它會自動抓取完整 A4。
-                        windowHeight: 1123, 
-                        backgroundColor: '#ffffff',
-                        onclone: (clonedDoc) => {
-                            const style = clonedDoc.createElement('style');
-                            style.innerHTML = `
-                                /* --- 解決 html2canvas 中文字型垂直偏下(下沉)的問題 --- */
-                                
-                                /* 1. 訂位明細與旅客表 (修正 Padding 以推高文字) */
-                                .trip-table td, .trip-table th, .pax-table td, .pax-table th {
-                                    padding-top: 1px !important;
-                                    padding-bottom: 7px !important;
-                                }
-                                
-                                /* 2. 票價小計表 */
-                                .fare-row-header th, .fare-row-data td {
-                                    padding-top: 0px !important;
-                                    padding-bottom: 6px !important;
-                                }
-                                
-                                /* 3. 頂部基本資料表 */
-                                .info-header-table td {
-                                    padding-top: 3px !important;
-                                    padding-bottom: 9px !important;
-                                }
-                                
-                                /* 4. 灰色資訊條 */
-                                .summary-bar {
-                                    padding-top: 1px !important;
-                                    padding-bottom: 7px !important;
-                                }
-                                
-                                /* 5. 純文字/無框線區塊 (使用 transform 直接上提) */
-                                .info-header-value, .info-header-label, 
-                                .total-value, .doc-title, .doc-subtitle, 
-                                .doc-section-header, .warning-text {
-                                    transform: translateY(-2px);
-                                }
-                                
-                                /* 6. Checkbox 符號特別微調 */
-                                .checkbox-symbol {
-                                    top: -3px !important;
-                                }
-                            `;
-                            clonedDoc.body.appendChild(style);
-                        }
-                    }).then(canvas => {
-                        const a = document.createElement('a'); a.href = canvas.toDataURL("image/png");
-                        a.download = generateFileName('高鐵確認單.png'); a.click();
-                        showToast("圖檔下載成功");
-                    });
-                };
-
-                const copyText = () => {
-                    let txt = `【高鐵訂位確認單】\n\n開票期限：${formattedDeadline.value}\n\n開票說明：\n請於D/L前通知 可開票 與 取票方式\n逾期將自動取消需重新訂票\n每筆訂位代碼，統一取票方式\n\n請業務們務必再次核對 票種/張數/金額 是否正確\n如有錯誤 請於「出票前」告知，出票後告知請自行負責。\n高鐵訂票服務窗口感謝您的配合。\n\n------------------\n\n`;
-                    
-                    addedTrips.value.forEach((t, i) => {
-                        const matrix = t.carClass === '商務車廂' ? fareRules.business : fareRules.standard;
-                        const base = matrix[t.from]?.[t.to] || matrix[t.to]?.[t.from] || 0;
-                        const disc = t.carClass === '商務車廂' ? 0.9 : 0.85;
-                        const fullPrice = Math.round(base * disc);
-                        const halfPrice = Math.round(base * 0.5);
-
-                        let details = [];
-                        if(t.tickets.adult > 0) details.push(`全票 ${t.tickets.adult} 張 ($${fullPrice}*${t.tickets.adult}=$${(fullPrice * t.tickets.adult).toLocaleString()})`);
-                        if(t.tickets.child > 0) details.push(`孩童 ${t.tickets.child} 張 ($${halfPrice}*${t.tickets.child}=$${(halfPrice * t.tickets.child).toLocaleString()})`);
-                        if(t.tickets.senior > 0) details.push(`敬老 ${t.tickets.senior} 張 ($${halfPrice}*${t.tickets.senior}=$${(halfPrice * t.tickets.senior).toLocaleString()})`);
-                        if(t.tickets.disability > 0) details.push(`愛心 ${t.tickets.disability} 張 ($${halfPrice}*${t.tickets.disability}=$${(halfPrice * t.tickets.disability).toLocaleString()})`);
-
-                        txt += `[行程紀錄 #${i+1}]\n\n`;
-                        txt += `${t.type}｜PNR ${t.pnr}\n${t.date.replace(/-/g, '/')}　${t.from}/${t.to}  班次 ${t.trainNo}　${t.depTime}-${t.arrTime}\n票數：${details.join('｜')}\n\n`;
-                    });
-                    
-                    txt += `總計應收金額：NT$ ${totalOrderAmount.value.toLocaleString()}\n\n---注意事項與改/退票說明---\n1. 座位皆由電腦自動劃位,恕無法指定座位,亦無法保證同行者為相鄰座位。\n2. 若因逾時未能搭乘,請自行洽詢站務人員是否可改搭當日其他車次之自由座,恕無法辦理退票。\n3. 高鐵車票須於搭乘當日使用,逾期視同廢票,恕不受理退票。\n4. 如需辦理改票/退票,請於 4個工作日前 申請,並提供紙本票根或 APP 電子票截圖(天災導致高鐵停駛者不在此限)。\n5. 退票將酌收手續費 每張新台幣 50 元。\n6. 辦理改票/退票時,請務必提供 紙本票根或電子票(APP 截圖),未提供者將視同正常搭乘,相關費用須自行負擔。\n7. 因航班延誤或取消等非高鐵因素致無法搭乘者,車票 恕無法改期或退票,敬請見諒。`;
-                    
-                    const el = document.createElement('textarea'); el.value = txt; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-                    showToast("文字範本已複製");
-                };
-                
-                const downloadTxt = () => {
-                    const blob = new Blob([document.querySelector('textarea')?.value || '請先點選複製文字'], { type: 'text/plain' });
-                    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-                    a.download = generateFileName('確認範本.txt'); a.click();
-                };
-                
-                const resetCurrentTripForm = () => {
-                    tripForm.pnr=''; ticketForm.adult=0; passengerList.value=[];
-                    showToast('行程表單已重置');
-                };
-
-                onMounted(() => {
-                    calculateDeadline();
-                });
+                const today = getTodayString();
 
                 return {
-                    baseInfo, tripForm, ticketForm, passengerList, addedTrips, stations, maskId,
-                    totalTickets, showPassengerModal, 
-                    totalOrderAmount, formattedDeadline, editingIndex, toastMsg, nowTimestamp: new Date().toLocaleString(),
-                    addTripToList, updateTripInList, startEdit, cancelEdit, removeTrip, hasDeparture, importDepartureInfo,
-                    openPassengerModal, downloadImage, copyText, downloadTxt, clearBasicInfo, 
-                    clearTripForm: resetCurrentTripForm, swapStations, focusInput, staffInput, hsrIdInput
-                };
+                    todayDateString: today, // 記錄「今天」的字串，用於跨日檢查
+                    stations: ['南港', '台北', '板橋', '桃園', '新竹', '苗栗', '台中', '彰化', '雲林', '嘉義', '台南', '左營'],
+                    toastMsg: '',
+                    editingIndex: null,
+                    showPassengerModal: false,
+                    baseInfo: {
+                        staff: '',
+                        bookingDate: today, // 預設今天
+                        deadlineDate: today, // 預設今天
+                        deadlineTime: '18:00',
+                        sales: '',
+                        orderId: '',
+                        groupId: ''
+                    },
+                    tripForm: {
+                        hsrOrderId: '',
+                        pnr: '',
+                        date: today, // 行程設定預設今天
+                        carClass: '標準車廂',
+                        trainNo: '',
+                        from: '台北',
+                        to: '左營',
+                        depTime: '',
+                        arrTime: ''
+                    },
+                    ticketForm: {
+                        adult: 1,
+                        child: 0,
+                        senior: 0,
+                        disability: 0
+                    },
+                    addedTrips: [],
+                    passengerList: [],
+                    checkDateInterval: null
+                }
+            },
+            computed: {
+                totalTickets() {
+                    return (this.ticketForm.adult || 0) + 
+                           (this.ticketForm.child || 0) + 
+                           (this.ticketForm.senior || 0) + 
+                           (this.ticketForm.disability || 0);
+                },
+                totalOrderAmount() {
+                    // 這裡先放一個模擬的總計邏輯 (範例：全票1000, 其他500)
+                    let total = 0;
+                    this.addedTrips.forEach(trip => {
+                        total += trip.totalAmount || 0;
+                    });
+                    return total;
+                },
+                formattedDeadline() {
+                    if (!this.baseInfo.deadlineDate) return '-';
+                    return `${this.baseInfo.deadlineDate.replace(/-/g, '/')} ${this.baseInfo.deadlineTime || '23:59'}`;
+                },
+                nowTimestamp() {
+                    return new Date().toLocaleString('zh-TW', { hour12: false });
+                },
+                hasDeparture() {
+                    return this.addedTrips.some(t => t.type === '去程');
+                }
+            },
+            watch: {
+                // 當票數變更時自動更新 passengerList 長度
+                totalTickets(newVal) {
+                    if (this.editingIndex !== null) return; // 編輯模式下不主動重置
+                    this.generatePassengerList();
+                }
+            },
+            mounted() {
+                this.generatePassengerList();
+
+                // 【核心需求：隨著每日日期變更自動更新】
+                // 設定每分鐘檢查一次是否跨日
+                this.checkDateInterval = setInterval(() => {
+                    this.checkAndUpdateDate();
+                }, 60000); // 60秒檢查一次
+            },
+            beforeUnmount() {
+                if (this.checkDateInterval) clearInterval(this.checkDateInterval);
+            },
+            methods: {
+                // 取得當前日期的 Helper
+                getTodayString() {
+                    const d = new Date();
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                },
+
+                // 檢查是否跨日並自動更新欄位
+                checkAndUpdateDate() {
+                    const newToday = this.getTodayString();
+                    
+                    if (this.todayDateString !== newToday) {
+                        // 代表跨日了！
+                        // 如果行程設定的日期原本是「舊的今天」，自動幫忙更新成「新的今天」
+                        if (this.tripForm.date === this.todayDateString) {
+                            this.tripForm.date = newToday;
+                        }
+                        
+                        // 同理處理訂票日期
+                        if (this.baseInfo.bookingDate === this.todayDateString) {
+                            this.baseInfo.bookingDate = newToday;
+                        }
+
+                        // 如果開票期限也是舊的今天，也更新
+                        if (this.baseInfo.deadlineDate === this.todayDateString) {
+                            this.baseInfo.deadlineDate = newToday;
+                        }
+
+                        // 更新基準天數
+                        this.todayDateString = newToday;
+                    }
+                },
+
+                showToast(msg) {
+                    this.toastMsg = msg;
+                    setTimeout(() => { this.toastMsg = ''; }, 3000);
+                },
+                focusInput(refName) {
+                    if (this.$refs[`${refName}Input`]) {
+                        this.$refs[`${refName}Input`].focus();
+                    }
+                },
+                clearBasicInfo() {
+                    this.baseInfo.staff = '';
+                    this.baseInfo.bookingDate = this.todayDateString;
+                    this.baseInfo.deadlineDate = this.todayDateString;
+                    this.baseInfo.deadlineTime = '18:00';
+                    this.baseInfo.sales = '';
+                    this.baseInfo.orderId = '';
+                    this.baseInfo.groupId = '';
+                    this.showToast('基本資料已清除');
+                },
+                clearTripForm() {
+                    this.tripForm = {
+                        hsrOrderId: '',
+                        pnr: '',
+                        date: this.todayDateString,
+                        carClass: '標準車廂',
+                        trainNo: '',
+                        from: '台北',
+                        to: '左營',
+                        depTime: '',
+                        arrTime: ''
+                    };
+                    this.ticketForm = { adult: 1, child: 0, senior: 0, disability: 0 };
+                    this.passengerList = [];
+                    this.generatePassengerList();
+                    this.cancelEdit();
+                    this.showToast('行程表單已重置');
+                },
+                swapStations() {
+                    const temp = this.tripForm.from;
+                    this.tripForm.from = this.tripForm.to;
+                    this.tripForm.to = temp;
+                },
+                generatePassengerList() {
+                    const newList = [];
+                    const addPax = (type, count) => {
+                        for (let i = 0; i < count; i++) {
+                            newList.push({ type: type, name: '', idNumber: '', passportNo: '', birthday: '' });
+                        }
+                    };
+                    addPax('全票', this.ticketForm.adult);
+                    addPax('孩童', this.ticketForm.child);
+                    addPax('敬老', this.ticketForm.senior);
+                    addPax('愛心', this.ticketForm.disability);
+                    this.passengerList = newList;
+                },
+                openPassengerModal() {
+                    this.showPassengerModal = true;
+                },
+                importDepartureInfo() {
+                    const dep = this.addedTrips.find(t => t.type === '去程');
+                    if (dep && dep.passengers) {
+                        this.passengerList = JSON.parse(JSON.stringify(dep.passengers));
+                        this.ticketForm = { ...dep.tickets };
+                        this.showToast('已帶入去程旅客資料');
+                    }
+                },
+                // 簡易計算金額的邏輯(僅為展示用)
+                calculateAmount() {
+                    const adultPrice = this.tripForm.carClass === '商務車廂' ? 1500 : 1000;
+                    const halfPrice = adultPrice / 2;
+                    return (this.ticketForm.adult * adultPrice) + 
+                           (this.ticketForm.child * halfPrice) + 
+                           (this.ticketForm.senior * halfPrice) + 
+                           (this.ticketForm.disability * halfPrice);
+                },
+                addTripToList(type) {
+                    const tripData = {
+                        ...JSON.parse(JSON.stringify(this.tripForm)),
+                        type: type,
+                        tickets: JSON.parse(JSON.stringify(this.ticketForm)),
+                        passengers: JSON.parse(JSON.stringify(this.passengerList)),
+                        totalAmount: this.calculateAmount()
+                    };
+                    this.addedTrips.push(tripData);
+                    this.showToast(`已新增 ${type} 行程`);
+                },
+                startEdit(index) {
+                    this.editingIndex = index;
+                    const trip = this.addedTrips[index];
+                    this.tripForm = { ...trip };
+                    this.ticketForm = { ...trip.tickets };
+                    this.passengerList = JSON.parse(JSON.stringify(trip.passengers));
+                },
+                updateTripInList() {
+                    if (this.editingIndex !== null) {
+                        const tripData = {
+                            ...JSON.parse(JSON.stringify(this.tripForm)),
+                            type: this.addedTrips[this.editingIndex].type, // 保持原本的類型
+                            tickets: JSON.parse(JSON.stringify(this.ticketForm)),
+                            passengers: JSON.parse(JSON.stringify(this.passengerList)),
+                            totalAmount: this.calculateAmount()
+                        };
+                        this.addedTrips[this.editingIndex] = tripData;
+                        this.cancelEdit();
+                        this.showToast('行程已更新');
+                    }
+                },
+                cancelEdit() {
+                    this.editingIndex = null;
+                },
+                removeTrip(index) {
+                    this.addedTrips.splice(index, 1);
+                    this.cancelEdit();
+                    this.showToast('已刪除行程');
+                },
+                async downloadImage() {
+                    this.showToast('正在生成圖片，請稍候...');
+                    const element = document.getElementById('image-node');
+                    try {
+                        const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+                        const link = document.createElement('a');
+                        link.download = `高鐵確認單_${this.baseInfo.orderId || '無單號'}.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                        this.showToast('圖片下載完成！');
+                    } catch (error) {
+                        this.showToast('圖片生成失敗');
+                        console.error(error);
+                    }
+                },
+                downloadTxt() {
+                    const text = this.generatePlainText();
+                    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `高鐵確認單_${this.baseInfo.orderId || '無單號'}.txt`;
+                    link.click();
+                    this.showToast('文字檔下載完成！');
+                },
+                copyText() {
+                    const text = this.generatePlainText();
+                    navigator.clipboard.writeText(text).then(() => {
+                        this.showToast('已複製到剪貼簿！');
+                    });
+                },
+                generatePlainText() {
+                    let txt = `【高鐵訂位確認單】\n`;
+                    txt += `訂單編號: ${this.baseInfo.orderId || '-'}\n`;
+                    txt += `開票期限: ${this.formattedDeadline}\n`;
+                    txt += `總計金額: TWD ${this.totalOrderAmount.toLocaleString()}\n\n`;
+                    
+                    this.addedTrips.forEach((t, i) => {
+                        txt += `--- ${t.type} (#${i+1}) ---\n`;
+                        txt += `訂位代號: ${t.hsrOrderId || '-'}\n`;
+                        txt += `搭乘日期: ${t.date.replace(/-/g, '/')}\n`;
+                        txt += `起訖站點: ${t.from} -> ${t.to}\n`;
+                        txt += `車次: ${t.trainNo}\n`;
+                        txt += `時間: ${t.depTime} - ${t.arrTime}\n`;
+                        txt += `票數: 全票${t.tickets.adult} 孩童${t.tickets.child} 敬老${t.tickets.senior} 愛心${t.tickets.disability}\n\n`;
+                    });
+                    return txt;
+                }
             }
         }).mount('#app');
     </script>
