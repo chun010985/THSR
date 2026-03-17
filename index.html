@@ -747,8 +747,13 @@
                     }
                 };
 
-                const baseInfo = reactive({ staff: '陳侑君', bookingDate: new Date().toISOString().split('T')[0], deadlineDate: '', deadlineTime: '18:00', sales: '', orderId: '', groupId: '' });
-                const tripForm = reactive({ hsrOrderId: '', pnr: '', date: '', carClass: '標準車廂', from: '台北', to: '左營', trainNo: '', depTime: '09:00', arrTime: '10:34' });
+                // 取得設備本地當天日期 (避免 toISOString 的 UTC 時差問題)
+                const getLocalDateString = (d = new Date()) => {
+                    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                };
+
+                const baseInfo = reactive({ staff: '陳侑君', bookingDate: getLocalDateString(), deadlineDate: '', deadlineTime: '18:00', sales: '', orderId: '', groupId: '' });
+                const tripForm = reactive({ hsrOrderId: '', pnr: '', date: getLocalDateString(), carClass: '標準車廂', from: '台北', to: '左營', trainNo: '', depTime: '09:00', arrTime: '10:34' });
                 const ticketForm = reactive({ adult: 0, child: 0, senior: 0, disability: 0 });
                 const passengerList = ref([]);
 
@@ -760,13 +765,24 @@
 
                 const calculateDeadline = () => {
                     if (!baseInfo.bookingDate) return;
-                    const bDate = new Date(baseInfo.bookingDate);
-                    let dDate = new Date(bDate); dDate.setDate(bDate.getDate() + 2);
-                    const day = bDate.getDay(); 
-                    const diff = day <= 5 ? 5-day : 5+(7-day);
-                    const friday = new Date(bDate); friday.setDate(bDate.getDate() + diff);
+                    
+                    // 完全使用本地時間解析，避開 toISOString 的時區漂移問題
+                    const [y, m, d] = baseInfo.bookingDate.split('-');
+                    const bDate = new Date(Number(y), Number(m) - 1, Number(d));
+                    
+                    let dDate = new Date(bDate); 
+                    dDate.setDate(bDate.getDate() + 2); // 規則 1：今天的 +2 天
+                    
+                    const day = bDate.getDay(); // 0 是週日, 6 是週六
+                    const diff = day <= 5 ? 5 - day : 5 + (7 - day); // 距離本週(或下週)五的天數
+                    
+                    const friday = new Date(bDate); 
+                    friday.setDate(bDate.getDate() + diff); // 當週的星期五
+                    
+                    // 規則 2：最多到當週的星期五 (如果 +2 天超過星期五，就強制壓在星期五)
                     const final = dDate > friday ? friday : dDate;
-                    baseInfo.deadlineDate = final.toISOString().split('T')[0];
+                    
+                    baseInfo.deadlineDate = getLocalDateString(final);
                 };
 
                 const swapStations = () => { const tmp = tripForm.from; tripForm.from = tripForm.to; tripForm.to = tmp; };
@@ -778,6 +794,7 @@
                 
                 const clearTripForm = () => { 
                     tripForm.pnr=''; ticketForm.adult=0; passengerList.value=[]; 
+                    tripForm.date = getLocalDateString(); // 重置表單時確保日期維持在今日
                     showToast('行程表單已重置');
                 };
 
@@ -829,6 +846,7 @@
 
                     Object.assign(ticketForm, { adult: 0, child: 0, senior: 0, disability: 0 });
                     passengerList.value = [];
+                    tripForm.date = getLocalDateString(); // 新增完後也重設回今日
                 };
 
                 const updateTripInList = () => {
@@ -844,6 +862,7 @@
                         breakdownText: getBreakdownText(ticketForm)
                     };
                     editingIndex.value = null; showToast("已更新");
+                    tripForm.date = getLocalDateString(); // 編輯完畢後重置為今日
                 };
                 
                 const importDepartureInfo = () => {
@@ -872,7 +891,10 @@
                 const totalTickets = computed(() => ticketForm.adult + ticketForm.child + ticketForm.senior + ticketForm.disability);
                 const totalOrderAmount = computed(() => addedTrips.value.reduce((s,t) => s + t.totalAmount, 0));
                 const formattedDeadline = computed(() => `${baseInfo.deadlineDate.replace(/-/g,'/')} ${baseInfo.deadlineTime}`);
-                const nowTimestamp = computed(() => new Date().toLocaleString('zh-TW', { hour12: false }));
+                
+                // 動態時間響應式綁定
+                const nowTime = ref(new Date());
+                const nowTimestamp = computed(() => nowTime.value.toLocaleString('zh-TW', { hour12: false }));
 
                 watch(ticketForm, (v) => syncPaxList(passengerList, v.adult+v.child+v.senior+v.disability, v), { deep: true });
                 watch(() => baseInfo.bookingDate, calculateDeadline);
@@ -991,23 +1013,22 @@
                     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
                     a.download = generateFileName('確認範本.txt'); a.click();
                 };
-                
-                const resetCurrentTripForm = () => {
-                    tripForm.pnr=''; ticketForm.adult=0; passengerList.value=[];
-                    showToast('行程表單已重置');
-                };
 
                 onMounted(() => {
                     calculateDeadline();
+                    // 讓預覽區的時間即時跳動更新
+                    setInterval(() => {
+                        nowTime.value = new Date();
+                    }, 1000);
                 });
 
                 return {
                     baseInfo, tripForm, ticketForm, passengerList, addedTrips, stations, maskId,
                     totalTickets, showPassengerModal, 
-                    totalOrderAmount, formattedDeadline, editingIndex, toastMsg, nowTimestamp: new Date().toLocaleString(),
+                    totalOrderAmount, formattedDeadline, editingIndex, toastMsg, nowTimestamp,
                     addTripToList, updateTripInList, startEdit, cancelEdit, removeTrip, hasDeparture, importDepartureInfo,
                     openPassengerModal, downloadImage, copyText, downloadTxt, clearBasicInfo, 
-                    clearTripForm: resetCurrentTripForm, swapStations, focusInput, staffInput, hsrIdInput
+                    clearTripForm, swapStations, focusInput, staffInput, hsrIdInput
                 };
             }
         }).mount('#app');
