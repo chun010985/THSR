@@ -389,11 +389,57 @@
         .footer-title { font-weight: 800; color: var(--j-theme-main); display: block; margin-bottom: 6px; font-size: 10px; letter-spacing: 0.1em; }
         .note-item { display: flex; align-items: flex-start; margin-bottom: 2px; }
         .note-num { width: 14px; flex-shrink: 0; font-weight: 700; color: var(--j-theme-main); }
+
+        /* =========================================
+           【新增】列印與輸出 PDF 專用 CSS
+           ========================================= */
+        @media print {
+            /* 隱藏所有操作介面 */
+            .no-print { display: none !important; }
+            
+            /* 重置網頁背景與邊距，強制印出顏色 */
+            body, html, #app {
+                background-color: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                height: auto !important;
+            }
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* 移除預覽區的深色背景與多餘的邊距，並讓它成為唯一可見區域 */
+            .preview-wrapper {
+                background: transparent !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                border: none !important;
+                display: block !important;
+            }
+
+            /* 確保產出大小剛好符合 A4，並移除陰影圓角 */
+            .doc-container {
+                width: 210mm !important;
+                min-height: 297mm !important;
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 auto !important;
+                padding: 15mm 20mm !important; /* A4 列印安全邊界 */
+            }
+
+            /* 設定紙張為 A4 */
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
     <div id="app" v-cloak class="max-w-6xl mx-auto">
-        <header class="mb-10 text-center">
+        <header class="mb-10 text-center no-print">
             <h1 class="text-3xl font-bold text-stone-700 tracking-wider font-serif">高鐵訂位確認單生成器</h1>
             <div class="flex items-center justify-center gap-2 mt-2">
                 <span class="h-[1px] w-8 bg-stone-300"></span>
@@ -402,11 +448,11 @@
             </div>
         </header>
 
-        <div v-if="toastMsg" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-stone-800 text-white px-6 py-3 rounded shadow-lg text-sm flex items-center gap-2 transition-all">
+        <div v-if="toastMsg" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-stone-800 text-white px-6 py-3 rounded shadow-lg text-sm flex items-center gap-2 transition-all no-print">
             <span class="w-2 h-2 bg-emerald-400 rounded-full"></span>{{ toastMsg }}
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start no-print">
               
             <div class="lg:col-span-8 space-y-6">
                 <!-- 基本資料卡片 -->
@@ -526,9 +572,17 @@
                             <span class="text-stone-500 font-bold text-sm">總金額</span>
                             <span class="text-2xl font-bold text-[#4a4a46] font-sans">${{ totalOrderAmount.toLocaleString() }}</span>
                         </div>
-                        <button @click="downloadImage" :disabled="addedTrips.length===0" class="w-full btn-primary py-3 mb-3 shadow-md font-bold text-sm flex items-center justify-center gap-2">
-                             下載圖片
-                        </button>
+                        <!-- 按鈕區 -->
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <button @click="downloadImage" :disabled="addedTrips.length===0" class="btn-primary py-2.5 shadow-sm font-bold text-[13px] flex items-center justify-center">
+                                下載圖片 (PNG)
+                            </button>
+                            <button @click="downloadPDF" :disabled="addedTrips.length===0" class="bg-[#1a202c] text-white py-2.5 rounded shadow-sm font-bold text-[13px] flex items-center justify-center hover:bg-black transition">
+                                下載 PDF (向量)
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-stone-400 text-center mb-3">💡 點選下載 PDF 後請選擇「另存為 PDF」以保留文字</p>
+                        
                         <div class="grid grid-cols-2 gap-3">
                             <button @click="downloadTxt" :disabled="addedTrips.length===0" class="btn-outline py-2 text-xs">下載文字</button>
                             <button @click="copyText" :disabled="addedTrips.length===0" class="btn-outline py-2 text-xs">複製文字</button>
@@ -539,7 +593,7 @@
         </div>
 
         <!-- 旅客名單 Modal -->
-        <div v-if="showPassengerModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div v-if="showPassengerModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print">
             <div class="bg-white rounded-lg w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl border border-[#e5e5e0]">
                 <div class="p-5 border-b border-[#e5e5e0] flex justify-between items-center bg-[#f7fafc] rounded-t-lg">
                     <h3 class="font-bold text-stone-700 flex items-center gap-2">
@@ -757,7 +811,7 @@
                 const ticketForm = reactive({ adult: 0, child: 0, senior: 0, disability: 0 });
                 const passengerList = ref([]);
 
-                const showToast = (msg) => { toastMsg.value = msg; setTimeout(() => { toastMsg.value = ''; }, 3000); };
+                const showToast = (msg) => { toastMsg.value = msg; setTimeout(() => { toastMsg.value = ''; }, 4500); };
                 const focusInput = (name) => {
                       if(name==='staff' && staffInput.value) staffInput.value.focus();
                       if(name==='hsrId' && hsrIdInput.value) hsrIdInput.value.focus();
@@ -922,9 +976,25 @@
                     return `${dateStr}_${hsrStr}${orderStr}${salesStr}_${suffix}`;
                 };
 
+                // === 下載 PDF 邏輯 (使用原生列印保留文字) ===
+                const downloadPDF = () => {
+                    showToast("準備產出 PDF！請在列印對話框的「目的地」選擇「另存為 PDF」。");
+                    
+                    // 暫時修改網頁標題，讓瀏覽器自動將預設檔名帶入為此標題
+                    const originalTitle = document.title;
+                    document.title = generateFileName('高鐵確認單');
+                    
+                    setTimeout(() => {
+                        window.print();
+                        // 開啟列印後將標題改回來
+                        document.title = originalTitle;
+                    }, 500);
+                };
+
                 // 下載圖片 
                 const downloadImage = () => {
                     const node = document.getElementById('image-node');
+                    showToast("圖片產生中...");
                     
                     html2canvas(node, { 
                         scale: 3, 
@@ -1027,7 +1097,7 @@
                     totalTickets, showPassengerModal, 
                     totalOrderAmount, formattedDeadline, editingIndex, toastMsg, nowTimestamp,
                     addTripToList, updateTripInList, startEdit, cancelEdit, removeTrip, hasDeparture, importDepartureInfo,
-                    openPassengerModal, downloadImage, copyText, downloadTxt, clearBasicInfo, 
+                    openPassengerModal, downloadImage, downloadPDF, copyText, downloadTxt, clearBasicInfo, 
                     clearTripForm, swapStations, focusInput, staffInput, hsrIdInput
                 };
             }
