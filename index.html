@@ -426,8 +426,17 @@
                 box-shadow: none !important;
                 border: none !important;
                 margin: 0 auto !important;
-                padding: 15mm 20mm !important; /* A4 列印安全邊界 */
+                padding: 10mm 15mm !important; /* 列印時縮小邊界，爭取更多單頁空間 */
             }
+
+            /* 避免行程區塊被從中間切斷，且微調間距讓單頁能塞下更多內容 */
+            .trip-container {
+                page-break-inside: avoid;
+                margin-bottom: 6px !important;
+            }
+            .notice-box { margin-bottom: 10px !important; padding: 8px 12px !important; }
+            .info-header-table { margin-bottom: 10px !important; }
+            .doc-header { margin-bottom: 12px !important; padding-bottom: 8px !important; }
 
             /* 設定紙張為 A4 */
             @page {
