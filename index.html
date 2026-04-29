@@ -134,11 +134,11 @@
             min-height: 1123px; 
             background-color: var(--j-bg-card);
             color: var(--j-text-doc);
-            line-height: 1.35;
+            line-height: 1.25; /* 縮減整體行高 */
             font-family: 'Yu Gothic', 'Microsoft JhengHei', 'Hiragino Sans', sans-serif; 
             position: relative;
             box-sizing: border-box;
-            padding: 35px 45px; 
+            padding: 20px 30px; /* 縮小邊界留白 */
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             display: flex;
             flex-direction: column;
@@ -148,12 +148,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 8px; /* 縮小間距 */
             border-bottom: 3px double var(--j-theme-main);
-            padding-bottom: 10px;
+            padding-bottom: 6px;
         }
         .doc-title {
-            font-size: 27px;
+            font-size: 24px; /* 標題微縮 */
             font-weight: 900;
             color: var(--j-theme-main); 
             letter-spacing: 0.2em;
@@ -162,27 +162,27 @@
             font-family: "MS Mincho", "Hiragino Mincho Pro", serif; 
         }
         .doc-subtitle {
-            font-size: 10px;
+            font-size: 9px;
             color: var(--j-theme-sub);
             font-weight: 600;
             letter-spacing: 3px;
             text-transform: uppercase;
-            margin-top: 6px;
+            margin-top: 4px;
         }
         .doc-meta { text-align: right; }
-        .doc-timestamp { font-size: 9px; color: var(--j-text-light); font-family: Consolas, monospace; }
+        .doc-timestamp { font-size: 8px; color: var(--j-text-light); font-family: Consolas, monospace; }
 
         .info-header-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 16px;
+            margin-bottom: 8px; /* 縮小間距 */
             border: 1px solid var(--j-border-table);
             table-layout: fixed;
             background: #fff;
         }
         .info-header-table td {
             border-right: 1px solid var(--j-border-table);
-            padding: 6px 4px;
+            padding: 3px 4px; /* 縮小 padding */
             vertical-align: middle;
             text-align: center;
         }
@@ -193,12 +193,12 @@
             font-size: 8px;
             color: var(--j-theme-sub);
             font-weight: 600;
-            margin-bottom: 3px;
+            margin-bottom: 1px;
             letter-spacing: 0.05em;
         }
         .info-header-value {
             display: block;
-            font-size: 10px;
+            font-size: 9px; /* 字體微縮 */
             font-weight: 800;
             color: var(--j-text-body);
             word-break: break-all;
@@ -208,24 +208,24 @@
         .notice-box {
             border: 1px dashed var(--j-theme-main); 
             background-color: var(--j-bg-body);
-            padding: 10px 15px; 
-            margin-bottom: 16px; 
-            font-size: 10px;
+            padding: 6px 10px; /* 縮小 padding */
+            margin-bottom: 8px; /* 縮小間距 */
+            font-size: 9px; /* 字體微縮 */
             color: var(--j-text-table);
             border-radius: 4px;
-            line-height: 1.6; 
+            line-height: 1.4; 
         }
         .notice-title { 
             font-weight: 900; 
-            margin-bottom: 4px; 
+            margin-bottom: 2px; 
             display: block; 
-            font-size: 11px;
+            font-size: 10px;
             color: var(--j-theme-main);
         }
         .checkbox-symbol { 
             font-family: sans-serif; 
             margin-right: 4px; 
-            font-size: 13px;
+            font-size: 11px;
             vertical-align: middle; 
             position: relative;
             top: -1px; 
@@ -233,23 +233,23 @@
         }
 
         .doc-section-header {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 900;
             color: #fff;
             background-color: var(--j-theme-main); 
-            padding: 6px 15px;
+            padding: 4px 15px;
             display: block;
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             border-radius: 4px;
             letter-spacing: 0.2em;
         }
 
         .trip-type-tab {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 900;
             color: #fff;
-            padding: 4px 14px;
+            padding: 3px 12px;
             display: inline-block;
             border-radius: 4px 4px 0 0;
             letter-spacing: 0.1em;
@@ -257,7 +257,7 @@
         }
 
         .trip-container {
-            margin-bottom: 10px; 
+            margin-bottom: 8px; 
             border: 1px solid var(--j-theme-main); 
             border-radius: 0 4px 4px 4px;
             overflow: hidden;
@@ -267,28 +267,28 @@
         .trip-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px; 
+            font-size: 9px; /* 字體微縮 */
             text-align: center;
-            line-height: 1.2; 
+            line-height: 1.15; 
             table-layout: fixed;
         }
         .trip-table th {
             background-color: var(--j-bg-th);
             color: var(--j-text-th);
             font-weight: 700;
-            padding: 3px 2px; 
+            padding: 2px 1px; /* 極致壓縮 padding */
             border-right: 1px solid var(--j-border-table);
             border-bottom: 1px solid var(--j-border-table);
             vertical-align: middle !important;
             letter-spacing: 0.02em;
-            font-size: 9px;
+            font-size: 8px;
         }
         .trip-table th:last-child { border-right: none; }
         
         .trip-table td {
             background-color: #fff;
             color: var(--j-text-table);
-            padding: 3px 2px; 
+            padding: 2px 1px; /* 極致壓縮 padding */
             border-right: 1px solid var(--j-border-table);
             border-bottom: 1px solid var(--j-border-table);
             font-weight: 600;
@@ -299,7 +299,7 @@
             font-family: "Courier New", Consolas, monospace; 
             font-weight: 900; 
             color: var(--j-theme-main); 
-            font-size: 11px; 
+            font-size: 10px; 
             letter-spacing: 0.05em;
         }
 
@@ -315,28 +315,28 @@
             font-weight: 700;
             font-size: 8px;
             border-bottom: 1px dashed var(--j-border);
-            padding: 3px 2px;
+            padding: 2px 1px; /* 極致壓縮 padding */
         }
         .fare-table td {
             background-color: #fafaf9;
             color: var(--j-text-table);
             font-family: Consolas, monospace;
-            font-size: 9px;
-            padding: 3px 2px;
+            font-size: 8.5px;
+            padding: 2px 1px; /* 極致壓縮 padding */
         }
         .fare-total-price {
             font-weight: 900;
             color: var(--j-theme-main);
-            font-size: 10px;
+            font-size: 9.5px;
         }
 
         .summary-bar {
             background-color: var(--j-bg-tag);
-            padding: 3px 12px; 
+            padding: 2px 10px; /* 壓縮 padding */
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 9px; 
+            font-size: 8px; 
             font-weight: 700;
             color: var(--j-text-th);
             border-top: 1px solid var(--j-border-table);
@@ -348,49 +348,49 @@
             border-collapse: collapse;
             table-layout: fixed;
             text-align: center;
-            line-height: 1.2; 
+            line-height: 1.1; 
         }
         .pax-table th {
             background-color: var(--j-bg-th);
             color: var(--j-text-th);
-            padding: 3px 2px; 
+            padding: 2px 1px; /* 極致壓縮 padding */
             font-weight: 800;
             border-bottom: 1px solid var(--j-border-table);
             border-right: 1px solid var(--j-border-table);
-            font-size: 9px; 
+            font-size: 8px; 
             text-align: center;
             vertical-align: middle !important;
         }
         .pax-table td {
-            padding: 3px 2px; 
+            padding: 2px 1px; /* 極致壓縮 padding */
             color: var(--j-text-table);
             border-bottom: 1px solid var(--j-border-table);
             border-right: 1px solid var(--j-border-table);
-            font-size: 10px; 
+            font-size: 9px; /* 字體微縮 */
             text-align: center;
             vertical-align: middle !important;
         }
 
         .grand-total {
             text-align: right;
-            margin-top: 8px;
-            padding-top: 8px;
+            margin-top: 4px;
+            padding-top: 6px;
             border-top: 2px solid var(--j-theme-main);
         }
-        .total-label { font-size: 11px; color: var(--j-theme-sub); font-weight: 700; margin-right: 12px; letter-spacing: 0.1em; }
-        .total-value { font-size: 28px; font-weight: 900; color: var(--j-theme-main); font-family: 'Arial', sans-serif; letter-spacing: -0.02em; }
+        .total-label { font-size: 10px; color: var(--j-theme-sub); font-weight: 700; margin-right: 12px; letter-spacing: 0.1em; }
+        .total-value { font-size: 24px; font-weight: 900; color: var(--j-theme-main); font-family: 'Arial', sans-serif; letter-spacing: -0.02em; }
 
         .warning-text {
             color: #9b2c2c;
             background-color: #fff5f5;
             border: 1px solid #fc8181;
             font-weight: 800;
-            margin-top: 12px;
-            margin-bottom: 12px;
-            padding: 10px 14px;
+            margin-top: 6px;
+            margin-bottom: 6px;
+            padding: 6px 10px; /* 壓縮 padding */
             display: block;
-            font-size: 10px;
-            line-height: 1.5;
+            font-size: 9px;
+            line-height: 1.4;
             text-align: center;
             border-radius: 4px;
         }
@@ -401,8 +401,8 @@
         .footer-section {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 6px; /* 縮小區塊間距 */
+            margin-top: 4px;
         }
 
         .risk-notice-box {
@@ -416,14 +416,14 @@
             background-color: #fed7d7;
             color: #9b2c2c;
             font-weight: 900;
-            font-size: 10px;
-            padding: 4px 10px;
+            font-size: 9px;
+            padding: 3px 8px;
             letter-spacing: 0.05em;
         }
         .risk-content {
-            padding: 6px 10px;
-            font-size: 9px;
-            line-height: 1.6;
+            padding: 4px 8px;
+            font-size: 8px;
+            line-height: 1.4;
             color: #742a2a;
         }
 
@@ -437,8 +437,8 @@
             background-color: var(--j-bg-th);
             color: var(--j-theme-main);
             font-weight: 900;
-            font-size: 10px;
-            padding: 5px 10px;
+            font-size: 9px;
+            padding: 4px 8px;
             letter-spacing: 0.1em;
             border-bottom: 1px solid var(--j-border-table);
             display: flex;
@@ -446,15 +446,15 @@
             gap: 6px;
         }
         .rules-content {
-            padding: 8px 10px;
+            padding: 4px 8px;
         }
         .rule-item {
             display: flex;
             align-items: flex-start;
-            margin-bottom: 4px;
-            font-size: 9px;
+            margin-bottom: 2px; /* 縮小列距 */
+            font-size: 8px; /* 縮小字體 */
             color: var(--j-text-table);
-            line-height: 1.5;
+            line-height: 1.4;
         }
         .rule-item:last-child {
             margin-bottom: 0;
@@ -462,16 +462,16 @@
         .rule-num {
             background-color: var(--j-theme-sub);
             color: #fff;
-            font-size: 8px;
+            font-size: 7px;
             font-weight: bold;
-            width: 12px;
-            height: 12px;
+            width: 11px;
+            height: 11px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-shrink: 0;
-            margin-right: 6px;
+            margin-right: 4px;
             margin-top: 1px;
         }
 
@@ -507,16 +507,16 @@
                 box-shadow: none !important;
                 border: none !important;
                 margin: 0 auto !important;
-                padding: 10mm 15mm !important; 
+                padding: 8mm 12mm !important; /* 極致縮小列印邊界，爭取最大空間 */
             }
 
             .trip-container {
                 page-break-inside: avoid;
-                margin-bottom: 6px !important;
+                margin-bottom: 4px !important;
             }
-            .notice-box { margin-bottom: 10px !important; padding: 8px 12px !important; }
-            .info-header-table { margin-bottom: 10px !important; }
-            .doc-header { margin-bottom: 12px !important; padding-bottom: 8px !important; }
+            .notice-box { margin-bottom: 6px !important; padding: 4px 8px !important; }
+            .info-header-table { margin-bottom: 6px !important; }
+            .doc-header { margin-bottom: 6px !important; padding-bottom: 4px !important; }
 
             @page {
                 size: A4 portrait;
@@ -753,7 +753,7 @@
                 <div class="doc-section-header">訂位明細</div>
 
                 <!-- 這裡開始是迴圈，每個行程都是獨立的表格 -->
-                <div v-for="(trip, idx) in addedTrips" :key="idx" style="margin-bottom: 10px;">
+                <div v-for="(trip, idx) in addedTrips" :key="idx" style="margin-bottom: 6px;">
                     <div class="trip-type-tab" :style="{ backgroundColor: trip.type === '去程' ? 'var(--j-theme-main)' : 'var(--j-theme-sub)' }">
                         {{ trip.type }}
                     </div>
@@ -1101,14 +1101,14 @@
                         onclone: (clonedDoc) => {
                             const style = clonedDoc.createElement('style');
                             style.innerHTML = `
-                                /* 針對壓縮版型重新調校 html2canvas 的 padding 偏移 */
-                                .trip-table td, .trip-table th, .pax-table td, .pax-table th { padding-top: 0px !important; padding-bottom: 5px !important; }
-                                .fare-table th, .fare-table td { padding-top: 0px !important; padding-bottom: 4px !important; }
-                                .info-header-table td { padding-top: 2px !important; padding-bottom: 8px !important; }
-                                .summary-bar { padding-top: 1px !important; padding-bottom: 5px !important; }
-                                .info-header-value, .info-header-label, .total-value, .doc-title, .doc-subtitle, .doc-section-header, .warning-text, .trip-type-tab, .risk-header, .rules-header { transform: translateY(-1px); }
-                                .checkbox-symbol { top: -2px !important; }
-                                .rule-num { transform: translateY(-1px); }
+                                /* 針對極致壓縮版型重新調校 html2canvas 的 padding 偏移 */
+                                .trip-table td, .trip-table th, .pax-table td, .pax-table th { padding-top: 0px !important; padding-bottom: 3px !important; }
+                                .fare-table th, .fare-table td { padding-top: 0px !important; padding-bottom: 3px !important; }
+                                .info-header-table td { padding-top: 1px !important; padding-bottom: 4px !important; }
+                                .summary-bar { padding-top: 0px !important; padding-bottom: 3px !important; }
+                                .info-header-value, .info-header-label, .total-value, .doc-title, .doc-subtitle, .doc-section-header, .warning-text, .trip-type-tab, .risk-header, .rules-header { transform: translateY(0px); }
+                                .checkbox-symbol { top: -1px !important; }
+                                .rule-num { transform: translateY(0px); }
                             `;
                             clonedDoc.body.appendChild(style);
                         }
