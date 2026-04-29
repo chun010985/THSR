@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>五福旅遊高鐵訂位確認單 - 現代專業版</title>
+    <title>高鐵訂位業務確認單 - 現代專業版</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -139,33 +139,34 @@
         }
 
         /* =========================================
-           【圖檔文件本體樣式 - 安全的 A4 尺寸設定 & 極限壓縮】
+           【圖檔文件本體樣式 - 安全的 A4 尺寸設定 & 適度壓縮】
            ========================================= */
         .doc-container {
             width: 794px;
             min-height: 1123px; 
             background-color: var(--m-bg-card);
             color: var(--m-text-main);
-            line-height: 1.25; 
+            line-height: 1.25; /* 適度縮減整體行高 */
             font-family: 'Yu Gothic', 'Microsoft JhengHei', 'Hiragino Sans', sans-serif; 
             position: relative;
             box-sizing: border-box;
-            padding: 20px 25px; /* 進一步縮減左右邊界 */
+            padding: 30px 45px; /* 恢復舒適的邊界留白 */
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
+            justify-content: flex-start; /* 確保內容由上往下排列不亂跑 */
         }
 
         .doc-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            margin-bottom: 8px; 
+            margin-bottom: 10px; 
             border-bottom: 3px solid var(--m-primary);
             padding-bottom: 6px;
         }
         .doc-title {
-            font-size: 22px; 
+            font-size: 24px; /* 恢復清晰大標題 */
             font-weight: 900;
             color: var(--m-primary); 
             letter-spacing: 0.15em;
@@ -173,7 +174,7 @@
             line-height: 1;
         }
         .doc-subtitle {
-            font-size: 8px;
+            font-size: 8.5px;
             color: var(--m-secondary);
             font-weight: 600;
             letter-spacing: 2px;
@@ -181,13 +182,13 @@
             margin-top: 4px;
         }
         .doc-meta { text-align: right; }
-        .doc-timestamp { font-size: 8px; color: var(--m-text-muted); font-family: Consolas, monospace; }
+        .doc-timestamp { font-size: 8.5px; color: var(--m-text-muted); font-family: Consolas, monospace; }
 
         /* 基本資訊表改為無邊框、帶背景的現代設計 */
         .info-header-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 8px;
+            margin-bottom: 10px; 
             background: var(--m-bg-input);
             border-radius: 6px;
             overflow: hidden;
@@ -196,7 +197,7 @@
         }
         .info-header-table td {
             border-right: 1px dashed var(--m-border-dark);
-            padding: 4px 6px;
+            padding: 5px 6px; /* 舒適 padding */
             vertical-align: middle;
             text-align: center;
         }
@@ -204,15 +205,15 @@
         
         .info-header-label {
             display: block;
-            font-size: 8px;
+            font-size: 8.5px;
             color: var(--m-secondary);
             font-weight: 700;
-            margin-bottom: 1px;
+            margin-bottom: 2px;
             letter-spacing: 0.05em;
         }
         .info-header-value {
             display: block;
-            font-size: 9px;
+            font-size: 9.5px;
             font-weight: 900;
             color: var(--m-text-main);
             word-break: break-all;
@@ -222,9 +223,9 @@
         .notice-box {
             border-left: 3px solid var(--m-primary-light); 
             background-color: var(--m-bg-tag);
-            padding: 6px 10px; 
-            margin-bottom: 8px; 
-            font-size: 9px; 
+            padding: 6px 12px; 
+            margin-bottom: 10px; 
+            font-size: 9.5px; 
             color: var(--m-text-body);
             border-radius: 0 4px 4px 0;
             line-height: 1.4; 
@@ -233,13 +234,13 @@
             font-weight: 900; 
             margin-bottom: 2px; 
             display: block; 
-            font-size: 10px;
+            font-size: 10.5px;
             color: var(--m-primary);
         }
         .checkbox-symbol { 
             font-family: sans-serif; 
-            margin-right: 4px; 
-            font-size: 11px;
+            margin-right: 3px; 
+            font-size: 12px;
             vertical-align: middle; 
             position: relative;
             top: -1px; 
@@ -247,13 +248,13 @@
         }
 
         .doc-section-header {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 900;
             color: var(--m-primary);
             display: flex;
             align-items: center;
             gap: 6px;
-            margin-bottom: 8px;
+            margin-bottom: 8px; 
             letter-spacing: 0.1em;
             border-bottom: 1px solid var(--m-border);
             padding-bottom: 4px;
@@ -261,22 +262,22 @@
         .doc-section-header::before {
             content: '';
             display: inline-block;
-            width: 6px;
+            width: 5px;
             height: 12px;
             background-color: var(--m-primary-light);
             border-radius: 2px;
         }
 
         .trip-container {
-            margin-bottom: 8px; 
+            margin-bottom: 10px; 
             border: 1px solid var(--m-border-dark); 
-            border-radius: 6px;
+            border-radius: 4px;
             overflow: hidden;
             background: #fff;
         }
         
         .trip-type-tab {
-            font-size: 9px;
+            font-size: 9.5px;
             font-weight: 900;
             color: #fff;
             padding: 4px 12px;
@@ -298,19 +299,20 @@
             background-color: var(--m-bg-th);
             color: var(--m-secondary);
             font-weight: 800;
-            padding: 2px 1px; /* 極致壓縮 padding */
+            padding: 3px 2px; /* 舒適 padding */
             border-bottom: 1px solid var(--m-border-dark);
             vertical-align: middle !important;
-            letter-spacing: 0.02em;
-            font-size: 8px;
+            letter-spacing: 0.01em;
+            font-size: 8.5px;
         }
         
         .trip-table td, .fare-table td, .pax-table td {
             color: var(--m-text-body);
-            padding: 2px 1px; /* 極致壓縮 padding */
+            padding: 3px 2px; /* 舒適 padding */
             border-bottom: 1px dashed var(--m-border);
             font-weight: 600;
             vertical-align: middle !important;
+            font-size: 9.5px;
         }
         
         /* 移除最後一列的底部虛線 */
@@ -320,21 +322,21 @@
             font-family: "Courier New", Consolas, monospace; 
             font-weight: 900; 
             color: var(--m-primary); 
-            font-size: 10px; 
-            letter-spacing: 0.05em;
+            font-size: 10.5px; 
+            letter-spacing: 0.02em;
         }
 
         .fare-table th { background-color: #fff; border-top: 1px dashed var(--m-border); border-bottom: 1px dashed var(--m-border); }
-        .fare-table td { background-color: #fff; font-family: Consolas, monospace; font-size: 8.5px; }
-        .fare-total-price { font-weight: 900; color: var(--m-primary); font-size: 9.5px; }
+        .fare-table td { background-color: #fff; font-family: Consolas, monospace; font-size: 9.5px; }
+        .fare-total-price { font-weight: 900; color: var(--m-primary); font-size: 10px; }
 
         .summary-bar {
             background-color: var(--m-bg-tag);
-            padding: 2px 10px; 
+            padding: 3px 12px; 
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 8px; 
+            font-size: 9px; 
             font-weight: 700;
             color: var(--m-primary);
             border-top: 1px solid var(--m-border-dark);
@@ -343,19 +345,18 @@
 
         /* 旅客表格加入輕微斑馬紋，因為沒有垂直線 */
         .pax-table tbody tr:nth-child(even) { background-color: var(--m-bg-input); }
-        .pax-table td { font-size: 9px; }
-
+        
         .grand-total {
             text-align: right;
-            margin-top: 4px;
-            padding-top: 6px;
+            margin-top: 6px;
+            padding-top: 8px;
             border-top: 2px solid var(--m-primary);
             display: flex;
             justify-content: flex-end;
             align-items: baseline;
             gap: 12px;
         }
-        .total-label { font-size: 10px; color: var(--m-secondary); font-weight: 800; letter-spacing: 0.1em; }
+        .total-label { font-size: 11px; color: var(--m-secondary); font-weight: 800; letter-spacing: 0.1em; }
         .total-value { font-size: 24px; font-weight: 900; color: var(--m-primary); font-family: 'Arial', sans-serif; letter-spacing: -0.02em; }
 
         .warning-text {
@@ -365,9 +366,9 @@
             font-weight: 800;
             margin-top: 6px;
             margin-bottom: 6px;
-            padding: 6px 10px; 
+            padding: 8px 12px; 
             display: block;
-            font-size: 9px;
+            font-size: 9.5px;
             line-height: 1.4;
             text-align: center;
             border-radius: 6px;
@@ -379,7 +380,7 @@
         .footer-section {
             display: flex;
             flex-direction: column;
-            gap: 6px; 
+            gap: 8px; 
             margin-top: 4px;
         }
 
@@ -394,13 +395,13 @@
             background-color: #ffe4e6;
             color: #be123c;
             font-weight: 900;
-            font-size: 9px;
-            padding: 3px 8px;
+            font-size: 9.5px;
+            padding: 4px 10px;
             letter-spacing: 0.05em;
         }
         .risk-content {
-            padding: 4px 8px;
-            font-size: 8px;
+            padding: 6px 10px;
+            font-size: 9px;
             line-height: 1.4;
             color: #881337;
         }
@@ -415,8 +416,8 @@
             background-color: var(--m-bg-th);
             color: var(--m-text-main);
             font-weight: 900;
-            font-size: 9px;
-            padding: 4px 8px;
+            font-size: 9.5px;
+            padding: 4px 10px;
             letter-spacing: 0.1em;
             border-bottom: 1px solid var(--m-border);
             display: flex;
@@ -424,30 +425,30 @@
             gap: 6px;
         }
         .rules-content {
-            padding: 4px 8px;
+            padding: 6px 10px;
         }
         .rule-item {
             display: flex;
             align-items: flex-start;
-            margin-bottom: 2px; 
-            font-size: 8px; 
+            margin-bottom: 3px; 
+            font-size: 8.5px; 
             color: var(--m-text-body);
-            line-height: 1.4;
+            line-height: 1.35;
         }
         .rule-item:last-child { margin-bottom: 0; }
         .rule-num {
             background-color: var(--m-secondary);
             color: #fff;
-            font-size: 7px;
+            font-size: 7.5px;
             font-weight: bold;
-            width: 11px;
-            height: 11px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-shrink: 0;
-            margin-right: 4px;
+            margin-right: 5px;
             margin-top: 1px;
         }
 
@@ -484,7 +485,7 @@
                 box-shadow: none !important;
                 border: none !important;
                 margin: 0 auto !important;
-                padding: 8mm 12mm !important; /* 極致縮小列印邊界，爭取最大空間 */
+                padding: 10mm 15mm !important; /* 舒適的列印邊界 */
             }
 
             .trip-container {
@@ -494,6 +495,7 @@
             .notice-box { margin-bottom: 6px !important; padding: 4px 8px !important; }
             .info-header-table { margin-bottom: 6px !important; }
             .doc-header { margin-bottom: 6px !important; padding-bottom: 4px !important; }
+            .doc-section-header { margin-bottom: 6px !important; }
 
             @page {
                 size: A4 portrait;
@@ -693,7 +695,7 @@
             <div id="image-node" class="doc-container">
                 <div class="doc-header">
                     <div>
-                        <h1 class="doc-title">五福旅遊高鐵訂位業務確認單</h1>
+                        <h1 class="doc-title">高鐵訂位業務確認單</h1>
                         <div class="doc-subtitle">BOOKING CONFIRMATION</div>
                     </div>
                     <div class="doc-meta">
@@ -805,7 +807,7 @@
                     <span class="total-value">NT$ {{ totalOrderAmount.toLocaleString() }}</span>
                 </div>
                 
-                <div class="mt-auto">
+                <div style="margin-top: 16px;"> <!-- 修正巨大空格，給予適當舒適間距 -->
                     <strong class="warning-text">
                         請業務們務必再次核對 票種/張數/金額 是否正確，如有錯誤 請於「出票前」告知，出票後告知請自行負責。<br>
                         高鐵訂票服務窗口感謝您的配合。
@@ -1058,7 +1060,7 @@
                 const downloadPDF = () => {
                     showToast("準備產出 PDF！請在列印對話框的「目的地」選擇「另存為 PDF」。");
                     const originalTitle = document.title;
-                    document.title = generateFileName('五福旅遊高鐵確認單');
+                    document.title = generateFileName('高鐵業務確認單');
                     
                     setTimeout(() => {
                         window.print();
@@ -1078,26 +1080,26 @@
                         onclone: (clonedDoc) => {
                             const style = clonedDoc.createElement('style');
                             style.innerHTML = `
-                                /* 針對極致壓縮版型重新調校 html2canvas 的 padding 偏移 */
-                                .trip-table td, .trip-table th, .pax-table td, .pax-table th { padding-top: 0px !important; padding-bottom: 3px !important; }
-                                .fare-table th, .fare-table td { padding-top: 0px !important; padding-bottom: 3px !important; }
-                                .info-header-table td { padding-top: 1px !important; padding-bottom: 4px !important; }
-                                .summary-bar { padding-top: 0px !important; padding-bottom: 3px !important; }
-                                .info-header-value, .info-header-label, .total-value, .doc-title, .doc-subtitle, .doc-section-header, .warning-text, .trip-type-tab, .risk-header, .rules-header { transform: translateY(0px); }
-                                .checkbox-symbol { top: -1px !important; }
-                                .rule-num { transform: translateY(0px); }
+                                /* 針對重新調整的舒適版型調校 html2canvas 的 padding 偏移 */
+                                .trip-table td, .trip-table th, .pax-table td, .pax-table th { padding-top: 1px !important; padding-bottom: 4px !important; }
+                                .fare-table th, .fare-table td { padding-top: 1px !important; padding-bottom: 4px !important; }
+                                .info-header-table td { padding-top: 2px !important; padding-bottom: 5px !important; }
+                                .summary-bar { padding-top: 1px !important; padding-bottom: 4px !important; }
+                                .info-header-value, .info-header-label, .total-value, .doc-title, .doc-subtitle, .doc-section-header, .warning-text, .trip-type-tab, .risk-header, .rules-header { transform: translateY(-1px); }
+                                .checkbox-symbol { top: -2px !important; }
+                                .rule-num { transform: translateY(-1px); }
                             `;
                             clonedDoc.body.appendChild(style);
                         }
                     }).then(canvas => {
                         const a = document.createElement('a'); a.href = canvas.toDataURL("image/png");
-                        a.download = generateFileName('五福旅遊高鐵確認單.png'); a.click();
+                        a.download = generateFileName('高鐵業務確認單.png'); a.click();
                         showToast("圖檔下載成功");
                     });
                 };
 
                 const copyText = () => {
-                    let txt = `【五福旅遊高鐵訂位業務確認單】\n\n開票期限：${formattedDeadline.value}\n\n開票說明：\n請於D/L前通知 可開票 與 取票方式\n逾期將自動取消需重新訂票\n每筆訂位代碼，統一取票方式\n\n請業務們務必再次核對 票種/張數/金額 是否正確\n如有錯誤 請於「出票前」告知，出票後告知請自行負責。\n高鐵訂票服務窗口感謝您的配合。\n\n------------------\n\n`;
+                    let txt = `【高鐵訂位業務確認單】\n\n開票期限：${formattedDeadline.value}\n\n開票說明：\n請於D/L前通知 可開票 與 取票方式\n逾期將自動取消需重新訂票\n每筆訂位代碼，統一取票方式\n\n請業務們務必再次核對 票種/張數/金額 是否正確\n如有錯誤 請於「出票前」告知，出票後告知請自行負責。\n高鐵訂票服務窗口感謝您的配合。\n\n------------------\n\n`;
                     
                     addedTrips.value.forEach((t, i) => {
                         const matrix = t.carClass === '商務車廂' ? fareRules.business : fareRules.standard;
