@@ -7,6 +7,8 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- 引入 Tesseract.js (前端 OCR 引擎) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     
     <style>
         /* =========================================
@@ -146,15 +148,15 @@
             min-height: 1123px; 
             background-color: var(--m-bg-card);
             color: var(--m-text-main);
-            line-height: 1.25; /* 適度縮減整體行高 */
+            line-height: 1.25; 
             font-family: 'Yu Gothic', 'Microsoft JhengHei', 'Hiragino Sans', sans-serif; 
             position: relative;
             box-sizing: border-box;
-            padding: 30px 45px; /* 恢復舒適的邊界留白 */
+            padding: 30px 45px; 
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* 確保內容由上往下排列不亂跑 */
+            justify-content: flex-start; 
         }
 
         .doc-header {
@@ -166,7 +168,7 @@
             padding-bottom: 6px;
         }
         .doc-title {
-            font-size: 24px; /* 恢復清晰大標題 */
+            font-size: 24px; 
             font-weight: 900;
             color: var(--m-primary); 
             letter-spacing: 0.15em;
@@ -197,7 +199,7 @@
         }
         .info-header-table td {
             border-right: 1px dashed var(--m-border-dark);
-            padding: 5px 6px; /* 舒適 padding */
+            padding: 5px 6px; 
             vertical-align: middle;
             text-align: center;
         }
@@ -224,7 +226,7 @@
             border-left: 3px solid var(--m-primary-light); 
             background-color: var(--m-bg-tag);
             padding: 6px 12px; 
-            margin-bottom: 10px; 
+            margin-bottom: 8px; 
             font-size: 9.5px; 
             color: var(--m-text-body);
             border-radius: 0 4px 4px 0;
@@ -245,6 +247,30 @@
             position: relative;
             top: -1px; 
             color: var(--m-primary);
+        }
+
+        /* 參團加購高鐵風險告知 */
+        .risk-notice-box {
+            background-color: #fff1f2;
+            border: 1px solid #fecdd3;
+            border-left: 4px solid var(--m-accent-red);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .risk-header {
+            background-color: #ffe4e6;
+            color: #be123c;
+            font-weight: 900;
+            font-size: 9.5px;
+            padding: 4px 10px;
+            letter-spacing: 0.05em;
+        }
+        .risk-content {
+            padding: 6px 10px;
+            font-size: 9px;
+            line-height: 1.4;
+            color: #881337;
         }
 
         .doc-section-header {
@@ -299,7 +325,7 @@
             background-color: var(--m-bg-th);
             color: var(--m-secondary);
             font-weight: 800;
-            padding: 3px 2px; /* 舒適 padding */
+            padding: 3px 2px; 
             border-bottom: 1px solid var(--m-border-dark);
             vertical-align: middle !important;
             letter-spacing: 0.01em;
@@ -308,7 +334,7 @@
         
         .trip-table td, .fare-table td, .pax-table td {
             color: var(--m-text-body);
-            padding: 3px 2px; /* 舒適 padding */
+            padding: 3px 2px; 
             border-bottom: 1px dashed var(--m-border);
             font-weight: 600;
             vertical-align: middle !important;
@@ -375,35 +401,13 @@
         }
 
         /* ====================
-           底部注意事項與風險告知
+           底部注意事項
            ==================== */
         .footer-section {
             display: flex;
             flex-direction: column;
             gap: 8px; 
             margin-top: 4px;
-        }
-
-        .risk-notice-box {
-            background-color: #fff1f2;
-            border: 1px solid #fecdd3;
-            border-left: 4px solid var(--m-accent-red);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        .risk-header {
-            background-color: #ffe4e6;
-            color: #be123c;
-            font-weight: 900;
-            font-size: 9.5px;
-            padding: 4px 10px;
-            letter-spacing: 0.05em;
-        }
-        .risk-content {
-            padding: 6px 10px;
-            font-size: 9px;
-            line-height: 1.4;
-            color: #881337;
         }
 
         .rules-box {
@@ -492,10 +496,11 @@
                 page-break-inside: avoid;
                 margin-bottom: 4px !important;
             }
-            .notice-box { margin-bottom: 6px !important; padding: 4px 8px !important; }
+            .notice-box { margin-bottom: 5px !important; padding: 4px 8px !important; }
+            .risk-notice-box { margin-bottom: 5px !important; }
             .info-header-table { margin-bottom: 6px !important; }
             .doc-header { margin-bottom: 6px !important; padding-bottom: 4px !important; }
-            .doc-section-header { margin-bottom: 6px !important; }
+            .doc-section-header { margin-bottom: 5px !important; }
 
             @page {
                 size: A4 portrait;
@@ -507,7 +512,7 @@
 <body class="p-4 md:p-8">
     <div id="app" v-cloak class="max-w-6xl mx-auto">
         <header class="mb-10 text-center no-print">
-            <h1 class="text-3xl font-bold text-slate-800 tracking-wider font-serif">高鐵訂位確認單生成器</h1>
+            <h1 class="text-3xl font-bold text-slate-800 tracking-wider font-serif">高鐵訂位業務確認單</h1>
             <div class="flex items-center justify-center gap-2 mt-2">
                 <span class="h-[1px] w-8 bg-slate-300"></span>
                 <p class="text-blue-500 font-bold text-xs tracking-[0.2em] uppercase">Professional Slip Generator</p>
@@ -545,17 +550,31 @@
                 </div>
 
                 <!-- 行程設定卡片 -->
-                <div class="modern-card p-6 md:p-8 relative">
-                    <div v-if="editingIndex !== null" class="absolute top-6 right-8 bg-amber-500 text-white px-4 py-1 text-xs font-bold rounded-full shadow-md animate-pulse">編輯模式中</div>
+                <div class="modern-card p-6 md:p-8 relative overflow-hidden">
+                    <!-- OCR 處理中的遮罩 -->
+                    <div v-if="isOcrProcessing" class="absolute inset-0 bg-white/90 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center border border-blue-200">
+                        <svg class="animate-spin h-10 w-10 text-blue-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <p class="font-bold text-blue-800 tracking-wider">AI 智能影像辨識中...</p>
+                        <p class="text-xs text-blue-600 mt-2 font-mono">{{ ocrProgress }}</p>
+                    </div>
+
+                    <div v-if="editingIndex !== null" class="absolute top-6 right-8 bg-amber-500 text-white px-4 py-1 text-xs font-bold rounded-full shadow-md animate-pulse z-0">編輯模式中</div>
+                    
                     <div class="flex justify-between items-center mb-8">
                         <h2 class="section-title">行程詳細設定</h2>
-                        <div class="flex items-center gap-4">
-                            <button @click="focusInput('hsrId')" class="btn-outline px-3 py-1 text-xs border-none font-bold bg-slate-100 hover:bg-slate-200">✎ 編輯 ID</button>
+                        <div class="flex items-center gap-3">
+                            <button @click="triggerOCRFromClipboard" class="btn-outline px-3 py-1 text-xs border-blue-200 text-blue-700 bg-blue-50 font-bold hover:bg-blue-100 flex items-center gap-1">
+                                <span>📸</span> 智能辨識截圖 (OCR)
+                            </button>
                             <button @click="clearTripForm" class="btn-outline px-3 py-1 text-xs border-none text-rose-600 font-bold hover:bg-rose-50 hover:text-rose-700">🗑 重置表單</button>
                         </div>
                     </div>
 
-                    <div class="space-y-8">
+                    <div class="text-xs text-slate-500 mb-4 flex items-center gap-2">
+                        <span class="text-amber-500">💡</span> <b>小秘訣：</b>您也可以在網頁任何地方直接按 <kbd class="bg-slate-100 border border-slate-300 px-1 rounded">Ctrl</kbd> + <kbd class="bg-slate-100 border border-slate-300 px-1 rounded">V</kbd> 貼上高鐵截圖，自動為您填表！
+                    </div>
+
+                    <div class="space-y-8 relative z-0">
                         <!-- 行程資訊 (通用表單) -->
                         <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl">
                             <span class="text-[11px] bg-blue-100 text-blue-800 px-3 py-1 rounded font-bold uppercase mb-4 inline-block tracking-widest border border-blue-200">Trip Details</span>
@@ -641,7 +660,6 @@
                             <span class="text-slate-600 font-bold text-sm">總金額</span>
                             <span class="text-2xl font-black text-slate-800 font-sans">${{ totalOrderAmount.toLocaleString() }}</span>
                         </div>
-                        <!-- 按鈕區 -->
                         <div class="grid grid-cols-2 gap-2 mb-3">
                             <button @click="downloadImage" :disabled="addedTrips.length===0" class="btn-primary py-2.5 shadow-md font-bold text-[13px] flex items-center justify-center">
                                 下載圖片 (PNG)
@@ -690,7 +708,6 @@
             </div>
         </div>
 
-        <!-- 預覽區 (列印區) -->
         <div class="preview-wrapper">
             <div id="image-node" class="doc-container">
                 <div class="doc-header">
@@ -729,10 +746,17 @@
                     </div>
                 </div>
 
+                <div class="risk-notice-box">
+                    <div class="risk-header">⚠️ 參團加購高鐵風險告知</div>
+                    <div class="risk-content">
+                        若因航班延誤或取消導致無法搭乘高鐵，除「因台灣本土天災導致班機異動」可受理退改票外，其餘非高鐵因素（包含國外天災、當地氣候惡劣、航空公司調度等），恕皆無法辦理改期或退票。<br>
+                        <span style="color: #be123c; font-weight: bold; display: inline-block; margin-top: 2px;">☑️ 若客人無法接受此風險，請勿加購高鐵票；購買即代表已了解並同意承擔風險。</span>
+                    </div>
+                </div>
+
                 <div class="doc-section-header">訂位明細</div>
 
-                <!-- 這裡開始是迴圈，每個行程都是獨立的表格 -->
-                <div v-for="(trip, idx) in addedTrips" :key="idx" style="margin-bottom: 6px;">
+                <div v-for="(trip, idx) in addedTrips" :key="idx" style="margin-bottom: 10px;">
                     <div class="trip-type-tab" :style="{ backgroundColor: trip.type === '去程' ? 'var(--m-primary)' : 'var(--m-secondary)' }">
                         {{ trip.type }}
                     </div>
@@ -800,30 +824,18 @@
                         </table>
                     </div>
                 </div>
-                <!-- 迴圈結束 -->
-
                 <div class="grand-total">
                     <span class="total-label">總計應收金額</span>
                     <span class="total-value">NT$ {{ totalOrderAmount.toLocaleString() }}</span>
                 </div>
                 
-                <div style="margin-top: 16px;"> <!-- 修正巨大空格，給予適當舒適間距 -->
+                <div style="margin-top: 16px;">
                     <strong class="warning-text">
                         請業務們務必再次核對 票種/張數/金額 是否正確，如有錯誤 請於「出票前」告知，出票後告知請自行負責。<br>
                         高鐵訂票服務窗口感謝您的配合。
                     </strong>
 
                     <div class="footer-section">
-                        <!-- 參團加購高鐵風險告知 -->
-                        <div class="risk-notice-box">
-                            <div class="risk-header">⚠️ 參團加購高鐵風險告知</div>
-                            <div class="risk-content">
-                                若因航班延誤或取消導致無法搭乘高鐵，除「因台灣本土天災導致班機異動」可受理退改票外，其餘非高鐵因素（包含國外天災、當地氣候惡劣、航空公司調度等），恕皆無法辦理改期或退票。<br>
-                                <span style="color: #be123c; font-weight: bold; display: inline-block; margin-top: 2px;">☑️ 若客人無法接受此風險，請勿加購高鐵票；購買即代表已了解並同意承擔風險。</span>
-                            </div>
-                        </div>
-
-                        <!-- 高鐵注意事項與改/退票說明 -->
                         <div class="rules-box">
                             <div class="rules-header">
                                 <span style="display:inline-block; width:3px; height:10px; background:var(--m-primary); border-radius:2px;"></span>
@@ -845,7 +857,7 @@
     </div>
 
     <script>
-        const { createApp, ref, reactive, computed, watch, onMounted } = Vue;
+        const { createApp, ref, reactive, computed, watch, onMounted, onUnmounted } = Vue;
 
         createApp({
             setup() {
@@ -854,6 +866,10 @@
                 const toastMsg = ref('');
                 const addedTrips = ref([]);
                 const editingIndex = ref(null);
+                
+                // OCR 狀態
+                const isOcrProcessing = ref(false);
+                const ocrProgress = ref('');
                 
                 const staffInput = ref(null);
                 const hsrIdInput = ref(null);
@@ -902,6 +918,140 @@
                       if(name==='staff' && staffInput.value) staffInput.value.focus();
                       if(name==='hsrId' && hsrIdInput.value) hsrIdInput.value.focus();
                 };
+
+                // =============== OCR 影像辨識邏輯 ===============
+                const handleGlobalPaste = async (e) => {
+                    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                    for (let index in items) {
+                        const item = items[index];
+                        if (item.kind === 'file' && item.type.includes('image/')) {
+                            const blob = item.getAsFile();
+                            e.preventDefault(); 
+                            await processOCR(blob);
+                            break; 
+                        }
+                    }
+                };
+
+                const triggerOCRFromClipboard = async () => {
+                    try {
+                        const clipboardItems = await navigator.clipboard.read();
+                        for (const clipboardItem of clipboardItems) {
+                            const imageTypes = clipboardItem.types.filter(type => type.startsWith('image/'));
+                            for (const imageType of imageTypes) {
+                                const blob = await clipboardItem.getType(imageType);
+                                await processOCR(blob);
+                                return;
+                            }
+                        }
+                        showToast("⚠️ 剪貼簿中沒有找到圖片，請先截圖！");
+                    } catch (err) {
+                        showToast("💡 瀏覽器權限受限：請直接在網頁任意處按 Ctrl+V 貼上圖片即可");
+                    }
+                };
+
+                const processOCR = async (imageBlob) => {
+                    if (isOcrProcessing.value) return;
+                    isOcrProcessing.value = true;
+                    ocrProgress.value = '啟動 AI 辨識引擎中... (首次載入需幾秒鐘)';
+                    
+                    try {
+                        const result = await Tesseract.recognize(
+                            imageBlob,
+                            'chi_tra+eng',
+                            {
+                                logger: m => {
+                                    if (m.status === 'recognizing text') {
+                                        ocrProgress.value = `掃描分析文字: ${Math.round(m.progress * 100)}%`;
+                                    } else if (m.status === 'loading tesseract core') {
+                                        ocrProgress.value = `載入核心元件中...`;
+                                    }
+                                }
+                            }
+                        );
+                        parseOcrText(result.data.text);
+                        showToast("✅ OCR 智能辨識完成，已帶入可能資訊 (請務必人工核對)");
+                    } catch (err) {
+                        console.error(err);
+                        showToast("❌ OCR 辨識失敗，請確認圖片是否清晰");
+                    } finally {
+                        isOcrProcessing.value = false;
+                        ocrProgress.value = '';
+                    }
+                };
+
+                const parseOcrText = (text) => {
+                    console.log("--- OCR 辨識結果 ---\n", text);
+                    
+                    // 1. 抓取高鐵訂位代號 (連續8個數字，排除年份如2024開頭)
+                    const matches8 = [...text.matchAll(/(?<!\d)(\d{8})(?!\d)/g)].map(m => m[1]);
+                    const possibleIds = matches8.filter(id => !id.startsWith('202'));
+                    if (possibleIds.length > 0) tripForm.hsrOrderId = possibleIds[0];
+
+                    // 2. 抓取日期
+                    const dateMatch = text.match(/(\d{4})[-\/年](\d{1,2})[-\/月](\d{1,2})/);
+                    if (dateMatch) {
+                        tripForm.date = `${dateMatch[1]}-${dateMatch[2].padStart(2, '0')}-${dateMatch[3].padStart(2, '0')}`;
+                    }
+
+                    // 3. 抓取時間 (09:00, 10:30)
+                    const timeMatches = [...text.matchAll(/([012]\d:[0-5]\d)/g)];
+                    if (timeMatches.length >= 2) {
+                        tripForm.depTime = timeMatches[0][1];
+                        tripForm.arrTime = timeMatches[1][1];
+                    } else if (timeMatches.length === 1) {
+                        tripForm.depTime = timeMatches[0][1];
+                    }
+
+                    // 4. 抓取站點 (確保起迄正確)
+                    const stationRegex = new RegExp(`(${stations.join('|')})`, 'g');
+                    const foundStations = [...text.matchAll(stationRegex)].map(m => m[1]);
+                    if (foundStations.length >= 2) {
+                        tripForm.from = foundStations[0];
+                        tripForm.to = foundStations[foundStations.length - 1]; 
+                    } else if (foundStations.length === 1) {
+                         tripForm.from = foundStations[0];
+                    }
+
+                    // 5. 抓取車次 (3~4碼數字)
+                    const trainNoMatch = text.match(/(?:車次|班次|次)[\s:：]*(\d{3,4})/i) || text.match(/(?<!\d)(\d{3,4})(?!\d)\s*(?:車次)/i);
+                    if (trainNoMatch) {
+                        tripForm.trainNo = trainNoMatch[1];
+                    }
+
+                    // 6. 抓取艙等
+                    if (text.includes('商務')) tripForm.carClass = '商務車廂';
+                    else if (text.includes('標準')) tripForm.carClass = '標準車廂';
+
+                    // 7. 抓取座位與票數推算 (例：3車 14A)
+                    const seatMatches = [...text.matchAll(/(\d+\s*車\s*\d+[A-Ea-e])/gi)];
+                    const seats = seatMatches.map(m => m[1].replace(/\s+/g, '').toUpperCase());
+                    
+                    const adultMatch = text.match(/全票\s*[xX*]?\s*(\d)/) || text.match(/(\d)\s*[xX*]?\s*全票/);
+                    if (adultMatch) ticketForm.adult = parseInt(adultMatch[1]);
+                    
+                    const childMatch = text.match(/孩童\s*[xX*]?\s*(\d)/);
+                    if (childMatch) ticketForm.child = parseInt(childMatch[1]);
+                    
+                    const seniorMatch = text.match(/敬老\s*[xX*]?\s*(\d)/);
+                    if (seniorMatch) ticketForm.senior = parseInt(seniorMatch[1]);
+                    
+                    const disabilityMatch = text.match(/愛心\s*[xX*]?\s*(\d)/);
+                    if (disabilityMatch) ticketForm.disability = parseInt(disabilityMatch[1]);
+
+                    // 如果沒有抓到票數但有座位，預設為全票
+                    const totalTickets = ticketForm.adult + ticketForm.child + ticketForm.senior + ticketForm.disability;
+                    if (totalTickets === 0 && seats.length > 0) {
+                        ticketForm.adult = seats.length; 
+                    }
+
+                    // 同步名單並賦予座位
+                    syncPaxList(passengerList, ticketForm.adult + ticketForm.child + ticketForm.senior + ticketForm.disability, ticketForm);
+                    for (let i = 0; i < Math.min(seats.length, passengerList.value.length); i++) {
+                        passengerList.value[i].seat = seats[i];
+                    }
+                };
+                // ===============================================
 
                 const calculateDeadline = () => {
                     if (!baseInfo.bookingDate) return;
@@ -1101,6 +1251,8 @@
                 const copyText = () => {
                     let txt = `【高鐵訂位業務確認單】\n\n開票期限：${formattedDeadline.value}\n\n開票說明：\n請於D/L前通知 可開票 與 取票方式\n逾期將自動取消需重新訂票\n每筆訂位代碼，統一取票方式\n\n請業務們務必再次核對 票種/張數/金額 是否正確\n如有錯誤 請於「出票前」告知，出票後告知請自行負責。\n高鐵訂票服務窗口感謝您的配合。\n\n------------------\n\n`;
                     
+                    txt += `【⚠️ 參團加購高鐵風險告知 ⚠️】\n若因航班延誤或取消導致無法搭乘高鐵，除「因台灣本土天災導致班機異動」可受理退改票外，其餘非高鐵因素（包含國外天災、當地氣候惡劣、航空公司調度等），恕皆無法辦理改期或退票。\n☑️ 若客人無法接受此風險，請勿加購高鐵票；購買即代表已了解並同意承擔風險。\n\n`;
+
                     addedTrips.value.forEach((t, i) => {
                         const matrix = t.carClass === '商務車廂' ? fareRules.business : fareRules.standard;
                         const base = matrix[t.from]?.[t.to] || matrix[t.to]?.[t.from] || 0;
@@ -1119,7 +1271,6 @@
                     });
                     
                     txt += `總計應收金額：NT$ ${totalOrderAmount.value.toLocaleString()}\n\n`;
-                    txt += `【⚠️ 參團加購高鐵風險告知 ⚠️】\n若因航班延誤或取消導致無法搭乘高鐵，除「因台灣本土天災導致班機異動」可受理退改票外，其餘非高鐵因素（包含國外天災、當地氣候惡劣、航空公司調度等），恕皆無法辦理改期或退票。\n☑️ 若客人無法接受此風險，請勿加購高鐵票；購買即代表已了解並同意承擔風險。\n\n`;
                     txt += `--- 高鐵注意事項與改/退票說明 ---\n1.座位為電腦系統劃位，無法保證座位連續性，亦無法指定座位與車廂。\n2.若乘車不及（逾時未搭乘），請改搭「當日」往後班次之自由座車廂。逾期視同廢票，請務必於乘車當日使用完畢，恕無法以此為由辦理退票。\n3.如需辦理改票或退票，請最晚於「4 個工作日前」提出申請，並提供實體票根或 APP 電子票訂位明細截圖。未提供憑證者將視同正常搭乘，相關費用須自行負擔。（註：若遇「台灣本土天災」導致高鐵本身停駛或航班異動者，為唯一豁免條件，不受上述 4 天前申請之限制。）\n4.辦理退票或改票，每張將酌收手續費新台幣 50 元。\n5.本車票為專案票種，在全台高鐵站現場（含售票窗口、機台），皆不受理取票、退票、換票、改票或補票價差之作業。`;
                     
                     const el = document.createElement('textarea'); el.value = txt; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
@@ -1137,12 +1288,20 @@
                     setInterval(() => {
                         nowTime.value = new Date();
                     }, 1000);
+
+                    // 綁定全域 Ctrl+V 貼上監聽器
+                    window.addEventListener('paste', handleGlobalPaste);
+                });
+
+                onUnmounted(() => {
+                    window.removeEventListener('paste', handleGlobalPaste);
                 });
 
                 return {
                     baseInfo, tripForm, ticketForm, passengerList, addedTrips, stations, maskId,
                     totalTickets, showPassengerModal, 
                     totalOrderAmount, formattedDeadline, editingIndex, toastMsg, nowTimestamp,
+                    isOcrProcessing, ocrProgress, triggerOCRFromClipboard,
                     addTripToList, updateTripInList, startEdit, cancelEdit, removeTrip, hasDeparture, importDepartureInfo,
                     openPassengerModal, downloadImage, downloadPDF, copyText, downloadTxt, clearBasicInfo, 
                     clearTripForm, swapStations, focusInput, staffInput, hsrIdInput
