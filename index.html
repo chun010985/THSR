@@ -983,27 +983,30 @@
                 const parseOcrText = (text) => {
                     console.log("--- OCR 辨識結果 ---\n", text);
                     
+                    // 濾除所有空白與換行，用來應對 OCR 常見的字元間隔碎裂問題 (例如 "車 次 0 8 0 3" -> "車次0803")
+                    const cleanText = text.replace(/[\s\n]+/g, '');
+
                     // 1. 抓取高鐵訂位代號 (連續8個數字，排除年份如2024開頭)
-                    const matches8 = [...text.matchAll(/(?<!\d)(\d{8})(?!\d)/g)].map(m => m[1]);
+                    const matches8 = [...cleanText.matchAll(/(?<!\d)(\d{8})(?!\d)/g)].map(m => m[1]);
                     const possibleIds = matches8.filter(id => !id.startsWith('202'));
                     if (possibleIds.length > 0) tripForm.hsrOrderId = possibleIds[0];
 
                     // 2. 抓取日期
-                    const dateMatch = text.match(/(\d{4})[-\/年](\d{1,2})[-\/月](\d{1,2})/);
+                    const dateMatch = cleanText.match(/(\d{4})[-\/年](\d{1,2})[-\/月](\d{1,2})/);
                     if (dateMatch) {
                         tripForm.date = `${dateMatch[1]}-${dateMatch[2].padStart(2, '0')}-${dateMatch[3].padStart(2, '0')}`;
                     }
 
-                    // 3. 抓取時間 (09:00, 10:30)
-                    const timeMatches = [...text.matchAll(/([012]\d:[0-5]\d)/g)];
+                    // 3. 抓取時間 (應對 09:00 變成 09: 00 或全形 09：00 的情況)
+                    const timeMatches = [...cleanText.matchAll(/([012]?\d[:：][0-5]\d)/g)];
                     if (timeMatches.length >= 2) {
-                        tripForm.depTime = timeMatches[0][1];
-                        tripForm.arrTime = timeMatches[1][1];
+                        tripForm.depTime = timeMatches[0][1].replace('：', ':');
+                        tripForm.arrTime = timeMatches[1][1].replace('：', ':');
                     } else if (timeMatches.length === 1) {
-                        tripForm.depTime = timeMatches[0][1];
+                        tripForm.depTime = timeMatches[0][1].replace('：', ':');
                     }
 
-                    // 4. 抓取站點 (確保起迄正確)
+                    // 4. 抓取站點 (站點保留使用原始 text 抓取較準確)
                     const stationRegex = new RegExp(`(${stations.join('|')})`, 'g');
                     const foundStations = [...text.matchAll(stationRegex)].map(m => m[1]);
                     if (foundStations.length >= 2) {
@@ -1013,33 +1016,34 @@
                          tripForm.from = foundStations[0];
                     }
 
-                    // 5. 抓取車次 (3~4碼數字)
-                    const trainNoMatch = text.match(/(?:車次|班次|次)[\s:：]*(\d{3,4})/i) || text.match(/(?<!\d)(\d{3,4})(?!\d)\s*(?:車次)/i);
+                    // 5. 抓取車次 (3~4碼數字，緊跟在車次/TrainNo後面，不怕空白與換行)
+                    const trainNoMatch = cleanText.match(/(?:車次|班次|次|TrainNo\.?)[:：]*(\d{3,4})/i) || 
+                                         cleanText.match(/(\d{3,4})(?:車次|班次)/i);
                     if (trainNoMatch) {
                         tripForm.trainNo = trainNoMatch[1];
                     }
 
                     // 6. 抓取艙等
-                    if (text.includes('商務')) tripForm.carClass = '商務車廂';
-                    else if (text.includes('標準')) tripForm.carClass = '標準車廂';
+                    if (cleanText.includes('商務')) tripForm.carClass = '商務車廂';
+                    else if (cleanText.includes('標準')) tripForm.carClass = '標準車廂';
 
-                    // 7. 抓取座位與票數推算 (例：3車 14A)
-                    const seatMatches = [...text.matchAll(/(\d+\s*車\s*\d+[A-Ea-e])/gi)];
-                    const seats = seatMatches.map(m => m[1].replace(/\s+/g, '').toUpperCase());
+                    // 7. 抓取座位與票數推算 (例：3車14A)
+                    const seatMatches = [...cleanText.matchAll(/(\d+車\d+[A-Ea-e])/gi)];
+                    const seats = seatMatches.map(m => m[1].toUpperCase());
                     
-                    const adultMatch = text.match(/全票\s*[xX*]?\s*(\d)/) || text.match(/(\d)\s*[xX*]?\s*全票/);
+                    const adultMatch = cleanText.match(/全票[xX*]?(\d)/) || cleanText.match(/(\d)[xX*]?全票/);
                     if (adultMatch) ticketForm.adult = parseInt(adultMatch[1]);
                     
-                    const childMatch = text.match(/孩童\s*[xX*]?\s*(\d)/);
+                    const childMatch = cleanText.match(/孩童[xX*]?(\d)/) || cleanText.match(/(\d)[xX*]?孩童/);
                     if (childMatch) ticketForm.child = parseInt(childMatch[1]);
                     
-                    const seniorMatch = text.match(/敬老\s*[xX*]?\s*(\d)/);
+                    const seniorMatch = cleanText.match(/敬老[xX*]?(\d)/) || cleanText.match(/(\d)[xX*]?敬老/);
                     if (seniorMatch) ticketForm.senior = parseInt(seniorMatch[1]);
                     
-                    const disabilityMatch = text.match(/愛心\s*[xX*]?\s*(\d)/);
+                    const disabilityMatch = cleanText.match(/愛心[xX*]?(\d)/) || cleanText.match(/(\d)[xX*]?愛心/);
                     if (disabilityMatch) ticketForm.disability = parseInt(disabilityMatch[1]);
 
-                    // 如果沒有抓到票數但有座位，預設為全票
+                    // 如果沒有抓到票數但有座位，預設推斷為全票
                     const totalTickets = ticketForm.adult + ticketForm.child + ticketForm.senior + ticketForm.disability;
                     if (totalTickets === 0 && seats.length > 0) {
                         ticketForm.adult = seats.length; 
