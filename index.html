@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高鐵訂位業務確認單 - 現代專業版</title>
+    <title>高鐵訂位確認單生成器</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- 引入 Tesseract.js (前端 OCR 引擎) -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     
     <style>
         /* =========================================
@@ -512,7 +510,7 @@
 <body class="p-4 md:p-8">
     <div id="app" v-cloak class="max-w-6xl mx-auto">
         <header class="mb-10 text-center no-print">
-            <h1 class="text-3xl font-bold text-slate-800 tracking-wider font-serif">高鐵訂位業務確認單</h1>
+            <h1 class="text-3xl font-bold text-slate-800 tracking-wider font-serif">高鐵訂位單生成系統</h1>
             <div class="flex items-center justify-center gap-2 mt-2">
                 <span class="h-[1px] w-8 bg-slate-300"></span>
                 <p class="text-blue-500 font-bold text-xs tracking-[0.2em] uppercase">Professional Slip Generator</p>
@@ -551,27 +549,13 @@
 
                 <!-- 行程設定卡片 -->
                 <div class="modern-card p-6 md:p-8 relative overflow-hidden">
-                    <!-- OCR 處理中的遮罩 -->
-                    <div v-if="isOcrProcessing" class="absolute inset-0 bg-white/90 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center border border-blue-200">
-                        <svg class="animate-spin h-10 w-10 text-blue-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <p class="font-bold text-blue-800 tracking-wider">AI 智能影像辨識中...</p>
-                        <p class="text-xs text-blue-600 mt-2 font-mono">{{ ocrProgress }}</p>
-                    </div>
-
                     <div v-if="editingIndex !== null" class="absolute top-6 right-8 bg-amber-500 text-white px-4 py-1 text-xs font-bold rounded-full shadow-md animate-pulse z-0">編輯模式中</div>
                     
                     <div class="flex justify-between items-center mb-8">
                         <h2 class="section-title">行程詳細設定</h2>
                         <div class="flex items-center gap-3">
-                            <button @click="triggerOCRFromClipboard" class="btn-outline px-3 py-1 text-xs border-blue-200 text-blue-700 bg-blue-50 font-bold hover:bg-blue-100 flex items-center gap-1">
-                                <span>📸</span> 智能辨識截圖 (OCR)
-                            </button>
                             <button @click="clearTripForm" class="btn-outline px-3 py-1 text-xs border-none text-rose-600 font-bold hover:bg-rose-50 hover:text-rose-700">🗑 重置表單</button>
                         </div>
-                    </div>
-
-                    <div class="text-xs text-slate-500 mb-4 flex items-center gap-2">
-                        <span class="text-amber-500">💡</span> <b>小秘訣：</b>您也可以在網頁任何地方直接按 <kbd class="bg-slate-100 border border-slate-300 px-1 rounded">Ctrl</kbd> + <kbd class="bg-slate-100 border border-slate-300 px-1 rounded">V</kbd> 貼上高鐵截圖，自動為您填表！
                     </div>
 
                     <div class="space-y-8 relative z-0">
@@ -579,7 +563,7 @@
                         <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl">
                             <span class="text-[11px] bg-blue-100 text-blue-800 px-3 py-1 rounded font-bold uppercase mb-4 inline-block tracking-widest border border-blue-200">Trip Details</span>
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-                                <div class="md:col-span-6"><label class="form-label">高鐵訂位編號</label><input ref="hsrIdInput" type="text" v-model="tripForm.hsrOrderId" class="font-bold tracking-widest text-blue-900 bg-white" placeholder="8碼編號"></div>
+                                <div class="md:col-span-6"><label class="form-label">高鐵訂位編號</label><input ref="hsrIdInput" type="text" v-model="tripForm.hsrOrderId" class="font-bold tracking-widest text-blue-900 bg-white" placeholder="8碼或11碼編號"></div>
                                 <div class="md:col-span-6"><label class="form-label">PNR 代碼</label><input type="text" v-model="tripForm.pnr" class="uppercase font-bold tracking-widest bg-white"></div>
                                 
                                 <div class="md:col-span-4"><label class="form-label">日期</label><input type="date" v-model="tripForm.date" class="bg-white"></div>
@@ -594,7 +578,7 @@
                         <!-- 票數設定區 -->
                         <div class="bg-white p-6 border border-slate-200 rounded-xl shadow-sm">
                             <div class="mb-5">
-                                <p class="text-xs font-bold mb-3 text-slate-600 border-b border-slate-100 pb-2">票數設定</p>
+                                <p class="text-xs font-bold mb-3 text-slate-600 border-b border-slate-100 pb-2">單趟票數設定</p>
                                 <div class="grid grid-cols-4 gap-4">
                                     <div><label class="form-label">全票</label><input type="number" v-model.number="ticketForm.adult" min="0"></div>
                                     <div><label class="form-label">孩童</label><input type="number" v-model.number="ticketForm.child" min="0"></div>
@@ -605,19 +589,15 @@
                             
                             <div class="flex justify-between items-center gap-3 mt-4 pt-4 border-t border-slate-100">
                                 <div class="flex gap-2">
-                                    <button @click="openPassengerModal" :disabled="totalTickets === 0" class="btn-outline px-5 py-2 text-sm shadow-sm">編輯名單</button>
-                                    
-                                    <button v-if="hasDeparture && editingIndex === null" @click="importDepartureInfo" class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-2 text-xs rounded-md hover:bg-indigo-100 transition font-bold flex items-center gap-1 shadow-sm">
-                                        <span>📋</span> 帶入去程旅客
-                                    </button>
+                                    <button @click="openPassengerModal" :disabled="totalTickets === 0" class="btn-outline px-5 py-2 text-sm shadow-sm">編輯單趟名單</button>
                                 </div>
                                 
                                 <div v-if="editingIndex === null" class="flex gap-2">
                                     <button @click="addTripToList('去程')" :disabled="totalTickets === 0" class="btn-primary px-6 py-2 text-sm shadow hover:shadow-md transition flex items-center gap-1">
-                                        <span class="text-lg leading-none">+</span> 新增去程
+                                        <span class="text-lg leading-none">+</span> 手動新增去程
                                     </button>
                                     <button @click="addTripToList('回程')" :disabled="totalTickets === 0" class="bg-white text-slate-700 border border-slate-300 px-6 py-2 text-sm rounded-md font-bold hover:bg-slate-50 transition flex items-center gap-1 shadow-sm">
-                                        <span class="text-lg leading-none">+</span> 新增回程
+                                        <span class="text-lg leading-none">+</span> 手動新增回程
                                     </button>
                                 </div>
                                 
@@ -635,11 +615,11 @@
                 <div class="modern-card p-6 sticky top-8 flex flex-col h-[85vh]">
                     <h2 class="section-title mb-4 border-b border-slate-100 pb-3">已登錄行程摘要</h2>
                     <div class="flex-1 overflow-y-auto space-y-3 pr-1">
-                        <div v-if="addedTrips.length===0" class="flex flex-col items-center justify-center h-40 text-slate-300">
+                        <div v-if="displayTrips.length===0" class="flex flex-col items-center justify-center h-40 text-slate-300">
                             <span class="text-4xl mb-2 opacity-50">📭</span>
                             <span class="text-sm font-bold">尚未新增任何行程</span>
                         </div>
-                        <div v-for="(t, i) in addedTrips" :key="i" class="p-4 bg-white border border-slate-200 rounded-xl relative hover:border-blue-300 transition group shadow-sm">
+                        <div v-for="(t, i) in displayTrips" :key="i" class="p-4 bg-white border border-slate-200 rounded-xl relative hover:border-blue-300 transition group shadow-sm">
                             <div class="flex justify-between items-start mb-2">
                                 <span :class="t.type === '去程' ? 'bg-blue-600' : 'bg-slate-500'" class="text-[10px] text-white px-2 py-0.5 rounded font-mono font-bold shadow-sm">{{ t.type }} #{{ i + 1 }}</span>
                                 <div class="flex gap-3 opacity-0 group-hover:opacity-100 transition">
@@ -655,24 +635,37 @@
                             </div>
                         </div>
                     </div>
+                    
                     <div class="pt-5 border-t border-slate-200 mt-auto bg-white">
-                        <div class="flex justify-between items-baseline mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                            <span class="text-slate-600 font-bold text-sm">總金額</span>
-                            <span class="text-2xl font-black text-slate-800 font-sans">${{ totalOrderAmount.toLocaleString() }}</span>
+                        <!-- 切換顯示模式按鈕 -->
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-slate-600 font-bold text-xs">單據顯示模式</span>
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" v-model="isDirectMode" class="sr-only peer">
+                                    <div class="relative w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <span class="ms-2 text-xs font-bold" :class="isDirectMode ? 'text-blue-700' : 'text-slate-600'">{{ isDirectMode ? '直客原價版' : '同業業務版' }}</span>
+                                </label>
+                            </div>
+                            <div class="flex justify-between items-baseline pt-2 border-t border-slate-200">
+                                <span class="text-slate-600 font-bold text-sm">目前總金額</span>
+                                <span class="text-2xl font-black text-slate-800 font-sans">${{ totalOrderAmount.toLocaleString() }}</span>
+                            </div>
                         </div>
+
                         <div class="grid grid-cols-2 gap-2 mb-3">
-                            <button @click="downloadImage" :disabled="addedTrips.length===0" class="btn-primary py-2.5 shadow-md font-bold text-[13px] flex items-center justify-center">
+                            <button @click="downloadImage" :disabled="displayTrips.length===0" class="btn-primary py-2.5 shadow-md font-bold text-[13px] flex items-center justify-center">
                                 下載圖片 (PNG)
                             </button>
-                            <button @click="downloadPDF" :disabled="addedTrips.length===0" class="bg-slate-800 text-white py-2.5 rounded-md shadow-md font-bold text-[13px] flex items-center justify-center hover:bg-black transition">
+                            <button @click="downloadPDF" :disabled="displayTrips.length===0" class="bg-slate-800 text-white py-2.5 rounded-md shadow-md font-bold text-[13px] flex items-center justify-center hover:bg-black transition">
                                 下載 PDF (向量)
                             </button>
                         </div>
-                        <p class="text-[10px] text-slate-400 text-center mb-3">💡 點選下載 PDF 後請選擇「另存為 PDF」以保留文字</p>
+                        <p class="text-[10px] text-slate-400 text-center mb-3">💡 請先選擇上方的「顯示模式」再點擊下載或複製</p>
                         
                         <div class="grid grid-cols-2 gap-3">
-                            <button @click="downloadTxt" :disabled="addedTrips.length===0" class="btn-outline py-2 text-xs">下載文字</button>
-                            <button @click="copyText" :disabled="addedTrips.length===0" class="btn-outline py-2 text-xs">複製文字</button>
+                            <button @click="downloadTxt" :disabled="displayTrips.length===0" class="btn-outline py-2 text-xs">下載文字</button>
+                            <button @click="copyText" :disabled="displayTrips.length===0" class="btn-outline py-2 text-xs">複製文字</button>
                         </div>
                     </div>
                 </div>
@@ -712,7 +705,8 @@
             <div id="image-node" class="doc-container">
                 <div class="doc-header">
                     <div>
-                        <h1 class="doc-title">高鐵訂位業務確認單</h1>
+                        <!-- 標題隨模式動態切換 -->
+                        <h1 class="doc-title">{{ isDirectMode ? '高鐵訂位確認單' : '高鐵訂位業務確認單' }}</h1>
                         <div class="doc-subtitle">BOOKING CONFIRMATION</div>
                     </div>
                     <div class="doc-meta">
@@ -740,7 +734,8 @@
                         <span class="checkbox-symbol">▢</span>超商取票(手續費自負)　　※ 每一筆訂位代碼為統一取票方式。
                     </div>
 
-                    <div style="margin-top: 8px; color: var(--m-secondary); border-top: 1px dashed var(--m-border-dark); padding-top: 6px;">
+                    <!-- 掛帳說明僅在同業業務版顯示 -->
+                    <div v-if="!isDirectMode" style="margin-top: 8px; color: var(--m-secondary); border-top: 1px dashed var(--m-border-dark); padding-top: 6px;">
                         <strong>【 掛帳說明 】</strong>
                         <span>掛帳 全票會先掛 85折的價格，優待票（孩童、敬老、愛心）都是半價。如果售價有調整需要更改請務必通知，謝謝您。</span>
                     </div>
@@ -756,7 +751,8 @@
 
                 <div class="doc-section-header">訂位明細</div>
 
-                <div v-for="(trip, idx) in addedTrips" :key="idx" style="margin-bottom: 10px;">
+                <!-- 讀取動態計算後的 displayTrips -->
+                <div v-for="(trip, idx) in displayTrips" :key="idx" style="margin-bottom: 10px;">
                     <div class="trip-type-tab" :style="{ backgroundColor: trip.type === '去程' ? 'var(--m-primary)' : 'var(--m-secondary)' }">
                         {{ trip.type }}
                     </div>
@@ -831,7 +827,8 @@
                 
                 <div style="margin-top: 16px;">
                     <strong class="warning-text">
-                        請業務們務必再次核對 票種/張數/金額 是否正確，如有錯誤 請於「出票前」告知，出票後告知請自行負責。<br>
+                        <!-- 警告文字隨模式切換 -->
+                        {{ isDirectMode ? '請務必再次核對' : '請業務們務必再次核對' }} 票種/張數/金額 是否正確，如有錯誤 請於「出票前」告知，出票後告知請自行負責。<br>
                         高鐵訂票服務窗口感謝您的配合。
                     </strong>
 
@@ -857,7 +854,7 @@
     </div>
 
     <script>
-        const { createApp, ref, reactive, computed, watch, onMounted, onUnmounted } = Vue;
+        const { createApp, ref, reactive, computed, watch, onMounted } = Vue;
 
         createApp({
             setup() {
@@ -867,9 +864,8 @@
                 const addedTrips = ref([]);
                 const editingIndex = ref(null);
                 
-                // OCR 狀態
-                const isOcrProcessing = ref(false);
-                const ocrProgress = ref('');
+                // 新增：單據顯示模式切換狀態
+                const isDirectMode = ref(false);
                 
                 const staffInput = ref(null);
                 const hsrIdInput = ref(null);
@@ -919,187 +915,6 @@
                       if(name==='hsrId' && hsrIdInput.value) hsrIdInput.value.focus();
                 };
 
-                // =============== OCR 影像辨識邏輯 ===============
-                const handleGlobalPaste = async (e) => {
-                    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-                    for (let index in items) {
-                        const item = items[index];
-                        if (item.kind === 'file' && item.type.includes('image/')) {
-                            const blob = item.getAsFile();
-                            e.preventDefault(); 
-                            await processOCR(blob);
-                            break; 
-                        }
-                    }
-                };
-
-                const triggerOCRFromClipboard = async () => {
-                    try {
-                        const clipboardItems = await navigator.clipboard.read();
-                        for (const clipboardItem of clipboardItems) {
-                            const imageTypes = clipboardItem.types.filter(type => type.startsWith('image/'));
-                            for (const imageType of imageTypes) {
-                                const blob = await clipboardItem.getType(imageType);
-                                await processOCR(blob);
-                                return;
-                            }
-                        }
-                        showToast("⚠️ 剪貼簿中沒有找到圖片，請先截圖！");
-                    } catch (err) {
-                        showToast("💡 瀏覽器權限受限：請直接在網頁任意處按 Ctrl+V 貼上圖片即可");
-                    }
-                };
-
-                const processOCR = async (imageBlob) => {
-                    if (isOcrProcessing.value) return;
-                    isOcrProcessing.value = true;
-                    ocrProgress.value = '啟動 AI 辨識引擎中... (首次載入需幾秒鐘)';
-                    
-                    try {
-                        const result = await Tesseract.recognize(
-                            imageBlob,
-                            'chi_tra+eng',
-                            {
-                                logger: m => {
-                                    if (m.status === 'recognizing text') {
-                                        ocrProgress.value = `掃描分析文字: ${Math.round(m.progress * 100)}%`;
-                                    } else if (m.status === 'loading tesseract core') {
-                                        ocrProgress.value = `載入核心元件中...`;
-                                    }
-                                }
-                            }
-                        );
-                        parseOcrText(result.data.text);
-                        showToast("✅ OCR 智能辨識完成，已帶入可能資訊 (請務必人工核對)");
-                    } catch (err) {
-                        console.error(err);
-                        showToast("❌ OCR 辨識失敗，請確認圖片是否清晰");
-                    } finally {
-                        isOcrProcessing.value = false;
-                        ocrProgress.value = '';
-                    }
-                };
-
-                const parseOcrText = (text) => {
-                    console.log("--- OCR 辨識結果 ---\n", text);
-                    
-                    // 濾除所有空白與換行，並將「臺」統一轉為「台」
-                    const cleanText = text.replace(/[\s\n]+/g, '').replace(/臺/g, '台');
-
-                    // 1. 高鐵訂位編號 (訂單代號) - 8碼數字
-                    const hsrIdMatch = cleanText.match(/(?:訂位代號|訂單代號|電腦代號|訂位編號|訂位號碼|代號|編號)[:：]?(\d{8})/);
-                    if (hsrIdMatch) {
-                        tripForm.hsrOrderId = hsrIdMatch[1];
-                    } else {
-                        const matches8 = [...cleanText.matchAll(/(?<!\d)(\d{8})(?!\d)/g)].map(m => m[1]);
-                        const possibleIds = matches8.filter(id => !id.startsWith('202')); // 排除年份
-                        if (possibleIds.length > 0) tripForm.hsrOrderId = possibleIds[0];
-                    }
-
-                    // 2. PNR (通常在 PNR 後面，5~8碼英數)
-                    const pnrMatch = cleanText.match(/(?:PNR|代碼|代號)[:：]?([A-Za-z0-9]{5,8})/i);
-                    if (pnrMatch && !/^\d+$/.test(pnrMatch[1])) { 
-                        tripForm.pnr = pnrMatch[1].toUpperCase();
-                    }
-
-                    // 3. 艙等 (車廂)
-                    if (cleanText.includes('商務')) tripForm.carClass = '商務車廂';
-                    else if (cleanText.includes('標準') || cleanText.includes('對號') || cleanText.includes('自由')) tripForm.carClass = '標準車廂';
-
-                    // 4. 日期
-                    const dateMatch = cleanText.match(/(202\d)[-\/年](\d{1,2})[-\/月](\d{1,2})/);
-                    if (dateMatch) {
-                        tripForm.date = `${dateMatch[1]}-${dateMatch[2].padStart(2, '0')}-${dateMatch[3].padStart(2, '0')}`;
-                    }
-
-                    // 5. 時間 (出發與抵達)
-                    const timeMatches = [...cleanText.matchAll(/([012]?\d[:：][0-5]\d)/g)];
-                    if (timeMatches.length >= 2) {
-                        tripForm.depTime = timeMatches[0][1].replace('：', ':').padStart(5, '0');
-                        tripForm.arrTime = timeMatches[1][1].replace('：', ':').padStart(5, '0');
-                    } else if (timeMatches.length === 1) {
-                        tripForm.depTime = timeMatches[0][1].replace('：', ':').padStart(5, '0');
-                    }
-
-                    // 6. 起訖站點
-                    const stationRegex = new RegExp(`(${stations.join('|')})`, 'g');
-                    const foundStations = [...cleanText.matchAll(stationRegex)].map(m => m[1]);
-                    if (foundStations.length >= 2) {
-                        tripForm.from = foundStations[0];
-                        tripForm.to = foundStations[foundStations.length - 1]; 
-                    } else if (foundStations.length === 1) {
-                        tripForm.from = foundStations[0];
-                    }
-
-                    // 7. 車次 (3~4碼數字)
-                    const trainNoMatch = cleanText.match(/(?:車次|班次|次|TrainNo\.?)[:：]*(\d{3,4})/i) || 
-                                         cleanText.match(/(\d{3,4})(?:車次|班次)/i);
-                    if (trainNoMatch) {
-                        tripForm.trainNo = trainNoMatch[1];
-                    }
-
-                    // 8. 姓名 + 身分證(隱碼) + 座位 + 自動推算票數
-                    const pax = [];
-                    // 抓出所有身分證字號 (含隱碼，例如 A12****789)
-                    const idMatches = [...cleanText.matchAll(/([A-Za-z][12][\d*]{5,8}\d)/g)];
-                    
-                    if (idMatches.length > 0) {
-                        idMatches.forEach(m => {
-                            const id = m[1].toUpperCase();
-                            const index = m.index;
-                            const before = cleanText.substring(Math.max(0, index - 15), index);
-                            const after = cleanText.substring(index + id.length, index + id.length + 15);
-                            
-                            let name = '';
-                            let type = '全票';
-                            let seat = '';
-                            
-                            // 判斷票種
-                            if (before.includes('孩童') || after.includes('孩童')) type = '孩童票';
-                            else if (before.includes('敬老') || after.includes('敬老')) type = '敬老票';
-                            else if (before.includes('愛心') || after.includes('愛心')) type = '愛心票';
-                            
-                            // 判斷姓名 (身分證前的 2~5 個中文字)
-                            const nameMatch = before.match(/([\u4e00-\u9fa5]{2,5})$/);
-                            if (nameMatch) {
-                                name = nameMatch[1].replace(/(全票|成人|孩童|敬老|愛心|早鳥|大學生|票)/g, '');
-                            }
-                            
-                            // 判斷座位 (身分證後面的 數字+車+數字+英文字母)
-                            const seatMatch = after.match(/(\d+車\d+[A-Za-z])/);
-                            if (seatMatch) seat = seatMatch[1].toUpperCase();
-                            
-                            pax.push({ type, name, idNumber: id, seat, passportNo: '', birthday: '' });
-                        });
-                    } else {
-                        // Fallback: 如果沒抓到身分證，只抓座位來推算
-                        const seatMatches = [...cleanText.matchAll(/(\d+車\d+[A-Za-z])/g)];
-                        seatMatches.forEach(m => {
-                             pax.push({ type: '全票', name: '', idNumber: '', seat: m[1].toUpperCase(), passportNo: '', birthday: '' });
-                        });
-                    }
-
-                    // 9. 更新票數與名單
-                    if (pax.length > 0) {
-                        ticketForm.adult = 0; ticketForm.child = 0; ticketForm.senior = 0; ticketForm.disability = 0;
-                        pax.forEach(p => {
-                            if (p.type === '孩童票') ticketForm.child++;
-                            else if (p.type === '敬老票') ticketForm.senior++;
-                            else if (p.type === '愛心票') ticketForm.disability++;
-                            else ticketForm.adult++;
-                        });
-                        passengerList.value = pax;
-                    } else {
-                        // 如果連座位都沒抓到，嘗試找純票種數量
-                        const adultMatch = cleanText.match(/全票[xX*]?(\d)/) || cleanText.match(/(\d)[xX*]?全票/);
-                        if (adultMatch) ticketForm.adult = parseInt(adultMatch[1]);
-                        
-                        const childMatch = cleanText.match(/孩童[xX*]?(\d)/) || cleanText.match(/(\d)[xX*]?孩童/);
-                        if (childMatch) ticketForm.child = parseInt(childMatch[1]);
-                    }
-                };
-                // ===============================================
-
                 const calculateDeadline = () => {
                     if (!baseInfo.bookingDate) return;
                     
@@ -1133,30 +948,33 @@
                     showToast('行程表單已重置');
                 };
 
-                const getCalcDetails = (trip, tks) => {
-                    const matrix = trip.carClass === '商務車廂' ? fareRules.business : fareRules.standard;
-                    const base = matrix[trip.from]?.[trip.to] || matrix[trip.to]?.[trip.from] || 0;
-                    const disc = trip.carClass === '商務車廂' ? 0.9 : 0.85;
-                    const full = Math.round(base * disc);
-                    const half = Math.round(base * 0.5);
-                    return {
-                        adultStr: tks.adult > 0 ? `${full}*${tks.adult}` : '',
-                        childStr: tks.child > 0 ? `${half}*${tks.child}` : '',
-                        seniorStr: tks.senior > 0 ? `${half}*${tks.senior}` : '',
-                        disabilityStr: tks.disability > 0 ? `${half}*${tks.disability}` : ''
-                    };
-                };
+                // 核心：動態計算顯示的行程資料 (依據是否為直客模式即時更新金額)
+                const displayTrips = computed(() => {
+                    return addedTrips.value.map(trip => {
+                        const tks = trip.tickets;
+                        const matrix = trip.carClass === '商務車廂' ? fareRules.business : fareRules.standard;
+                        const base = matrix[trip.from]?.[trip.to] || matrix[trip.to]?.[trip.from] || 0;
+                        
+                        // 直客模式不打折，業務模式 85折/9折
+                        const disc = isDirectMode.value ? 1 : (trip.carClass === '商務車廂' ? 0.9 : 0.85);
+                        const full = Math.round(base * disc);
+                        const half = Math.round(base * 0.5);
+                        
+                        const calcDetails = {
+                            adultStr: tks.adult > 0 ? `${full}*${tks.adult}` : '',
+                            childStr: tks.child > 0 ? `${half}*${tks.child}` : '',
+                            seniorStr: tks.senior > 0 ? `${half}*${tks.senior}` : '',
+                            disabilityStr: tks.disability > 0 ? `${half}*${tks.disability}` : ''
+                        };
+                        const totalAmount = (tks.adult * full) + ((tks.child + tks.senior + tks.disability) * half);
 
-                const getFare = (trip) => {
-                    const matrix = trip.carClass === '商務車廂' ? fareRules.business : fareRules.standard;
-                    return matrix[trip.from]?.[trip.to] || matrix[trip.to]?.[trip.from] || 0;
-                };
-
-                const calcTotal = (trip, tks) => {
-                    const base = getFare(trip);
-                    const disc = trip.carClass === '商務車廂' ? 0.9 : 0.85;
-                    return (tks.adult * Math.round(base*disc)) + ((tks.child + tks.senior + tks.disability) * Math.round(base*0.5));
-                };
+                        return {
+                            ...trip,
+                            totalAmount,
+                            calcDetails
+                        };
+                    });
+                });
 
                 const getBreakdownText = (tks) => {
                     let p = [];
@@ -1173,8 +991,6 @@
                         ...JSON.parse(JSON.stringify(tripForm)),
                         tickets: { ...ticketForm },
                         passengers: JSON.parse(JSON.stringify(passengerList.value)),
-                        totalAmount: calcTotal(tripForm, ticketForm),
-                        calcDetails: getCalcDetails(tripForm, ticketForm),
                         breakdownText: getBreakdownText(ticketForm)
                     });
                     showToast(`已新增${type}`);
@@ -1192,8 +1008,6 @@
                         ...JSON.parse(JSON.stringify(tripForm)),
                         tickets: { ...ticketForm },
                         passengers: JSON.parse(JSON.stringify(passengerList.value)),
-                        totalAmount: calcTotal(tripForm, ticketForm),
-                        calcDetails: getCalcDetails(tripForm, ticketForm),
                         breakdownText: getBreakdownText(ticketForm)
                     };
                     editingIndex.value = null; showToast("已更新");
@@ -1224,7 +1038,9 @@
                 
                 const hasDeparture = computed(() => addedTrips.value.some(t => t.type === '去程'));
                 const totalTickets = computed(() => ticketForm.adult + ticketForm.child + ticketForm.senior + ticketForm.disability);
-                const totalOrderAmount = computed(() => addedTrips.value.reduce((s,t) => s + t.totalAmount, 0));
+                
+                // 總金額改由動態的 displayTrips 計算
+                const totalOrderAmount = computed(() => displayTrips.value.reduce((s,t) => s + t.totalAmount, 0));
                 const formattedDeadline = computed(() => `${baseInfo.deadlineDate.replace(/-/g,'/')} ${baseInfo.deadlineTime}`);
                 
                 const nowTime = ref(new Date());
@@ -1257,7 +1073,7 @@
                 const downloadPDF = () => {
                     showToast("準備產出 PDF！請在列印對話框的「目的地」選擇「另存為 PDF」。");
                     const originalTitle = document.title;
-                    document.title = generateFileName('高鐵業務確認單');
+                    document.title = generateFileName(isDirectMode.value ? '高鐵確認單' : '高鐵業務確認單');
                     
                     setTimeout(() => {
                         window.print();
@@ -1290,25 +1106,25 @@
                         }
                     }).then(canvas => {
                         const a = document.createElement('a'); a.href = canvas.toDataURL("image/png");
-                        a.download = generateFileName('高鐵業務確認單.png'); a.click();
+                        a.download = generateFileName(isDirectMode.value ? '高鐵確認單.png' : '高鐵業務確認單.png'); a.click();
                         showToast("圖檔下載成功");
                     });
                 };
 
                 const copyText = () => {
-                    let txt = `【高鐵訂位業務確認單】\n\n開票期限：${formattedDeadline.value}\n\n開票說明：\n請於D/L前通知 可開票 與 取票方式\n逾期將自動取消需重新訂票\n每筆訂位代碼，統一取票方式\n\n請業務們務必再次核對 票種/張數/金額 是否正確\n如有錯誤 請於「出票前」告知，出票後告知請自行負責。\n高鐵訂票服務窗口感謝您的配合。\n\n------------------\n\n`;
+                    let txt = `【${isDirectMode.value ? '高鐵訂位確認單' : '高鐵訂位業務確認單'}】\n\n開票期限：${formattedDeadline.value}\n\n開票說明：\n請於D/L前通知 可開票 與 取票方式\n逾期將自動取消需重新訂票\n每筆訂位代碼，統一取票方式\n\n${isDirectMode.value ? '請務必再次核對' : '請業務們務必再次核對'} 票種/張數/金額 是否正確\n如有錯誤 請於「出票前」告知，出票後告知請自行負責。\n高鐵訂票服務窗口感謝您的配合。\n\n------------------\n\n`;
                     
                     txt += `【⚠️ 參團加購高鐵風險告知 ⚠️】\n若因航班延誤或取消導致無法搭乘高鐵，除「因台灣本土天災導致班機異動」可受理退改票外，其餘非高鐵因素（包含國外天災、當地氣候惡劣、航空公司調度等），恕皆無法辦理改期或退票。\n☑️ 若客人無法接受此風險，請勿加購高鐵票；購買即代表已了解並同意承擔風險。\n\n`;
 
-                    addedTrips.value.forEach((t, i) => {
+                    displayTrips.value.forEach((t, i) => {
                         const matrix = t.carClass === '商務車廂' ? fareRules.business : fareRules.standard;
                         const base = matrix[t.from]?.[t.to] || matrix[t.to]?.[t.from] || 0;
-                        const disc = t.carClass === '商務車廂' ? 0.9 : 0.85;
-                        const fullPrice = Math.round(base * disc);
+                        const disc = isDirectMode.value ? 1 : (t.carClass === '商務車廂' ? 0.9 : 0.85);
+                        const actualFullPrice = Math.round(base * disc);
                         const halfPrice = Math.round(base * 0.5);
 
                         let details = [];
-                        if(t.tickets.adult > 0) details.push(`全票 ${t.tickets.adult} 張 ($${fullPrice}*${t.tickets.adult}=$${(fullPrice * t.tickets.adult).toLocaleString()})`);
+                        if(t.tickets.adult > 0) details.push(`全票 ${t.tickets.adult} 張 ($${actualFullPrice}*${t.tickets.adult}=$${(actualFullPrice * t.tickets.adult).toLocaleString()})`);
                         if(t.tickets.child > 0) details.push(`孩童 ${t.tickets.child} 張 ($${halfPrice}*${t.tickets.child}=$${(halfPrice * t.tickets.child).toLocaleString()})`);
                         if(t.tickets.senior > 0) details.push(`敬老 ${t.tickets.senior} 張 ($${halfPrice}*${t.tickets.senior}=$${(halfPrice * t.tickets.senior).toLocaleString()})`);
                         if(t.tickets.disability > 0) details.push(`愛心 ${t.tickets.disability} 張 ($${halfPrice}*${t.tickets.disability}=$${(halfPrice * t.tickets.disability).toLocaleString()})`);
@@ -1327,7 +1143,7 @@
                 const downloadTxt = () => {
                     const blob = new Blob([document.querySelector('textarea')?.value || '請先點選複製文字'], { type: 'text/plain' });
                     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-                    a.download = generateFileName('確認範本.txt'); a.click();
+                    a.download = generateFileName(isDirectMode.value ? '確認範本.txt' : '業務確認範本.txt'); a.click();
                 };
 
                 onMounted(() => {
@@ -1335,20 +1151,12 @@
                     setInterval(() => {
                         nowTime.value = new Date();
                     }, 1000);
-
-                    // 綁定全域 Ctrl+V 貼上監聽器
-                    window.addEventListener('paste', handleGlobalPaste);
-                });
-
-                onUnmounted(() => {
-                    window.removeEventListener('paste', handleGlobalPaste);
                 });
 
                 return {
-                    baseInfo, tripForm, ticketForm, passengerList, addedTrips, stations, maskId,
-                    totalTickets, showPassengerModal, 
+                    baseInfo, tripForm, ticketForm, passengerList, addedTrips, displayTrips, stations, maskId,
+                    totalTickets, showPassengerModal, isDirectMode,
                     totalOrderAmount, formattedDeadline, editingIndex, toastMsg, nowTimestamp,
-                    isOcrProcessing, ocrProgress, triggerOCRFromClipboard,
                     addTripToList, updateTripInList, startEdit, cancelEdit, removeTrip, hasDeparture, importDepartureInfo,
                     openPassengerModal, downloadImage, downloadPDF, copyText, downloadTxt, clearBasicInfo, 
                     clearTripForm, swapStations, focusInput, staffInput, hsrIdInput
