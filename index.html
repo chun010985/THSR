@@ -590,6 +590,11 @@
                             <div class="flex justify-between items-center gap-3 mt-4 pt-4 border-t border-slate-100">
                                 <div class="flex gap-2">
                                     <button @click="openPassengerModal" :disabled="totalTickets === 0" class="btn-outline px-5 py-2 text-sm shadow-sm">編輯單趟名單</button>
+                                    
+                                    <!-- 補回「帶入去程旅客」按鈕 -->
+                                    <button v-if="hasDeparture && editingIndex === null" @click="importDepartureInfo" class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-2 text-xs rounded-md hover:bg-indigo-100 transition font-bold flex items-center gap-1 shadow-sm">
+                                        <span>📋</span> 帶入去程旅客
+                                    </button>
                                 </div>
                                 
                                 <div v-if="editingIndex === null" class="flex gap-2">
@@ -1018,8 +1023,15 @@
                     const depTrip = [...addedTrips.value].reverse().find(t => t.type === '去程');
                     if (!depTrip) { showToast('找不到去程資料'); return; }
                     Object.assign(ticketForm, depTrip.tickets);
-                    passengerList.value = JSON.parse(JSON.stringify(depTrip.passengers));
-                    showToast('已帶入去程旅客資料');
+                    
+                    // 複製去程名單，但強制清空座位資料
+                    const clonedPax = JSON.parse(JSON.stringify(depTrip.passengers));
+                    clonedPax.forEach(p => {
+                        p.seat = '';
+                    });
+                    passengerList.value = clonedPax;
+                    
+                    showToast('已帶入去程旅客資料 (不含座位)');
                 };
 
                 const startEdit = (idx) => {
