@@ -983,76 +983,119 @@
                 const parseOcrText = (text) => {
                     console.log("--- OCR 辨識結果 ---\n", text);
                     
-                    // 濾除所有空白與換行，用來應對 OCR 常見的字元間隔碎裂問題 (例如 "車 次 0 8 0 3" -> "車次0803")
-                    const cleanText = text.replace(/[\s\n]+/g, '');
+                    // 濾除所有空白與換行，並將「臺」統一轉為「台」
+                    const cleanText = text.replace(/[\s\n]+/g, '').replace(/臺/g, '台');
 
-                    // 1. 抓取高鐵訂位代號 (連續8個數字，排除年份如2024開頭)
-                    const matches8 = [...cleanText.matchAll(/(?<!\d)(\d{8})(?!\d)/g)].map(m => m[1]);
-                    const possibleIds = matches8.filter(id => !id.startsWith('202'));
-                    if (possibleIds.length > 0) tripForm.hsrOrderId = possibleIds[0];
+                    // 1. 高鐵訂位編號 (訂單代號) - 8碼數字
+                    const hsrIdMatch = cleanText.match(/(?:訂位代號|訂單代號|電腦代號|訂位編號|訂位號碼|代號|編號)[:：]?(\d{8})/);
+                    if (hsrIdMatch) {
+                        tripForm.hsrOrderId = hsrIdMatch[1];
+                    } else {
+                        const matches8 = [...cleanText.matchAll(/(?<!\d)(\d{8})(?!\d)/g)].map(m => m[1]);
+                        const possibleIds = matches8.filter(id => !id.startsWith('202')); // 排除年份
+                        if (possibleIds.length > 0) tripForm.hsrOrderId = possibleIds[0];
+                    }
 
-                    // 2. 抓取日期
-                    const dateMatch = cleanText.match(/(\d{4})[-\/年](\d{1,2})[-\/月](\d{1,2})/);
+                    // 2. PNR (通常在 PNR 後面，5~8碼英數)
+                    const pnrMatch = cleanText.match(/(?:PNR|代碼|代號)[:：]?([A-Za-z0-9]{5,8})/i);
+                    if (pnrMatch && !/^\d+$/.test(pnrMatch[1])) { 
+                        tripForm.pnr = pnrMatch[1].toUpperCase();
+                    }
+
+                    // 3. 艙等 (車廂)
+                    if (cleanText.includes('商務')) tripForm.carClass = '商務車廂';
+                    else if (cleanText.includes('標準') || cleanText.includes('對號') || cleanText.includes('自由')) tripForm.carClass = '標準車廂';
+
+                    // 4. 日期
+                    const dateMatch = cleanText.match(/(202\d)[-\/年](\d{1,2})[-\/月](\d{1,2})/);
                     if (dateMatch) {
                         tripForm.date = `${dateMatch[1]}-${dateMatch[2].padStart(2, '0')}-${dateMatch[3].padStart(2, '0')}`;
                     }
 
-                    // 3. 抓取時間 (應對 09:00 變成 09: 00 或全形 09：00 的情況)
+                    // 5. 時間 (出發與抵達)
                     const timeMatches = [...cleanText.matchAll(/([012]?\d[:：][0-5]\d)/g)];
                     if (timeMatches.length >= 2) {
-                        tripForm.depTime = timeMatches[0][1].replace('：', ':');
-                        tripForm.arrTime = timeMatches[1][1].replace('：', ':');
+                        tripForm.depTime = timeMatches[0][1].replace('：', ':').padStart(5, '0');
+                        tripForm.arrTime = timeMatches[1][1].replace('：', ':').padStart(5, '0');
                     } else if (timeMatches.length === 1) {
-                        tripForm.depTime = timeMatches[0][1].replace('：', ':');
+                        tripForm.depTime = timeMatches[0][1].replace('：', ':').padStart(5, '0');
                     }
 
-                    // 4. 抓取站點 (站點保留使用原始 text 抓取較準確)
+                    // 6. 起訖站點
                     const stationRegex = new RegExp(`(${stations.join('|')})`, 'g');
-                    const foundStations = [...text.matchAll(stationRegex)].map(m => m[1]);
+                    const foundStations = [...cleanText.matchAll(stationRegex)].map(m => m[1]);
                     if (foundStations.length >= 2) {
                         tripForm.from = foundStations[0];
                         tripForm.to = foundStations[foundStations.length - 1]; 
                     } else if (foundStations.length === 1) {
-                         tripForm.from = foundStations[0];
+                        tripForm.from = foundStations[0];
                     }
 
-                    // 5. 抓取車次 (3~4碼數字，緊跟在車次/TrainNo後面，不怕空白與換行)
+                    // 7. 車次 (3~4碼數字)
                     const trainNoMatch = cleanText.match(/(?:車次|班次|次|TrainNo\.?)[:：]*(\d{3,4})/i) || 
                                          cleanText.match(/(\d{3,4})(?:車次|班次)/i);
                     if (trainNoMatch) {
                         tripForm.trainNo = trainNoMatch[1];
                     }
 
-                    // 6. 抓取艙等
-                    if (cleanText.includes('商務')) tripForm.carClass = '商務車廂';
-                    else if (cleanText.includes('標準')) tripForm.carClass = '標準車廂';
-
-                    // 7. 抓取座位與票數推算 (例：3車14A)
-                    const seatMatches = [...cleanText.matchAll(/(\d+車\d+[A-Ea-e])/gi)];
-                    const seats = seatMatches.map(m => m[1].toUpperCase());
+                    // 8. 姓名 + 身分證(隱碼) + 座位 + 自動推算票數
+                    const pax = [];
+                    // 抓出所有身分證字號 (含隱碼，例如 A12****789)
+                    const idMatches = [...cleanText.matchAll(/([A-Za-z][12][\d*]{5,8}\d)/g)];
                     
-                    const adultMatch = cleanText.match(/全票[xX*]?(\d)/) || cleanText.match(/(\d)[xX*]?全票/);
-                    if (adultMatch) ticketForm.adult = parseInt(adultMatch[1]);
-                    
-                    const childMatch = cleanText.match(/孩童[xX*]?(\d)/) || cleanText.match(/(\d)[xX*]?孩童/);
-                    if (childMatch) ticketForm.child = parseInt(childMatch[1]);
-                    
-                    const seniorMatch = cleanText.match(/敬老[xX*]?(\d)/) || cleanText.match(/(\d)[xX*]?敬老/);
-                    if (seniorMatch) ticketForm.senior = parseInt(seniorMatch[1]);
-                    
-                    const disabilityMatch = cleanText.match(/愛心[xX*]?(\d)/) || cleanText.match(/(\d)[xX*]?愛心/);
-                    if (disabilityMatch) ticketForm.disability = parseInt(disabilityMatch[1]);
-
-                    // 如果沒有抓到票數但有座位，預設推斷為全票
-                    const totalTickets = ticketForm.adult + ticketForm.child + ticketForm.senior + ticketForm.disability;
-                    if (totalTickets === 0 && seats.length > 0) {
-                        ticketForm.adult = seats.length; 
+                    if (idMatches.length > 0) {
+                        idMatches.forEach(m => {
+                            const id = m[1].toUpperCase();
+                            const index = m.index;
+                            const before = cleanText.substring(Math.max(0, index - 15), index);
+                            const after = cleanText.substring(index + id.length, index + id.length + 15);
+                            
+                            let name = '';
+                            let type = '全票';
+                            let seat = '';
+                            
+                            // 判斷票種
+                            if (before.includes('孩童') || after.includes('孩童')) type = '孩童票';
+                            else if (before.includes('敬老') || after.includes('敬老')) type = '敬老票';
+                            else if (before.includes('愛心') || after.includes('愛心')) type = '愛心票';
+                            
+                            // 判斷姓名 (身分證前的 2~5 個中文字)
+                            const nameMatch = before.match(/([\u4e00-\u9fa5]{2,5})$/);
+                            if (nameMatch) {
+                                name = nameMatch[1].replace(/(全票|成人|孩童|敬老|愛心|早鳥|大學生|票)/g, '');
+                            }
+                            
+                            // 判斷座位 (身分證後面的 數字+車+數字+英文字母)
+                            const seatMatch = after.match(/(\d+車\d+[A-Za-z])/);
+                            if (seatMatch) seat = seatMatch[1].toUpperCase();
+                            
+                            pax.push({ type, name, idNumber: id, seat, passportNo: '', birthday: '' });
+                        });
+                    } else {
+                        // Fallback: 如果沒抓到身分證，只抓座位來推算
+                        const seatMatches = [...cleanText.matchAll(/(\d+車\d+[A-Za-z])/g)];
+                        seatMatches.forEach(m => {
+                             pax.push({ type: '全票', name: '', idNumber: '', seat: m[1].toUpperCase(), passportNo: '', birthday: '' });
+                        });
                     }
 
-                    // 同步名單並賦予座位
-                    syncPaxList(passengerList, ticketForm.adult + ticketForm.child + ticketForm.senior + ticketForm.disability, ticketForm);
-                    for (let i = 0; i < Math.min(seats.length, passengerList.value.length); i++) {
-                        passengerList.value[i].seat = seats[i];
+                    // 9. 更新票數與名單
+                    if (pax.length > 0) {
+                        ticketForm.adult = 0; ticketForm.child = 0; ticketForm.senior = 0; ticketForm.disability = 0;
+                        pax.forEach(p => {
+                            if (p.type === '孩童票') ticketForm.child++;
+                            else if (p.type === '敬老票') ticketForm.senior++;
+                            else if (p.type === '愛心票') ticketForm.disability++;
+                            else ticketForm.adult++;
+                        });
+                        passengerList.value = pax;
+                    } else {
+                        // 如果連座位都沒抓到，嘗試找純票種數量
+                        const adultMatch = cleanText.match(/全票[xX*]?(\d)/) || cleanText.match(/(\d)[xX*]?全票/);
+                        if (adultMatch) ticketForm.adult = parseInt(adultMatch[1]);
+                        
+                        const childMatch = cleanText.match(/孩童[xX*]?(\d)/) || cleanText.match(/(\d)[xX*]?孩童/);
+                        if (childMatch) ticketForm.child = parseInt(childMatch[1]);
                     }
                 };
                 // ===============================================
